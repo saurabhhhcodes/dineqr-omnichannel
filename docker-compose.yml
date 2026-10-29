@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  dineqr-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dineqr-platform
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+      # Optional: default fallback Razorpay keys (cafes can also configure their own inside the app)
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-rzp_test_dineqr_platform}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-dineqr_secret_2026}
+    volumes:
+      # Persistent storage for SQLite database
+      - ./data:/app/data

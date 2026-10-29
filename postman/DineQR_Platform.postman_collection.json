@@ -1,0 +1,553 @@
+{
+  "info": {
+    "_postman_id": "dineqr-platform-v2-complete",
+    "name": "DineQR Multi-Restaurant Platform API",
+    "description": "Comprehensive Postman test collection for DineQR: Multi-Tenant Super Admin, Table QR Generator, Menu Editor, Live Ordering, Razorpay Integration, GST Invoicing, and Spreadsheet Exports.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3001", "type": "string" },
+    { "key": "restaurant_id", "value": "rest_losteria", "type": "string" },
+    { "key": "table_id", "value": "tbl_1", "type": "string" },
+    { "key": "order_id", "value": "", "type": "string" },
+    { "key": "rzp_order_id", "value": "", "type": "string" },
+    { "key": "dish_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Health & Status",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Service is online', function () { var j = pm.response.json(); pm.expect(j.status).to.eql('online'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Super Admin & Multi-Tenancy",
+      "item": [
+        {
+          "name": "List All Restaurants",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/restaurants"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns restaurants array', function () { var j = pm.response.json(); pm.expect(j.restaurants.length).to.be.above(0); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Super Admin Fleet Overview",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/restaurants/super-admin/overview"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Has platform GMV metrics', function () { var j = pm.response.json(); pm.expect(j.stats).to.have.property('total_gmv'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Provision New Cafe Tenant",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Urban Chai & Bakes\",\n  \"slug\": \"urban-chai\",\n  \"tagline\": \"Handcrafted Chai & Bakery\",\n  \"address\": \"Koramangala 5th Block, Bengaluru\",\n  \"phone\": \"+91 98111 22233\",\n  \"gstin\": \"29AAACB1111A1Z1\",\n  \"fssai\": \"10011223344556\",\n  \"seed_starter_data\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/restaurants"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Restaurant created (201)', function () { pm.response.to.have.status(201); });",
+                  "var j = pm.response.json();",
+                  "pm.test('Returns restaurant object', function () { pm.expect(j.restaurant.slug).to.eql('urban-chai'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Restaurant Razorpay Keys",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"L'Osteria Gourmet Bistro\",\n  \"razorpay_key_id\": \"rzp_test_sampleKey123\",\n  \"razorpay_key_secret\": \"sampleSecret456\"\n}"
+            },
+            "url": "{{baseUrl}}/api/restaurants/{{restaurant_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.test('Direct Razorpay flagged true', function () { pm.expect(j.restaurant.has_custom_razorpay).to.be.true; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Tables & QR Code Generator",
+      "item": [
+        {
+          "name": "List Tables for Restaurant",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/tables?restaurant_id={{restaurant_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.tables.length).to.be.above(0);",
+                  "pm.environment.set('table_id', j.tables[0].id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create New Dining Table",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restaurant_id\": \"{{restaurant_id}}\",\n  \"table_number\": \"Table Postman-88\",\n  \"section\": \"Patio Garden\",\n  \"capacity\": 4\n}"
+            },
+            "url": "{{baseUrl}}/api/tables"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Created table (201)', function () { pm.response.to.have.status(201); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.table).to.have.property('menu_url');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Generate QR Code Data URL",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/tables/{{table_id}}/qr"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.test('QR code image is Base64 PNG', function () { pm.expect(j.qr_data_url).to.include('data:image/png;base64,'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Menu Management (Add Dishes to Existing QR)",
+      "item": [
+        {
+          "name": "Fetch Categorized Menu",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/menu?restaurant_id={{restaurant_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.categories.length).to.be.above(0);",
+                  "pm.expect(j.items.length).to.be.above(0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add New Dish to Existing Menu",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restaurant_id\": \"{{restaurant_id}}\",\n  \"category_id\": \"cat_starters\",\n  \"name\": \"Postman Crispy Truffle Arancini\",\n  \"description\": \"Crispy fried risotto balls with fontina cheese and black truffle glaze.\",\n  \"price\": 380,\n  \"image_url\": \"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80&auto=format&fit=crop\",\n  \"is_veg\": 1,\n  \"spice_level\": \"Mild\",\n  \"prep_time_mins\": 12,\n  \"calories\": 360,\n  \"tags\": \"Chef's Special\"\n}"
+            },
+            "url": "{{baseUrl}}/api/menu/items"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Dish created (201)', function () { pm.response.to.have.status(201); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.item.name).to.eql('Postman Crispy Truffle Arancini');",
+                  "pm.environment.set('dish_id', j.item.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Toggle Dish Availability (In Stock / Sold Out)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"is_available\": false}" },
+            "url": "{{baseUrl}}/api/menu/items/{{dish_id}}/availability"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.item.is_available).to.eql(0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Customer Ordering & Checkout",
+      "item": [
+        {
+          "name": "Place Table Order",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restaurant_id\": \"{{restaurant_id}}\",\n  \"table_id\": \"{{table_id}}\",\n  \"customer_name\": \"Postman Test Diner\",\n  \"customer_phone\": \"+91 9988776655\",\n  \"special_instructions\": \"Please make it extra crispy, allergies: peanuts\",\n  \"payment_method\": \"RAZORPAY\",\n  \"items\": [\n    { \"id\": \"item_6\", \"quantity\": 1, \"notes\": \"Fresh basil\" },\n    { \"id\": \"item_15\", \"quantity\": 2, \"notes\": \"Less ice\" }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/orders"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Order placed (201)', function () { pm.response.to.have.status(201); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.order).to.have.property('grand_total');",
+                  "pm.expect(j.order.subtotal).to.eql(970);",
+                  "pm.environment.set('order_id', j.order.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Single Order Details",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/orders/{{order_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.order.id).to.eql(pm.environment.get('order_id'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Razorpay Payment API & Verification",
+      "item": [
+        {
+          "name": "Get Cafe Razorpay Gateway Config",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/payment/razorpay/config?restaurant_id={{restaurant_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j).to.have.property('configured');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Razorpay Order in Paise",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"{{order_id}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/payment/razorpay/create-order"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.razorpay_order.currency).to.eql('INR');",
+                  "pm.expect(j.razorpay_order.amount).to.be.above(0);",
+                  "pm.environment.set('rzp_order_id', j.razorpay_order.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify Razorpay Payment Signature",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"{{order_id}}\",\n  \"razorpay_order_id\": \"{{rzp_order_id}}\",\n  \"razorpay_payment_id\": \"pay_postman_test99\",\n  \"razorpay_signature\": \"valid_postman_sig\",\n  \"is_mock\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/payment/razorpay/verify"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.order.payment_status).to.eql('PAID');",
+                  "pm.expect(j.order.razorpay_payment_id).to.eql('pay_postman_test99');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7. Kitchen Display & Status Workflow",
+      "item": [
+        {
+          "name": "Advance Status to PREPARING",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\": \"PREPARING\"}" },
+            "url": "{{baseUrl}}/api/orders/{{order_id}}/status"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.order.status).to.eql('PREPARING');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Advance Status to READY",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\": \"READY\"}" },
+            "url": "{{baseUrl}}/api/orders/{{order_id}}/status"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.order.status).to.eql('READY');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Advance Status to COMPLETED",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"status\": \"COMPLETED\"}" },
+            "url": "{{baseUrl}}/api/orders/{{order_id}}/status"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.order.status).to.eql('COMPLETED');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8. Tax Invoices & Analytics",
+      "item": [
+        {
+          "name": "Get Official GST Tax Invoice",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/invoice/{{order_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.invoice).to.have.property('invoice_number');",
+                  "pm.expect(j.invoice.breakdown.grand_total).to.be.above(0);",
+                  "pm.expect(j.invoice.restaurant).to.have.property('gstin');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Restaurant Analytics & Top Dishes",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/stats?restaurant_id={{restaurant_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var j = pm.response.json();",
+                  "pm.expect(j.stats.total_orders).to.be.above(0);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "9. Spreadsheet CSV Export",
+      "item": [
+        {
+          "name": "Download Excel Spreadsheet Report",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/orders/export?restaurant_id={{restaurant_id}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type is text/csv', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('text/csv'); });",
+                  "pm.test('Contains Order ID column header', function () { pm.expect(pm.response.text()).to.include('\"Order ID\"'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

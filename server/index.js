@@ -1,0 +1,78 @@
+// server/index.js - Express server entry point
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+import { initDb } from './db.js';
+import { registerSSE } from './sse.js';
+
+import tablesRouter from './routes/tables.js';
+import menuRouter from './routes/menu.js';
+import ordersRouter from './routes/orders.js';
+import paymentRouter from './routes/payment.js';
+import invoiceRouter from './routes/invoice.js';
+import statsRouter from './routes/stats.js';
+import restaurantsRouter from './routes/restaurants.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+// Initialize database & tables
+initDb();
+
+// Middlewares
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Server-Sent Events endpoint for real-time kitchen display updates
+app.get('/api/events', registerSSE);
+
+// API Routes
+app.use('/api/restaurants', restaurantsRouter);
+app.use('/api/tables', tablesRouter);
+app.use('/api/menu', menuRouter);
+app.use('/api/orders', ordersRouter);
+app.use('/api/payment/razorpay', paymentRouter);
+app.use('/api/invoice', invoiceRouter);
+app.use('/api/stats', statsRouter);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'online',
+    timestamp: new Date().toISOString(),
+    service: 'DineQR Restaurant Platform API',
+  });
+});
+
+// Serve public directory assets (e.g. food videos) and production frontend
+const publicPath = path.resolve(__dirname, '../public');
+const distPath = path.resolve(__dirname, '../dist');
+app.use(express.static(publicPath));
+app.use(express.static(distPath));
+
+// Fallback to index.html for client-side React routing
+app.use((req, res, next) => {
+  if (req.method !== 'GET' || req.path.startsWith('/api')) {
+    return next();
+  }
+  const indexPath = path.join(distPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile('index.html', { root: distPath });
+  } else {
+    res.status(200).send(`DineQR Server running on port ${PORT}. In dev mode, visit Vite dev server at http://localhost:5173.`);
+  }
+});
+
+// Start listening
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 DineQR Platform Server running on http://localhost:${PORT}`);
+  console.log(`📡 Real-time Kitchen SSE ready at http://localhost:${PORT}/api/events`);
+});
