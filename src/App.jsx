@@ -17,6 +17,7 @@ import { AdminMenu } from './pages/AdminMenu.jsx';
 import { AdminSettings } from './pages/AdminSettings.jsx';
 import { AdminDashboard } from './pages/AdminDashboard.jsx';
 import { SuperAdmin } from './pages/SuperAdmin.jsx';
+import { ClientOnboarding } from './pages/ClientOnboarding.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -40,7 +41,11 @@ function AppContent() {
           <Route path="/order/:orderId" element={<OrderConfirmation />} />
           <Route path="/invoice/:orderId" element={<InvoiceView />} />
 
-          {/* Restaurant Staff & Cafe Owner */}
+          {/* Client Self-Onboarding & Join */}
+          <Route path="/onboard" element={<ClientOnboarding />} />
+          <Route path="/join" element={<ClientOnboarding />} />
+
+          {/* Restaurant / Clinic / Gym Staff & Owner */}
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/kitchen" element={<AdminKitchen />} />
           <Route path="/admin/tables" element={<AdminTables />} />
@@ -50,6 +55,7 @@ function AppContent() {
 
           {/* Super Admin Fleet */}
           <Route path="/super-admin" element={<SuperAdmin />} />
+          <Route path="/admin/super" element={<SuperAdmin />} />
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/menu" replace />} />

@@ -58,14 +58,14 @@ const distPath = path.resolve(__dirname, '../dist');
 app.use(express.static(publicPath));
 app.use(express.static(distPath));
 
-// Fallback to index.html for client-side React routing
-app.use((req, res, next) => {
-  if (req.method !== 'GET' || req.path.startsWith('/api')) {
-    return next();
+// Fallback to index.html for client-side React routing (Express 5 syntax)
+app.get('{*path}', (req, res) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ success: false, error: 'API endpoint not found' });
   }
   const indexPath = path.join(distPath, 'index.html');
   if (fs.existsSync(indexPath)) {
-    res.sendFile('index.html', { root: distPath });
+    res.status(200).sendFile('index.html', { root: distPath });
   } else {
     res.status(200).send(`DineQR Server running on port ${PORT}. In dev mode, visit Vite dev server at http://localhost:5173.`);
   }

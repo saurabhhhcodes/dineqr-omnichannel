@@ -64,6 +64,8 @@ export function initDb() {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       slug TEXT UNIQUE NOT NULL,
+      business_type TEXT DEFAULT 'restaurant',
+      station_type TEXT DEFAULT 'table',
       tagline TEXT,
       address TEXT,
       phone TEXT,
@@ -76,6 +78,14 @@ export function initDb() {
       service_charge_pct REAL DEFAULT 0.0,
       razorpay_key_id TEXT DEFAULT '',
       razorpay_key_secret TEXT DEFAULT '',
+      upi_id TEXT DEFAULT '',
+      bank_account TEXT DEFAULT '',
+      bank_ifsc TEXT DEFAULT '',
+      commission_pct REAL DEFAULT 2.0,
+      settlement_type TEXT DEFAULT 'direct',
+      onboarding_status TEXT DEFAULT 'approved',
+      admin_pin TEXT DEFAULT '1234',
+      admin_password TEXT DEFAULT 'admin123',
       is_active INTEGER DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -180,6 +190,16 @@ export function initDb() {
   ensureColumn('orders', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('restaurants', 'razorpay_key_id', "TEXT DEFAULT ''");
   ensureColumn('restaurants', 'razorpay_key_secret', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'business_type', "TEXT DEFAULT 'restaurant'");
+  ensureColumn('restaurants', 'station_type', "TEXT DEFAULT 'table'");
+  ensureColumn('restaurants', 'admin_pin', "TEXT DEFAULT '1234'");
+  ensureColumn('restaurants', 'admin_password', "TEXT DEFAULT 'admin123'");
+  ensureColumn('restaurants', 'upi_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'bank_account', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'bank_ifsc', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'commission_pct', "REAL DEFAULT 2.0");
+  ensureColumn('restaurants', 'settlement_type', "TEXT DEFAULT 'direct'");
+  ensureColumn('restaurants', 'onboarding_status', "TEXT DEFAULT 'approved'");
 
   // Seed default restaurants
   for (const r of defaultRestaurants) {
@@ -187,13 +207,16 @@ export function initDb() {
     if (!existing) {
       execute(
         `INSERT INTO restaurants (
-          id, name, slug, tagline, address, phone, email, gstin, fssai, currency,
-          cgst_pct, sgst_pct, service_charge_pct, razorpay_key_id, razorpay_key_secret, is_active
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          id, name, slug, business_type, station_type, tagline, address, phone, email, gstin, fssai, currency,
+          cgst_pct, sgst_pct, service_charge_pct, razorpay_key_id, razorpay_key_secret, upi_id, bank_account, bank_ifsc,
+          commission_pct, settlement_type, onboarding_status, is_active
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           r.id,
           r.name,
           r.slug,
+          r.business_type || 'restaurant',
+          r.station_type || 'table',
           r.tagline,
           r.address,
           r.phone,
@@ -206,7 +229,36 @@ export function initDb() {
           r.service_charge_pct,
           r.razorpay_key_id,
           r.razorpay_key_secret,
+          r.upi_id || '',
+          r.bank_account || '',
+          r.bank_ifsc || '',
+          r.commission_pct || 2.0,
+          r.settlement_type || 'direct',
+          r.onboarding_status || 'approved',
           r.is_active,
+        ]
+      );
+    } else {
+      execute(
+        `UPDATE restaurants SET
+          business_type = COALESCE(business_type, ?),
+          station_type = COALESCE(station_type, ?),
+          razorpay_key_id = CASE WHEN razorpay_key_id = '' OR razorpay_key_id IS NULL THEN ? ELSE razorpay_key_id END,
+          razorpay_key_secret = CASE WHEN razorpay_key_secret = '' OR razorpay_key_secret IS NULL THEN ? ELSE razorpay_key_secret END,
+          upi_id = CASE WHEN upi_id = '' OR upi_id IS NULL THEN ? ELSE upi_id END,
+          bank_account = CASE WHEN bank_account = '' OR bank_account IS NULL THEN ? ELSE bank_account END,
+          bank_ifsc = CASE WHEN bank_ifsc = '' OR bank_ifsc IS NULL THEN ? ELSE bank_ifsc END,
+          onboarding_status = 'approved'
+         WHERE id = ?`,
+        [
+          r.business_type || 'restaurant',
+          r.station_type || 'table',
+          r.razorpay_key_id || '',
+          r.razorpay_key_secret || '',
+          r.upi_id || '',
+          r.bank_account || '',
+          r.bank_ifsc || '',
+          existing.id,
         ]
       );
     }
@@ -240,9 +292,9 @@ export function initDb() {
     if (!exists) {
       execute(
         `INSERT INTO menu_items (
-          id, restaurant_id, category_id, name, description, price, image_url,
+          id, restaurant_id, category_id, name, description, price, image_url, video_url,
           is_veg, is_available, spice_level, prep_time_mins, calories, tags
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           item.id,
           item.restaurant_id,
@@ -251,6 +303,7 @@ export function initDb() {
           item.description,
           item.price,
           item.image_url,
+          item.video_url || '',
           item.is_veg,
           item.is_available,
           item.spice_level,

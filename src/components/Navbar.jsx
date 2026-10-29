@@ -1,4 +1,4 @@
-// src/components/Navbar.jsx - Premium responsive header with customer vs admin experience
+// src/components/Navbar.jsx - Enterprise responsive header with multi-vertical switching & client onboarding
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -14,7 +14,13 @@ import {
   Bell,
   ExternalLink,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  Stethoscope,
+  Dumbbell,
+  PartyPopper,
+  PlusCircle,
+  Lock,
+  Laptop
 } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
@@ -28,7 +34,7 @@ export function Navbar({ onOpenCart }) {
   const [activeOrdersCount, setActiveOrdersCount] = useState(0);
   const [waiterCalled, setWaiterCalled] = useState(false);
 
-  // Poll for kitchen alert count for the active restaurant
+  // Poll for kitchen / clinic queue count for the active restaurant
   useEffect(() => {
     if (!activeRestaurant) return;
 
@@ -53,9 +59,42 @@ export function Navbar({ onOpenCart }) {
     location.pathname.startsWith('/order/') ||
     location.pathname.startsWith('/invoice/');
 
+  const isClinic = activeRestaurant?.business_type === 'clinic';
+  const isGym = activeRestaurant?.business_type === 'gym';
+  const isEvent = activeRestaurant?.business_type === 'event';
+
+  // Industry Brand Icon
+  const BrandIcon = isClinic
+    ? Stethoscope
+    : isGym
+    ? Dumbbell
+    : isEvent
+    ? PartyPopper
+    : Utensils;
+
+  const brandGradient = isClinic
+    ? 'from-teal-600 to-emerald-500'
+    : isGym
+    ? 'from-blue-600 to-indigo-600'
+    : isEvent
+    ? 'from-purple-600 to-pink-600'
+    : 'from-amber-600 to-orange-500';
+
+  const defaultStationLabel = isClinic
+    ? 'Consultation Room 01'
+    : isGym
+    ? 'Workout Bay 01'
+    : isEvent
+    ? 'VIP Lounge Booth 01'
+    : 'Table 01';
+
   const handleCallWaiter = () => {
     setWaiterCalled(true);
-    addToast('Server notified! A team member is on their way to your table.');
+    addToast(
+      isClinic
+        ? 'Reception & Nurse notified! A team member will attend to your room.'
+        : 'Server notified! A team member is on their way.'
+    );
     setTimeout(() => setWaiterCalled(false), 8000);
   };
 
@@ -63,34 +102,36 @@ export function Navbar({ onOpenCart }) {
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         {/* ============================================================ */}
-        {/* CUSTOMER MENU VIEW (Clean, Luxury, Uncluttered Experience)  */}
+        {/* CUSTOMER / PATIENT MENU VIEW (Clean & Luxury)                */}
         {/* ============================================================ */}
         {isCustomerView ? (
           <>
-            {/* Restaurant Brand on Table Menu */}
+            {/* Business Brand on Digital Menu */}
             <div className="flex items-center gap-3">
               <Link to="/menu" className="flex items-center gap-2.5 group shrink-0">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-600 to-orange-500 flex items-center justify-center text-white shadow-md shadow-orange-500/20 group-hover:scale-105 transition">
-                  <Utensils className="w-5 h-5" />
+                <div
+                  className={`w-10 h-10 rounded-2xl bg-gradient-to-tr ${brandGradient} flex items-center justify-center text-white shadow-md shadow-slate-900/10 group-hover:scale-105 transition`}
+                >
+                  <BrandIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight leading-none group-hover:text-amber-600 transition">
+                  <div className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight leading-none group-hover:text-sky-600 transition">
                     {activeRestaurant?.name || "L'Osteria Gourmet Bistro"}
                   </div>
                   <p className="text-[10px] text-slate-400 mt-0.5 font-medium hidden sm:block">
-                    {activeRestaurant?.tagline || 'Artisanal Kitchen & Wood-Fired Oven'}
+                    {activeRestaurant?.tagline || 'Self-Ordering & Instant Payment Platform'}
                   </p>
                 </div>
               </Link>
             </div>
 
-            {/* Center Table Indicator */}
+            {/* Center Station / Room / Table Indicator */}
             <div className="flex items-center gap-2">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold shadow-xs">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-900 text-xs font-bold shadow-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>{table ? table.table_number : 'Table 01'}</span>
+                <span>{table ? table.table_number : defaultStationLabel}</span>
                 {table?.section && (
-                  <span className="text-amber-700/70 font-normal hidden sm:inline">
+                  <span className="text-slate-500 font-normal hidden sm:inline">
                     · {table.section}
                   </span>
                 )}
@@ -99,7 +140,7 @@ export function Navbar({ onOpenCart }) {
 
             {/* Right Customer Actions */}
             <div className="flex items-center gap-2 sm:gap-3">
-              {/* Call Waiter Button */}
+              {/* Call Staff Button */}
               <button
                 onClick={handleCallWaiter}
                 disabled={waiterCalled}
@@ -108,22 +149,22 @@ export function Navbar({ onOpenCart }) {
                     ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
                     : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
-                title="Call your waiter for assistance"
+                title={isClinic ? 'Call reception / nurse' : 'Call attendant'}
               >
                 <Bell className={`w-3.5 h-3.5 ${waiterCalled ? 'text-emerald-600' : 'text-amber-600'}`} />
-                <span>{waiterCalled ? 'Staff Called!' : 'Call Waiter'}</span>
+                <span>{waiterCalled ? 'Attendant Notified' : isClinic ? 'Call Reception' : 'Call Waiter'}</span>
               </button>
 
-              {/* Shopping Cart Button */}
+              {/* Shopping / Booking Cart */}
               {onOpenCart && (
                 <button
                   onClick={onOpenCart}
-                  className="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-95 text-white text-xs font-black shadow-md shadow-orange-500/25 transition cursor-pointer"
+                  className="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 active:scale-95 text-white text-xs font-black shadow-md shadow-sky-600/25 transition cursor-pointer"
                 >
                   <ShoppingBag className="w-4 h-4" />
-                  <span className="hidden sm:inline">Cart</span>
+                  <span className="hidden sm:inline">{isClinic ? 'Bookings' : 'Cart'}</span>
                   {itemCount > 0 ? (
-                    <span className="inline-flex items-center justify-center bg-white text-orange-700 font-black text-[11px] rounded-full h-5 min-w-5 px-1.5 shadow-xs animate-bounce">
+                    <span className="inline-flex items-center justify-center bg-white text-sky-700 font-black text-[11px] rounded-full h-5 min-w-5 px-1.5 shadow-xs animate-bounce">
                       {itemCount}
                     </span>
                   ) : null}
@@ -135,40 +176,54 @@ export function Navbar({ onOpenCart }) {
                 </button>
               )}
 
-              {/* Discrete Staff Portal link for cafe owners */}
+              {/* Onboard / Join link for other businesses */}
+              <Link
+                to="/onboard"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-xs"
+                title="Register your clinic, restaurant, gym, or festival"
+              >
+                <PlusCircle className="w-3.5 h-3.5 text-sky-400" />
+                <span>Join as Business</span>
+              </Link>
+
+              {/* Discrete Staff Portal link */}
               <Link
                 to="/admin"
                 className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-xs font-semibold flex items-center gap-1"
-                title="Switch to Restaurant Staff / Management Portal"
+                title="Switch to Staff / Management Portal"
               >
-                <span className="hidden md:inline text-[11px]">Staff Mode</span>
+                <span className="hidden lg:inline text-[11px]">Staff Mode</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </Link>
             </div>
           </>
         ) : (
           /* ============================================================ */
-          /* RESTAURANT MANAGEMENT / ADMIN OPERATIONS VIEW                */
+          /* BUSINESS MANAGEMENT / ADMIN OPERATIONS VIEW                  */
           /* ============================================================ */
           <>
-            {/* Brand & Restaurant Selector */}
+            {/* Brand & Multi-Tenant Organization Switcher */}
             <div className="flex items-center gap-3">
               <Link to="/admin" className="flex items-center gap-2 group shrink-0">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-600 to-orange-500 flex items-center justify-center text-white shadow-md shadow-orange-500/20 group-hover:scale-105 transition">
-                  <Utensils className="w-5 h-5" />
+                <div
+                  className={`w-10 h-10 rounded-2xl bg-gradient-to-tr ${brandGradient} flex items-center justify-center text-white shadow-md shadow-slate-900/10 group-hover:scale-105 transition`}
+                >
+                  <BrandIcon className="w-5 h-5" />
                 </div>
                 <div className="hidden sm:block">
                   <div className="font-bold text-slate-900 tracking-tight flex items-center gap-1.5 leading-none">
                     <span>DineQR</span>
-                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-orange-100 text-orange-800">
-                      Ops
+                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-800">
+                      Enterprise
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-0.5">Kitchen & Floor Operations</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">
+                    {isClinic ? 'Clinic Reception & Token Queue' : 'Operations & Floor Management'}
+                  </p>
                 </div>
               </Link>
 
-              {/* Multi-Tenant Cafe Switcher Dropdown */}
+              {/* Multi-Tenant Organization Switcher Dropdown */}
               <div className="relative">
                 <select
                   value={activeRestaurant?.id || ''}
@@ -176,13 +231,23 @@ export function Navbar({ onOpenCart }) {
                     const found = restaurants.find((r) => r.id === e.target.value);
                     if (found) setActiveRestaurant(found);
                   }}
-                  className="bg-slate-100 hover:bg-slate-200/80 text-slate-800 font-bold text-xs py-1.5 px-3 rounded-xl border border-slate-200 outline-none cursor-pointer pr-7 appearance-none"
+                  className="bg-slate-100 hover:bg-slate-200/80 text-slate-800 font-bold text-xs py-1.5 px-3 rounded-xl border border-slate-200 outline-none cursor-pointer pr-7 appearance-none max-w-[200px] truncate"
                 >
-                  {restaurants.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      ☕ {r.name}
-                    </option>
-                  ))}
+                  {restaurants.map((r) => {
+                    const prefix =
+                      r.business_type === 'clinic'
+                        ? '🏥'
+                        : r.business_type === 'gym'
+                        ? '🏋️'
+                        : r.business_type === 'event'
+                        ? '🎪'
+                        : '🍽️';
+                    return (
+                      <option key={r.id} value={r.id}>
+                        {prefix} {r.name}
+                      </option>
+                    );
+                  })}
                 </select>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-500 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
@@ -194,12 +259,12 @@ export function Navbar({ onOpenCart }) {
                 to="/admin/kitchen"
                 className={`relative px-3 py-2 rounded-xl transition flex items-center gap-1.5 ${
                   location.pathname.startsWith('/admin/kitchen')
-                    ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
+                    ? 'bg-sky-500 text-white font-bold shadow-xs'
                     : 'hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
-                <ChefHat className="w-4 h-4" />
-                <span>Kitchen KDS</span>
+                {isClinic ? <Stethoscope className="w-4 h-4" /> : <ChefHat className="w-4 h-4 text-amber-500" />}
+                <span>{isClinic ? 'Token Queue' : 'Kitchen KDS'}</span>
                 {activeOrdersCount > 0 && (
                   <span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-black bg-rose-600 text-white rounded-full animate-pulse">
                     {activeOrdersCount}
@@ -216,7 +281,7 @@ export function Navbar({ onOpenCart }) {
                 }`}
               >
                 <QrCode className="w-4 h-4" />
-                <span>Tables & QRs</span>
+                <span>{isClinic ? 'Rooms & QRs' : isGym ? 'Bays & QRs' : 'Tables & QRs'}</span>
               </Link>
 
               <Link
@@ -228,7 +293,7 @@ export function Navbar({ onOpenCart }) {
                 }`}
               >
                 <BookOpen className="w-4 h-4" />
-                <span>Edit Menu</span>
+                <span>{isClinic ? 'Services / Tests' : 'Catalog / Menu'}</span>
               </Link>
 
               <Link
@@ -250,7 +315,7 @@ export function Navbar({ onOpenCart }) {
                     ? 'bg-slate-900 text-white shadow-xs'
                     : 'hover:bg-slate-100 hover:text-slate-900'
                 }`}
-                title="Razorpay Direct Settlement & Cafe Profile"
+                title="Razorpay Direct Settlement & Business Profile"
               >
                 <Settings className="w-4 h-4" />
                 <span>Payments</span>
@@ -263,7 +328,7 @@ export function Navbar({ onOpenCart }) {
                     ? 'bg-purple-600 text-white shadow-xs'
                     : 'text-purple-700 bg-purple-50 hover:bg-purple-100'
                 }`}
-                title="Super Admin Multi-Tenant Fleet Command"
+                title="Super Admin Fleet Command"
               >
                 <Building2 className="w-4 h-4" />
                 <span>Super Admin</span>
@@ -273,11 +338,11 @@ export function Navbar({ onOpenCart }) {
             {/* Quick Preview Customer Menu Link */}
             <div className="flex items-center gap-2">
               <Link
-                to="/menu?table=tbl_1"
+                to={`/menu?restaurant_id=${activeRestaurant?.id || ''}&table=tbl_1`}
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-xs"
               >
-                <Utensils className="w-3.5 h-3.5 text-amber-400" />
-                <span>Customer Menu</span>
+                <BrandIcon className="w-3.5 h-3.5 text-amber-400" />
+                <span>Live QR View</span>
               </Link>
             </div>
           </>

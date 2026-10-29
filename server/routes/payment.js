@@ -72,6 +72,33 @@ router.get('/config', (req, res) => {
   });
 });
 
+// POST /api/payment/razorpay/test-keys - Live validation of Razorpay credentials
+router.post('/test-keys', async (req, res) => {
+  try {
+    const { key_id, key_secret } = req.body;
+    if (!key_id || !key_secret) {
+      return res.status(400).json({ success: false, error: 'Both Key ID and Key Secret are required' });
+    }
+    const rzp = new Razorpay({ key_id: key_id.trim(), key_secret: key_secret.trim() });
+    const testList = await rzp.orders.all({ count: 1 });
+    const isTestMode = key_id.trim().startsWith('rzp_test_');
+    res.json({
+      success: true,
+      valid: true,
+      mode: isTestMode ? 'Test Mode' : 'Live Production',
+      message: `Successfully connected to Razorpay account in ${isTestMode ? 'Test' : 'Live'} Mode`,
+      existing_orders_sample_count: testList.count !== undefined ? testList.count : 0,
+    });
+  } catch (err) {
+    console.error('Razorpay key validation failed:', err);
+    res.status(400).json({
+      success: false,
+      valid: false,
+      error: 'Razorpay authentication failed: ' + (err.error?.description || err.message),
+    });
+  }
+});
+
 // POST /api/payment/razorpay/create-order - Create Razorpay order
 router.post('/create-order', async (req, res) => {
   try {

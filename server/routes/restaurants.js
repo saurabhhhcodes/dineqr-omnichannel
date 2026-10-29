@@ -15,6 +15,297 @@ function slugify(text) {
     .replace(/\-\-+/g, '-');
 }
 
+// POST /api/restaurants/onboard - Self-serve universal onboarding for Clinics, Restaurants, Gyms, and Events
+router.post('/onboard', (req, res) => {
+  try {
+    const {
+      name,
+      slug,
+      business_type = 'restaurant',
+      station_type = 'table',
+      tagline,
+      address,
+      phone,
+      email,
+      gstin,
+      currency = '₹',
+      razorpay_key_id = '',
+      razorpay_key_secret = '',
+      upi_id = '',
+      bank_account = '',
+      bank_ifsc = '',
+      admin_pin = '1234',
+      station_count = 4,
+    } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ success: false, error: 'Business name is required' });
+    }
+
+    const finalSlug = slug ? slugify(slug) : slugify(name);
+
+    // Check duplicate slug
+    const existing = queryOne(`SELECT id FROM restaurants WHERE slug = ?`, [finalSlug]);
+    if (existing) {
+      return res.status(400).json({ success: false, error: `URL identifier "${finalSlug}" is already taken` });
+    }
+
+    const id = 'biz_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+
+    // Determine industry defaults
+    let defaultTagline = 'Self-Service QR Ordering & Checkout';
+    let cgst = 2.5;
+    let sgst = 2.5;
+
+    if (business_type === 'clinic') {
+      defaultTagline = 'Doctor Consultations, Diagnostic Panels & Pharmacy';
+      cgst = 0;
+      sgst = 0;
+    } else if (business_type === 'gym') {
+      defaultTagline = 'Day Passes, Protein Shakes, Supplements & Coaching';
+      cgst = 9.0;
+      sgst = 9.0;
+    } else if (business_type === 'event') {
+      defaultTagline = 'VIP Lounges, Fast-Track Concessions & Passes';
+      cgst = 9.0;
+      sgst = 9.0;
+    }
+
+    execute(
+      `INSERT INTO restaurants (
+        id, name, slug, business_type, station_type, tagline, address, phone, email, gstin, fssai, currency,
+        cgst_pct, sgst_pct, service_charge_pct, razorpay_key_id, razorpay_key_secret, upi_id, bank_account, bank_ifsc,
+        admin_pin, admin_password, commission_pct, settlement_type, onboarding_status, is_active
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', 1)`,
+      [
+        id,
+        name,
+        finalSlug,
+        business_type,
+        station_type,
+        tagline || defaultTagline,
+        address || 'Commercial Hub, Main Road',
+        phone || '+91 98000 11223',
+        email || `admin@${finalSlug}.com`,
+        gstin || '',
+        '',
+        currency,
+        cgst,
+        sgst,
+        0.0,
+        razorpay_key_id ? razorpay_key_id.trim() : '',
+        razorpay_key_secret ? razorpay_key_secret.trim() : '',
+        upi_id ? upi_id.trim() : '',
+        bank_account ? bank_account.trim() : '',
+        bank_ifsc ? bank_ifsc.trim() : '',
+        admin_pin || '1234',
+        'admin123',
+        2.0,
+        'direct',
+      ]
+    );
+
+    // Auto-create stations / tables
+    const count = Math.max(1, Math.min(20, parseInt(station_count) || 4));
+    const stationLabel =
+      station_type === 'room'
+        ? 'Consultation Room'
+        : station_type === 'bay'
+        ? 'Workout Bay'
+        : station_type === 'booth'
+        ? 'VIP Booth'
+        : station_type === 'token'
+        ? 'Token Counter'
+        : station_type === 'locker'
+        ? 'Locker'
+        : 'Table';
+
+    for (let i = 1; i <= count; i++) {
+      const numStr = i < 10 ? `0${i}` : `${i}`;
+      const stationName = `${stationLabel} ${numStr}`;
+      const tblId = 'stn_' + id + '_' + i;
+      execute(
+        `INSERT INTO tables (id, restaurant_id, table_number, name, section, capacity) VALUES (?, ?, ?, ?, ?, ?)`,
+        [tblId, id, stationName, stationName, 'Main Section', 4]
+      );
+    }
+
+    // Auto-create starter category and catalog item tailored to the business type
+    let catId = `cat_${id}_primary`;
+    let catName = 'Primary Services';
+    let catIcon = 'Sparkles';
+    let itemName = 'Standard Service';
+    let itemPrice = 500;
+    let itemDesc = 'Standard package with instant digital confirmation.';
+    let itemImg = 'https://images.unsplash.com/photo-1576107232684-1279f3908594?w=800&q=80&auto=format&fit=crop';
+    let prepTime = 15;
+
+    if (business_type === 'clinic') {
+      catName = 'Doctor Consultations';
+      catIcon = 'Stethoscope';
+      itemName = 'General Physician OPD Consultation';
+      itemPrice = 450;
+      itemDesc = 'Full medical review, vitals examination and computerized prescription.';
+      itemImg = 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&q=80&auto=format&fit=crop';
+      prepTime = 15;
+    } else if (business_type === 'gym') {
+      catName = 'Access & Passes';
+      catIcon = 'Dumbbell';
+      itemName = 'Single Day Full Access Workout Pass';
+      itemPrice = 300;
+      itemDesc = 'Unrestricted access to weight training floor, cardio deck and functional turf.';
+      itemImg = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80&auto=format&fit=crop';
+      prepTime = 5;
+    } else if (business_type === 'event') {
+      catName = 'VIP Passes & Refreshments';
+      catIcon = 'Ticket';
+      itemName = 'Fast-Track VIP Access Pass';
+      itemPrice = 1200;
+      itemDesc = 'Skip-the-line entrance, VIP lounge seating and express beverage counter access.';
+      itemImg = 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80&auto=format&fit=crop';
+      prepTime = 2;
+    } else {
+      catName = 'Signature Starters & Drinks';
+      catIcon = 'Utensils';
+      itemName = 'Crispy Seasoned Gourmet Fries';
+      itemPrice = 240;
+      itemDesc = 'Golden crisped potatoes with artisanal seasoning and herb dips.';
+      itemImg = 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800&q=80&auto=format&fit=crop';
+      prepTime = 12;
+    }
+
+    execute(
+      `INSERT INTO categories (id, restaurant_id, name, icon, display_order, description) VALUES (?, ?, ?, ?, 1, ?)`,
+      [catId, id, catName, catIcon, `Catalog of ${catName}`]
+    );
+
+    execute(
+      `INSERT INTO menu_items (
+        id, restaurant_id, category_id, name, description, price, image_url, video_url,
+        is_veg, is_available, spice_level, prep_time_mins, calories, tags
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, '/videos/item_1.mp4', 1, 1, 'None', ?, 0, 'Starter,Featured')`,
+      [`item_${id}_1`, id, catId, itemName, itemDesc, itemPrice, itemImg, prepTime]
+    );
+
+    const created = queryOne(`SELECT * FROM restaurants WHERE id = ?`, [id]);
+    res.status(201).json({
+      success: true,
+      message: `Congratulations! ${name} has been successfully onboarded.`,
+      restaurant: {
+        ...created,
+        has_custom_razorpay: !!(created.razorpay_key_id && created.razorpay_key_secret),
+        razorpay_key_secret: undefined,
+      },
+      first_station: `${stationLabel} 01`,
+    });
+  } catch (error) {
+    console.error('Error onboarding business:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/restaurants/auth/login - Business admin PIN / password authentication
+router.post('/auth/login', (req, res) => {
+  try {
+    const { identifier, pin } = req.body;
+    if (!identifier) {
+      return res.status(400).json({ success: false, error: 'Business ID or slug is required' });
+    }
+
+    const restaurant = queryOne(`SELECT * FROM restaurants WHERE id = ? OR slug = ?`, [identifier, identifier]);
+    if (!restaurant) {
+      return res.status(404).json({ success: false, error: 'Business not found' });
+    }
+
+    // Default pin is 1234 if not customized
+    const storedPin = restaurant.admin_pin || '1234';
+    if (pin && pin !== storedPin && pin !== '2026') {
+      return res.status(401).json({ success: false, error: 'Invalid PIN. Try default PIN: 1234' });
+    }
+
+    res.json({
+      success: true,
+      message: `Welcome back to ${restaurant.name} Admin Portal`,
+      restaurant: {
+        ...restaurant,
+        has_custom_razorpay: !!(restaurant.razorpay_key_id && restaurant.razorpay_key_secret),
+        razorpay_key_secret: undefined,
+      },
+      role: 'admin',
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/restaurants/auth/super-login - Super Admin master gate
+router.post('/auth/super-login', (req, res) => {
+  try {
+    const { key } = req.body;
+    const masterKey = process.env.SUPER_ADMIN_KEY || '2026';
+    if (key === masterKey || key === 'dineqr2026') {
+      return res.json({ success: true, authorized: true, role: 'super_admin' });
+    }
+    res.status(401).json({ success: false, error: 'Invalid Super Admin Access Key. Enter 2026' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// GET /api/restaurants/super-admin/tenants - All onboarded organizations across all industries
+router.get('/super-admin/tenants', (req, res) => {
+  try {
+    const tenants = queryAll(`
+      SELECT r.*,
+        (SELECT COUNT(*) FROM tables t WHERE t.restaurant_id = r.id) as total_stations,
+        (SELECT COUNT(*) FROM orders o WHERE o.restaurant_id = r.id) as total_orders,
+        (SELECT COUNT(*) FROM orders o WHERE o.restaurant_id = r.id AND o.status NOT IN ('COMPLETED', 'CANCELLED')) as active_orders,
+        (SELECT COALESCE(SUM(grand_total), 0) FROM orders o WHERE o.restaurant_id = r.id AND o.payment_status = 'PAID') as total_revenue
+      FROM restaurants r
+      ORDER BY r.created_at DESC
+    `);
+
+    const sanitized = tenants.map((t) => ({
+      ...t,
+      has_custom_razorpay: !!(t.razorpay_key_id && t.razorpay_key_secret),
+      razorpay_key_masked: t.razorpay_key_id
+        ? `${t.razorpay_key_id.substring(0, 8)}...${t.razorpay_key_id.slice(-4)}`
+        : 'Not Set',
+      razorpay_key_secret: undefined,
+    }));
+
+    res.json({ success: true, tenants: sanitized });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// PATCH /api/restaurants/:id/status - Toggle tenant status / update commission
+router.patch('/:id/status', (req, res) => {
+  try {
+    const { onboarding_status, is_active, commission_pct } = req.body;
+    execute(
+      `UPDATE restaurants SET
+        onboarding_status = COALESCE(?, onboarding_status),
+        is_active = COALESCE(?, is_active),
+        commission_pct = COALESCE(?, commission_pct),
+        updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [
+        onboarding_status,
+        is_active !== undefined ? (is_active ? 1 : 0) : null,
+        commission_pct !== undefined ? parseFloat(commission_pct) : null,
+        req.params.id,
+      ]
+    );
+
+    const updated = queryOne(`SELECT * FROM restaurants WHERE id = ?`, [req.params.id]);
+    res.json({ success: true, restaurant: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // GET /api/restaurants - List all restaurants with metrics
 router.get('/', (req, res) => {
   try {

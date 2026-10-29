@@ -122,15 +122,29 @@ export function CustomerMenu() {
             </p>
           </div>
 
-          {/* Current Table Selector */}
+          {/* Current Table / Room Selector */}
           <div className="w-full md:w-auto bg-white/10 backdrop-blur-xl rounded-2xl p-3.5 border border-white/15 flex items-center justify-between gap-4 shadow-xl">
             <div className="text-left">
               <div className="text-[10px] text-amber-300 font-extrabold uppercase tracking-widest">
-                Ordering For
+                {currentRestaurant?.business_type === 'clinic'
+                  ? 'Patient Room / Token'
+                  : currentRestaurant?.business_type === 'gym'
+                  ? 'Workout Bay / Locker'
+                  : currentRestaurant?.business_type === 'event'
+                  ? 'VIP Lounge / Booth'
+                  : 'Table Number'}
               </div>
               <div className="text-sm font-black text-white flex items-center gap-1.5 mt-0.5">
                 <Utensils className="w-4 h-4 text-amber-400" />
-                <span>{table ? table.table_number : 'Table 01'}</span>
+                <span>
+                  {table
+                    ? table.table_number
+                    : currentRestaurant?.business_type === 'clinic'
+                    ? 'Room 01'
+                    : currentRestaurant?.business_type === 'gym'
+                    ? 'Bay 01'
+                    : 'Table 01'}
+                </span>
                 {table?.section && (
                   <span className="text-xs font-normal text-slate-300">({table.section})</span>
                 )}
@@ -145,7 +159,9 @@ export function CustomerMenu() {
               }}
               className="bg-slate-900/90 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer shadow-inner"
             >
-              <option value="">Change Table...</option>
+              <option value="">
+                {currentRestaurant?.business_type === 'clinic' ? 'Change Room / Token...' : 'Change Table...'}
+              </option>
               {availableTables.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.table_number} ({t.section})
@@ -165,7 +181,15 @@ export function CustomerMenu() {
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search pizzas, pasta, starters, mocktails..."
+                placeholder={
+                  currentRestaurant?.business_type === 'clinic'
+                    ? 'Search consultations, blood tests, health panels...'
+                    : currentRestaurant?.business_type === 'gym'
+                    ? 'Search day passes, whey protein shakes, trainers...'
+                    : currentRestaurant?.business_type === 'event'
+                    ? 'Search VIP passes, craft beers, cocktails, merch...'
+                    : 'Search pizzas, pasta, starters, mocktails...'
+                }
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-100/80 focus:bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition shadow-inner"
