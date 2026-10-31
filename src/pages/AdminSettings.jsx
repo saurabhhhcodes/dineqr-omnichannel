@@ -37,6 +37,7 @@ export function AdminSettings() {
     upi_id: '',
     bank_account: '',
     bank_ifsc: '',
+    cloud_domain: '',
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -70,6 +71,7 @@ export function AdminSettings() {
             upi_id: r.upi_id || '',
             bank_account: r.bank_account || '',
             bank_ifsc: r.bank_ifsc || '',
+            cloud_domain: r.cloud_domain || '',
           });
         }
       })
@@ -437,6 +439,57 @@ export function AdminSettings() {
                   <span className="text-[10px] text-slate-400 mt-0.5 block">Standard 2.5%</span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* CUSTOM CLOUD DOMAIN CONFIGURATION */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-black text-slate-900">
+                    Custom Cloud Domain & Public QR Origin
+                  </h2>
+                  <span className="px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 text-[10px] font-bold uppercase">
+                    Admin Custom Domain
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Set your branded domain (e.g. <code className="text-purple-700 bg-purple-50 px-1 py-0.5 rounded">order.myrestaurant.com</code> or your custom tunnel).
+                  All table QR codes and printable placards will encode this exact cloud domain for live public smartphone scanning.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Public Cloud Domain (HTTPS)
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="https://order.myrestaurant.com or https://attention-software-carmen-waterproof.trycloudflare.com"
+                  value={formData.cloud_domain}
+                  onChange={(e) => setFormData({ ...formData, cloud_domain: e.target.value })}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-mono text-slate-800 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!formData.cloud_domain) {
+                      addToast('Please enter a domain first', 'error');
+                      return;
+                    }
+                    window.open(formData.cloud_domain, '_blank');
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer"
+                >
+                  Test Link
+                </button>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1.5">
+                Leave blank to automatically use the incoming request hostname (e.g. Cloudflare tunnel or Netlify edge).
+              </p>
             </div>
           </div>
 

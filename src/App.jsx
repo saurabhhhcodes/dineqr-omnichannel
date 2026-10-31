@@ -19,6 +19,12 @@ import { AdminDashboard } from './pages/AdminDashboard.jsx';
 import { SuperAdmin } from './pages/SuperAdmin.jsx';
 import { ClientOnboarding } from './pages/ClientOnboarding.jsx';
 import { LandingHero } from './pages/LandingHero.jsx';
+import { AdminFloorPlan } from './pages/AdminFloorPlan.jsx';
+import { AdminReservations } from './pages/AdminReservations.jsx';
+import { AdminStaff } from './pages/AdminStaff.jsx';
+import { AdminInventory } from './pages/AdminInventory.jsx';
+import { AdminPurchases } from './pages/AdminPurchases.jsx';
+import { AdminDownloads } from './pages/AdminDownloads.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -53,6 +59,13 @@ function AppContent() {
           <Route path="/admin/tables" element={<AdminTables />} />
           <Route path="/admin/menu" element={<AdminMenu />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/floor-plan" element={<AdminFloorPlan />} />
+          <Route path="/admin/reservations" element={<AdminReservations />} />
+          <Route path="/admin/staff" element={<AdminStaff />} />
+          <Route path="/admin/inventory" element={<AdminInventory />} />
+          <Route path="/admin/purchases" element={<AdminPurchases />} />
+          <Route path="/admin/downloads" element={<AdminDownloads />} />
+          <Route path="/downloads" element={<AdminDownloads />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
 
           {/* Super Admin Fleet */}

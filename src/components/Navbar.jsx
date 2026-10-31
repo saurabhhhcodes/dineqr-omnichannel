@@ -309,6 +309,79 @@ export function Navbar({ onOpenCart }) {
               </Link>
 
               <Link
+                to="/admin/floor-plan"
+                className={`px-3 py-2 rounded-xl transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/floor-plan')
+                    ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                    : 'hover:bg-slate-100 hover:text-slate-900'
+                }`}
+                title="Visual Drag & Drop Floor Plan"
+              >
+                <span>Floor Plan</span>
+              </Link>
+
+              <Link
+                to="/admin/reservations"
+                className={`px-2.5 py-2 rounded-xl transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/reservations')
+                    ? 'bg-purple-600 text-white font-bold shadow-xs'
+                    : 'hover:bg-slate-100 hover:text-slate-900'
+                }`}
+                title="Table Bookings & Guest Reservations"
+              >
+                <span>Bookings</span>
+              </Link>
+
+              <Link
+                to="/admin/staff"
+                className={`px-2.5 py-2 rounded-xl transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/staff')
+                    ? 'bg-blue-600 text-white font-bold shadow-xs'
+                    : 'hover:bg-slate-100 hover:text-slate-900'
+                }`}
+                title="Staff Planning & Shift Scheduler"
+              >
+                <span>Staff</span>
+              </Link>
+
+              <Link
+                to="/admin/inventory"
+                className={`px-2.5 py-2 rounded-xl transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/inventory')
+                    ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                    : 'hover:bg-slate-100 hover:text-slate-900'
+                }`}
+                title="Real-Time Inventory & Stock Alerts"
+              >
+                <span>Inventory</span>
+              </Link>
+
+              <Link
+                to="/admin/purchases"
+                className={`px-2.5 py-2 rounded-xl transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/purchases')
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'hover:bg-slate-100 hover:text-slate-900'
+                }`}
+                title="Purchases & 3-Way Matching"
+              >
+                <span>Purchases</span>
+              </Link>
+
+              <Link
+                to="/admin/downloads"
+                className={`px-2.5 py-2 rounded-xl transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/downloads')
+                    ? 'bg-slate-900 text-amber-300 font-bold shadow-xs'
+                    : 'text-amber-700 bg-amber-50 hover:bg-amber-100'
+                }`}
+                title="Download Standalone EXE, APK, DMG & Linux Packages"
+              >
+                <Laptop className="w-3.5 h-3.5" />
+                <span>Apps</span>
+              </Link>
+
+              <Link
                 to="/admin/settings"
                 className={`px-3 py-2 rounded-xl transition flex items-center gap-1.5 ${
                   location.pathname.startsWith('/admin/settings')

@@ -34,6 +34,7 @@ export function RazorpayModal({
           razorpay_order_id: orderData.razorpay_order.id,
           razorpay_payment_id: fakePaymentId,
           razorpay_signature: fakeSignature,
+          payment_method: orderData.order.payment_method || (selectedMethod === 'upi' ? 'Razorpay (UPI Direct)' : selectedMethod === 'card' ? 'Razorpay (Card)' : 'Razorpay (NetBanking)'),
           is_mock: true,
         }),
       });

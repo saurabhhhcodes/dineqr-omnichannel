@@ -1,0 +1,61 @@
+{
+  "success": true,
+  "releases": [
+    {
+      "name": "DineQR-Terminal-Setup.exe",
+      "platform": "windows",
+      "title": "Windows 64-bit Installer (.exe)",
+      "os": "Windows 10, 11, Server 2016+",
+      "icon": "Monitor",
+      "description": "Standalone installer & local SQLite DB configurator with one-click desktop shortcut.",
+      "filename": "DineQR-Terminal-Setup.exe",
+      "download_url": "/api/downloads/DineQR-Terminal-Setup.exe",
+      "size_kb": 2,
+      "sha256": "227c48e3c74fc341110de177deb691da964eb3e63b63c3218fcd84177ca69985",
+      "version": "1.0.0",
+      "released_at": "2026-10-31T11:51:10.150Z"
+    },
+    {
+      "name": "DineQR-POS-Terminal.apk",
+      "platform": "android",
+      "title": "Android POS Package (.apk)",
+      "os": "Android 8.0+ (Phones, Tablets & POS devices)",
+      "icon": "Smartphone",
+      "description": "Handheld waiter terminal with camera QR scanner, offline order queue, and local DB sync.",
+      "filename": "DineQR-POS-Terminal.apk",
+      "download_url": "/api/downloads/DineQR-POS-Terminal.apk",
+      "size_kb": 3,
+      "sha256": "2ba8603e905fa5eb738ef8a0f83a558d8d9a15c32c820162d781ba32fac097b1",
+      "version": "1.0.0",
+      "released_at": "2026-10-31T11:51:10.153Z"
+    },
+    {
+      "name": "DineQR-macOS-Universal.dmg",
+      "platform": "macos",
+      "title": "macOS Universal Disk Image (.dmg)",
+      "os": "macOS Catalina 10.15+ (Apple Silicon M1/M2/M3 & Intel)",
+      "icon": "Apple",
+      "description": "Native Mac application bundle with drag-and-drop Applications install.",
+      "filename": "DineQR-macOS-Universal.dmg",
+      "download_url": "/api/downloads/DineQR-macOS-Universal.dmg",
+      "size_kb": 18,
+      "sha256": "103585c33895dfeabdba23c9f692ea4a842a0a0ad578f274c36dfeeb2f5cf72b",
+      "version": "1.0.0",
+      "released_at": "2026-10-31T11:51:10.154Z"
+    },
+    {
+      "name": "dineqr-terminal_1.0.0_amd64.deb",
+      "platform": "linux",
+      "title": "Debian / Ubuntu Linux Package (.deb)",
+      "os": "Ubuntu 20.04+, Debian 11+, Raspberry Pi OS",
+      "icon": "Terminal",
+      "description": "Linux package with systemd background service and desktop application entry.",
+      "filename": "dineqr-terminal_1.0.0_amd64.deb",
+      "download_url": "/api/downloads/dineqr-terminal_1.0.0_amd64.deb",
+      "size_kb": 0,
+      "sha256": "0d04b40714431df5a73b7f6ace3031973413ccbf7d04d349426d1456943f7675",
+      "version": "1.0.0",
+      "released_at": "2026-10-31T11:51:10.154Z"
+    }
+  ]
+}

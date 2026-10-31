@@ -12,6 +12,20 @@
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "dineqr-platform"
+      }
     }
-  ]
+  ],
+  "services": {
+    "dineqr-platform": {
+      "root": ".",
+      "framework": "vite",
+      "buildCommand": "npm install && npm run build"
+    }
+  }
 }

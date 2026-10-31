@@ -673,52 +673,64 @@ export function ClientOnboarding() {
               </p>
             </div>
 
-            {/* Quick Access Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left max-w-2xl mx-auto">
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-700">
-                <span className="text-[11px] text-slate-400 uppercase font-semibold">Active Stations</span>
-                <div className="text-xl font-bold text-white mt-0.5">{stationCount} {stationType}s</div>
-                <span className="text-[11px] text-emerald-400">QR codes generated</span>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-700">
-                <span className="text-[11px] text-slate-400 uppercase font-semibold">Payment Gateway</span>
-                <div className="text-xl font-bold text-white mt-0.5">Razorpay Direct</div>
-                <span className="text-[11px] text-sky-400">Linked to merchant</span>
+            {/* Quick Access Credentials Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-left max-w-3xl mx-auto">
+              <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/40">
+                <span className="text-[11px] text-amber-400 uppercase font-black">Merchant User ID</span>
+                <div className="text-xl font-mono font-black text-white mt-0.5">
+                  {createdResult.restaurant.merchant_user_id || 'MER-84920'}
+                </div>
+                <span className="text-[11px] text-slate-400">Use for portal login</span>
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-900 border border-slate-700">
                 <span className="text-[11px] text-slate-400 uppercase font-semibold">Staff Access PIN</span>
                 <div className="text-xl font-mono font-bold text-amber-400 mt-0.5">{adminPin}</div>
-                <span className="text-[11px] text-slate-500">For admin login</span>
+                <span className="text-[11px] text-slate-500">Security passcode</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-700">
+                <span className="text-[11px] text-slate-400 uppercase font-semibold">Subscription Plan</span>
+                <div className="text-xl font-bold text-emerald-400 mt-0.5">₹1,000 / mo</div>
+                <span className="text-[11px] text-emerald-500">Flat rate active</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-700">
+                <span className="text-[11px] text-slate-400 uppercase font-semibold">Active Stations</span>
+                <div className="text-xl font-bold text-white mt-0.5">{stationCount} {stationType}s</div>
+                <span className="text-[11px] text-sky-400">QR codes generated</span>
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                to="/admin"
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20 transition"
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveRestaurant(createdResult.restaurant);
+                  navigate('/admin/orders');
+                }}
+                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 transition cursor-pointer"
               >
                 <Laptop className="w-4 h-4" />
-                <span>Open Operations Dashboard</span>
-              </Link>
+                <span>One-Click Login to Dashboard</span>
+              </button>
 
               <Link
                 to="/admin/tables"
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm flex items-center justify-center gap-2 transition"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm flex items-center justify-center gap-2 transition"
               >
                 <QrCode className="w-4 h-4" />
-                <span>Download Printable QR Placards</span>
+                <span>Print QR Placards</span>
               </Link>
 
               <Link
-                to={`/menu?restaurant_id=${createdResult.restaurant.id}`}
+                to={`/menu?restaurant=${createdResult.restaurant.slug || createdResult.restaurant.id}&table=stn_${createdResult.restaurant.id}_1`}
                 target="_blank"
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold text-sm flex items-center justify-center gap-2 transition"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold text-sm flex items-center justify-center gap-2 transition"
               >
                 <ExternalLink className="w-4 h-4" />
-                <span>Preview Customer View</span>
+                <span>Test Live QR Menu</span>
               </Link>
             </div>
           </div>

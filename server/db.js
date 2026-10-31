@@ -213,11 +213,126 @@ export function initDb() {
     );
   `);
 
+  // 9. Table Bookings & Guest Reservations (Odoo Fine Dining Parity)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS reservations (
+      id TEXT PRIMARY KEY,
+      restaurant_id TEXT NOT NULL,
+      table_id TEXT,
+      guest_name TEXT NOT NULL,
+      guest_phone TEXT NOT NULL,
+      guest_email TEXT,
+      party_size INTEGER DEFAULT 2,
+      reservation_date TEXT NOT NULL,
+      reservation_time TEXT NOT NULL,
+      special_requests TEXT,
+      status TEXT DEFAULT 'CONFIRMED', -- CONFIRMED, SEATED, COMPLETED, CANCELLED
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+    );
+  `);
+
+  // 10. Staff Planning & Shift Schedules (Odoo Staff Planning Parity)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS staff_shifts (
+      id TEXT PRIMARY KEY,
+      restaurant_id TEXT NOT NULL,
+      employee_name TEXT NOT NULL,
+      role TEXT NOT NULL, -- Head Chef, Sous Chef, Floor Captain, Waiter, Bartender, Receptionist
+      shift_date TEXT NOT NULL,
+      start_time TEXT NOT NULL,
+      end_time TEXT NOT NULL,
+      color TEXT DEFAULT '#f59e0b',
+      status TEXT DEFAULT 'SCHEDULED', -- SCHEDULED, CLOCKED_IN, COMPLETED, UNAVAILABLE
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+    );
+  `);
+
+  // 11. Real-Time Inventory & Stock Management (Odoo Inventory Parity)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS inventory_items (
+      id TEXT PRIMARY KEY,
+      restaurant_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      sku TEXT UNIQUE,
+      category TEXT DEFAULT 'Raw Ingredients',
+      current_stock REAL NOT NULL DEFAULT 0,
+      min_reorder_level REAL NOT NULL DEFAULT 10,
+      unit TEXT NOT NULL DEFAULT 'kg', -- kg, litres, units, packets, boxes
+      unit_cost REAL NOT NULL DEFAULT 0,
+      expiration_date TEXT,
+      supplier_name TEXT,
+      status TEXT DEFAULT 'IN_STOCK', -- IN_STOCK, LOW_STOCK, EXPIRED, OUT_OF_STOCK
+      last_restocked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+    );
+  `);
+
+  // 12. Vendor Purchases, Bills & 3-Way Matching RfQs (Odoo Purchases Parity)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS purchase_orders (
+      id TEXT PRIMARY KEY,
+      restaurant_id TEXT NOT NULL,
+      rfq_number TEXT NOT NULL,
+      vendor_name TEXT NOT NULL,
+      vendor_email TEXT,
+      items_json TEXT NOT NULL,
+      subtotal REAL NOT NULL,
+      tax_amount REAL NOT NULL,
+      total_amount REAL NOT NULL,
+      status TEXT DEFAULT 'RECEIVED', -- DRAFT, RFQ_SENT, RECEIVED, BILL_VERIFIED, PAID
+      payment_terms TEXT DEFAULT 'Net 15',
+      received_date TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+    );
+  `);
+
+  // 13. Interactive Visual Floor Plan Coordinates (Odoo Floor Plan Parity)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS floor_plan_tables (
+      id TEXT PRIMARY KEY,
+      restaurant_id TEXT NOT NULL,
+      table_id TEXT NOT NULL,
+      pos_x REAL NOT NULL DEFAULT 100,
+      pos_y REAL NOT NULL DEFAULT 100,
+      shape TEXT NOT NULL DEFAULT 'circle', -- circle, square, rect
+      width REAL NOT NULL DEFAULT 90,
+      height REAL NOT NULL DEFAULT 90,
+      rotation REAL NOT NULL DEFAULT 0,
+      zone TEXT NOT NULL DEFAULT 'Main Dining',
+      FOREIGN KEY(table_id) REFERENCES tables(id) ON DELETE CASCADE
+    );
+  `);
+
   // Apply migrations for columns in case of existing database
   ensureColumn('tables', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('categories', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('menu_items', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('menu_items', 'video_url', "TEXT DEFAULT ''");
+  ensureColumn('orders', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
+  ensureColumn('orders', 'payment_method', "TEXT DEFAULT 'Razorpay / UPI'");
+  ensureColumn('orders', 'split_type', "TEXT DEFAULT 'SINGLE'");
+  ensureColumn('orders', 'split_shares', "INTEGER DEFAULT 1");
+  ensureColumn('restaurants', 'razorpay_key_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'razorpay_key_secret', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'business_type', "TEXT DEFAULT 'restaurant'");
+  ensureColumn('restaurants', 'station_type', "TEXT DEFAULT 'table'");
+  ensureColumn('restaurants', 'admin_pin', "TEXT DEFAULT '1234'");
+  ensureColumn('restaurants', 'admin_password', "TEXT DEFAULT 'admin123'");
+  ensureColumn('restaurants', 'upi_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'bank_account', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'bank_ifsc', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'commission_pct', "REAL DEFAULT 2.0");
+  ensureColumn('restaurants', 'settlement_type', "TEXT DEFAULT 'direct'");
+  ensureColumn('restaurants', 'onboarding_status', "TEXT DEFAULT 'approved'");
+  ensureColumn('restaurants', 'cloud_domain', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'merchant_user_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'subscription_plan', "TEXT DEFAULT 'Pro ₹1,000/mo'");
+  ensureColumn('restaurants', 'subscription_status', "TEXT DEFAULT 'active'");
   ensureColumn('orders', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('restaurants', 'razorpay_key_id', "TEXT DEFAULT ''");
   ensureColumn('restaurants', 'razorpay_key_secret', "TEXT DEFAULT ''");
@@ -231,6 +346,8 @@ export function initDb() {
   ensureColumn('restaurants', 'commission_pct', "REAL DEFAULT 2.0");
   ensureColumn('restaurants', 'settlement_type', "TEXT DEFAULT 'direct'");
   ensureColumn('restaurants', 'onboarding_status', "TEXT DEFAULT 'approved'");
+  ensureColumn('restaurants', 'cloud_domain', "TEXT DEFAULT ''");
+  ensureColumn('orders', 'payment_method', "TEXT DEFAULT 'Razorpay / UPI'");
 
   // Seed default restaurants
   for (const r of defaultRestaurants) {
@@ -363,6 +480,99 @@ export function initDb() {
         `INSERT INTO wallets (restaurant_id, balance, total_earned, total_commission, total_withdrawn, min_withdrawal)
          VALUES (?, ?, ?, ?, 0, 500)`,
         [r.id, netEarned, netEarned, commission]
+      );
+    }
+  }
+
+  // Seed sample floor plan tables if empty
+  const fpCount = queryOne(`SELECT COUNT(*) as c FROM floor_plan_tables`)?.c || 0;
+  if (fpCount === 0) {
+    const tables = queryAll(`SELECT id, restaurant_id, table_number FROM tables WHERE restaurant_id = 'rest_losteria'`);
+    let px = 80;
+    let py = 80;
+    tables.forEach((t, idx) => {
+      const shape = idx % 2 === 0 ? 'circle' : 'rect';
+      execute(
+        `INSERT INTO floor_plan_tables (id, restaurant_id, table_id, pos_x, pos_y, shape, width, height, rotation, zone)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)`,
+        [`fp_${t.id}`, t.restaurant_id, t.id, px, py, shape, shape === 'circle' ? 90 : 110, shape === 'circle' ? 90 : 80, 'Main Dining']
+      );
+      px += 140;
+      if (px > 500) {
+        px = 80;
+        py += 130;
+      }
+    });
+  }
+
+  // Seed sample reservations if empty
+  const resCount = queryOne(`SELECT COUNT(*) as c FROM reservations`)?.c || 0;
+  if (resCount === 0) {
+    const sampleReservations = [
+      { id: 'res_1', restaurant_id: 'rest_losteria', table_id: 'tbl_1', guest_name: 'Ananya Sharma', guest_phone: '+91 98765 43210', party_size: 4, reservation_date: '2026-10-31', reservation_time: '20:00', status: 'CONFIRMED', special_requests: 'Anniversary celebration. Window seating preferred.' },
+      { id: 'res_2', restaurant_id: 'rest_losteria', table_id: 'tbl_2', guest_name: 'Vikram Malhotra', guest_phone: '+91 98111 22334', party_size: 2, reservation_date: '2026-10-31', reservation_time: '20:30', status: 'SEATED', special_requests: 'Quiet table for business dinner.' },
+      { id: 'res_3', restaurant_id: 'rest_losteria', table_id: 'tbl_5', guest_name: 'Priya Iyer', guest_phone: '+91 97234 56789', party_size: 6, reservation_date: '2026-11-01', reservation_time: '19:45', status: 'CONFIRMED', special_requests: 'Family dinner, high-chair needed.' },
+      { id: 'res_4', restaurant_id: 'rest_apex_clinic', table_id: 'tbl_c1', guest_name: 'Rajesh Verma', guest_phone: '+91 99887 76655', party_size: 1, reservation_date: '2026-10-31', reservation_time: '18:15', status: 'CONFIRMED', special_requests: 'Cardiology follow-up OPD.' }
+    ];
+    for (const r of sampleReservations) {
+      execute(
+        `INSERT INTO reservations (id, restaurant_id, table_id, guest_name, guest_phone, party_size, reservation_date, reservation_time, special_requests, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [r.id, r.restaurant_id, r.table_id, r.guest_name, r.guest_phone, r.party_size, r.reservation_date, r.reservation_time, r.special_requests, r.status]
+      );
+    }
+  }
+
+  // Seed sample staff shifts if empty
+  const shiftCount = queryOne(`SELECT COUNT(*) as c FROM staff_shifts`)?.c || 0;
+  if (shiftCount === 0) {
+    const sampleShifts = [
+      { id: 'shift_1', restaurant_id: 'rest_losteria', employee_name: 'Marco Rossi', role: 'Head Chef', shift_date: '2026-10-31', start_time: '12:00', end_time: '22:00', color: '#ef4444', status: 'CLOCKED_IN', notes: 'Dinner rush supervision' },
+      { id: 'shift_2', restaurant_id: 'rest_losteria', employee_name: 'Sunil Rao', role: 'Sous Chef', shift_date: '2026-10-31', start_time: '14:00', end_time: '23:00', color: '#f97316', status: 'SCHEDULED', notes: 'Pasta and Wood-fire station' },
+      { id: 'shift_3', restaurant_id: 'rest_losteria', employee_name: 'Kavita Menon', role: 'Floor Captain', shift_date: '2026-10-31', start_time: '16:00', end_time: '00:00', color: '#10b981', status: 'SCHEDULED', notes: 'Main dining floor VIP service' },
+      { id: 'shift_4', restaurant_id: 'rest_losteria', employee_name: 'Aakash Verma', role: 'Bartender', shift_date: '2026-10-31', start_time: '17:00', end_time: '01:00', color: '#06b6d4', status: 'SCHEDULED', notes: 'Cocktail & Craft Beer Bar' }
+    ];
+    for (const s of sampleShifts) {
+      execute(
+        `INSERT INTO staff_shifts (id, restaurant_id, employee_name, role, shift_date, start_time, end_time, color, status, notes)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [s.id, s.restaurant_id, s.employee_name, s.role, s.shift_date, s.start_time, s.end_time, s.color, s.status, s.notes]
+      );
+    }
+  }
+
+  // Seed sample inventory if empty
+  const invCount = queryOne(`SELECT COUNT(*) as c FROM inventory_items`)?.c || 0;
+  if (invCount === 0) {
+    const sampleInventory = [
+      { id: 'inv_1', restaurant_id: 'rest_losteria', name: 'San Marzano Tomato Sauce', sku: 'ING-TOM-01', category: 'Raw Ingredients', current_stock: 45.5, min_reorder_level: 20, unit: 'litres', unit_cost: 240, expiration_date: '2026-12-15', supplier_name: 'Napoli Imports India', status: 'IN_STOCK' },
+      { id: 'inv_2', restaurant_id: 'rest_losteria', name: 'Buffalo Mozzarella DOP', sku: 'ING-MOZ-02', category: 'Dairy & Cheese', current_stock: 8.2, min_reorder_level: 15, unit: 'kg', unit_cost: 680, expiration_date: '2026-11-05', supplier_name: 'Artisan Dairy Farm', status: 'LOW_STOCK' },
+      { id: 'inv_3', restaurant_id: 'rest_losteria', name: 'Italian Tipo 00 Flour', sku: 'ING-FLR-03', category: 'Grains & Flour', current_stock: 120.0, min_reorder_level: 40, unit: 'kg', unit_cost: 110, expiration_date: '2027-04-20', supplier_name: 'Caputo Grains Ltd', status: 'IN_STOCK' },
+      { id: 'inv_4', restaurant_id: 'rest_losteria', name: 'White Truffle Infused Oil', sku: 'ING-TRF-04', category: 'Oils & Condiments', current_stock: 1.5, min_reorder_level: 4, unit: 'litres', unit_cost: 2200, expiration_date: '2027-02-10', supplier_name: 'Gourmet World Dist', status: 'LOW_STOCK' },
+      { id: 'inv_5', restaurant_id: 'rest_losteria', name: 'Organic Colombian Coffee Beans', sku: 'ING-COF-05', category: 'Beverages', current_stock: 28.0, min_reorder_level: 10, unit: 'kg', unit_cost: 850, expiration_date: '2026-11-30', supplier_name: 'Blue Tokai Roasters', status: 'IN_STOCK' }
+    ];
+    for (const item of sampleInventory) {
+      execute(
+        `INSERT INTO inventory_items (id, restaurant_id, name, sku, category, current_stock, min_reorder_level, unit, unit_cost, expiration_date, supplier_name, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [item.id, item.restaurant_id, item.name, item.sku, item.category, item.current_stock, item.min_reorder_level, item.unit, item.unit_cost, item.expiration_date, item.supplier_name, item.status]
+      );
+    }
+  }
+
+  // Seed sample purchase orders & RfQs if empty
+  const poCount = queryOne(`SELECT COUNT(*) as c FROM purchase_orders`)?.c || 0;
+  if (poCount === 0) {
+    const samplePOs = [
+      { id: 'po_1', restaurant_id: 'rest_losteria', rfq_number: 'PO-2026-089', vendor_name: 'Napoli Imports India', vendor_email: 'supply@napoli-imports.in', items_json: JSON.stringify([{ item: 'San Marzano Tomato Sauce (20L drum)', qty: 2, price: 4800 }, { item: 'Tipo 00 Flour (25kg sack)', qty: 4, price: 4400 }]), subtotal: 9200, tax_amount: 460, total_amount: 9660, status: 'BILL_VERIFIED', payment_terms: 'Net 15', received_date: '2026-10-28' },
+      { id: 'po_2', restaurant_id: 'rest_losteria', rfq_number: 'PO-2026-090', vendor_name: 'Artisan Dairy Farm', vendor_email: 'orders@artisandairy.co.in', items_json: JSON.stringify([{ item: 'Fresh Buffalo Mozzarella (10kg)', qty: 2, price: 13600 }]), subtotal: 13600, tax_amount: 680, total_amount: 14280, status: 'RECEIVED', payment_terms: 'Immediate UPI', received_date: '2026-10-30' },
+      { id: 'po_3', restaurant_id: 'rest_losteria', rfq_number: 'RFQ-2026-091', vendor_name: 'Gourmet World Dist', vendor_email: 'sales@gourmetworld.in', items_json: JSON.stringify([{ item: 'White Truffle Oil (500ml glass bottle)', qty: 6, price: 6600 }]), subtotal: 6600, tax_amount: 330, total_amount: 6930, status: 'RFQ_SENT', payment_terms: 'Net 30', received_date: null }
+    ];
+    for (const po of samplePOs) {
+      execute(
+        `INSERT INTO purchase_orders (id, restaurant_id, rfq_number, vendor_name, vendor_email, items_json, subtotal, tax_amount, total_amount, status, payment_terms, received_date)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [po.id, po.restaurant_id, po.rfq_number, po.vendor_name, po.vendor_email, po.items_json, po.subtotal, po.tax_amount, po.total_amount, po.status, po.payment_terms, po.received_date]
       );
     }
   }

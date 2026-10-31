@@ -41,6 +41,7 @@ export function CartDrawer({ isOpen, onClose }) {
   const [customerPhone, setCustomerPhone] = useState('');
   const [tableInstructions, setTableInstructions] = useState('');
   const [paymentChoice, setPaymentChoice] = useState('RAZORPAY'); // 'RAZORPAY' or 'CASH_AT_COUNTER'
+  const [specificMethod, setSpecificMethod] = useState('Google Pay');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Razorpay state
@@ -58,6 +59,8 @@ export function CartDrawer({ isOpen, onClose }) {
     setIsSubmitting(true);
 
     try {
+      const selectedMethodName = paymentChoice === 'CASH_AT_COUNTER' ? 'Cash at Counter' : `Razorpay (${specificMethod})`;
+
       // 1. Create order in backend local database
       const orderPayload = {
         restaurant_id: table?.restaurant_id || activeRestaurant?.id || 'rest_losteria',
@@ -65,7 +68,7 @@ export function CartDrawer({ isOpen, onClose }) {
         customer_name: customerName.trim() || 'Guest',
         customer_phone: customerPhone.trim(),
         special_instructions: tableInstructions.trim(),
-        payment_method: paymentChoice,
+        payment_method: selectedMethodName,
         items: items.map((i) => ({
           id: i.id,
           quantity: i.quantity,
@@ -91,7 +94,10 @@ export function CartDrawer({ isOpen, onClose }) {
         const rzpRes = await fetch('/api/payment/razorpay/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order_id: createdOrder.id }),
+          body: JSON.stringify({
+            order_id: createdOrder.id,
+            payment_method: selectedMethodName,
+          }),
         });
 
         const rzpData = await rzpRes.json();
@@ -302,35 +308,67 @@ export function CartDrawer({ isOpen, onClose }) {
                     <div className="text-xs font-bold text-slate-700">Payment Option</div>
 
                     {/* Razorpay Online */}
-                    <label
-                      onClick={() => setPaymentChoice('RAZORPAY')}
-                      className={`flex items-center justify-between p-3 rounded-2xl border transition cursor-pointer ${
+                    <div
+                      className={`p-3 rounded-2xl border transition ${
                         paymentChoice === 'RAZORPAY'
-                          ? 'border-sky-500 bg-sky-50/50 ring-1 ring-sky-500'
+                          ? 'border-sky-500 bg-sky-50/40 ring-1 ring-sky-500'
                           : 'border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center">
-                          <CreditCard className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                            <span>Razorpay Online</span>
-                            <span className="text-[9px] font-extrabold uppercase bg-sky-100 text-sky-800 px-1 py-0.2 rounded">
-                              UPI / Cards
-                            </span>
+                      <label
+                        onClick={() => setPaymentChoice('RAZORPAY')}
+                        className="flex items-center justify-between cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center">
+                            <CreditCard className="w-4 h-4" />
                           </div>
-                          <div className="text-[11px] text-slate-500">Google Pay, PhonePe, Cards, NetBanking</div>
+                          <div>
+                            <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                              <span>Razorpay Online Gateway</span>
+                              <span className="text-[9px] font-extrabold uppercase bg-sky-100 text-sky-800 px-1 py-0.2 rounded">
+                                Instant
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-500">Pick preferred UPI app or cards</div>
+                          </div>
                         </div>
-                      </div>
-                      <input
-                        type="radio"
-                        checked={paymentChoice === 'RAZORPAY'}
-                        onChange={() => setPaymentChoice('RAZORPAY')}
-                        className="accent-sky-600"
-                      />
-                    </label>
+                        <input
+                          type="radio"
+                          checked={paymentChoice === 'RAZORPAY'}
+                          onChange={() => setPaymentChoice('RAZORPAY')}
+                          className="accent-sky-600"
+                        />
+                      </label>
+
+                      {/* Direct Method Selector Subgrid */}
+                      {paymentChoice === 'RAZORPAY' && (
+                        <div className="mt-3 pt-2.5 border-t border-sky-100/70 grid grid-cols-3 gap-1.5">
+                          {[
+                            { id: 'Google Pay', name: 'GPay', icon: '⚡', color: 'hover:border-blue-400' },
+                            { id: 'PhonePe', name: 'PhonePe', icon: '🟣', color: 'hover:border-purple-400' },
+                            { id: 'Paytm', name: 'Paytm', icon: '🔵', color: 'hover:border-sky-400' },
+                            { id: 'BHIM / Cred UPI', name: 'BHIM / UPI', icon: '🇮🇳', color: 'hover:border-emerald-400' },
+                            { id: 'Debit & Credit Cards', name: 'Cards', icon: '💳', color: 'hover:border-amber-400' },
+                            { id: 'NetBanking', name: 'NetBanking', icon: '🏦', color: 'hover:border-slate-400' },
+                          ].map((m) => (
+                            <button
+                              key={m.id}
+                              type="button"
+                              onClick={() => setSpecificMethod(m.id)}
+                              className={`p-2 rounded-xl text-left border text-xs font-medium transition cursor-pointer flex flex-col justify-between ${
+                                specificMethod === m.id
+                                  ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
+                                  : 'bg-white text-slate-700 border-slate-200 ' + m.color
+                              }`}
+                            >
+                              <div className="text-base">{m.icon}</div>
+                              <div className="text-[10px] font-bold mt-1 truncate">{m.name}</div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
 
                     {/* Pay at Counter */}
                     <label

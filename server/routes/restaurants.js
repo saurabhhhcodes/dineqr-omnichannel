@@ -71,12 +71,15 @@ router.post('/onboard', (req, res) => {
       sgst = 9.0;
     }
 
+    const merchantUserId = 'MER-' + Math.floor(10000 + Math.random() * 90000);
+
     execute(
       `INSERT INTO restaurants (
         id, name, slug, business_type, station_type, tagline, address, phone, email, gstin, fssai, currency,
         cgst_pct, sgst_pct, service_charge_pct, razorpay_key_id, razorpay_key_secret, upi_id, bank_account, bank_ifsc,
-        admin_pin, admin_password, commission_pct, settlement_type, onboarding_status, is_active
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', 1)`,
+        admin_pin, admin_password, commission_pct, settlement_type, onboarding_status, is_active,
+        merchant_user_id, subscription_plan
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', 1, ?, '1000_MONTHLY')`,
       [
         id,
         name,
@@ -102,6 +105,7 @@ router.post('/onboard', (req, res) => {
         'admin123',
         2.0,
         'direct',
+        merchantUserId,
       ]
     );
 
@@ -212,7 +216,7 @@ router.post('/auth/login', (req, res) => {
       return res.status(400).json({ success: false, error: 'Business ID or slug is required' });
     }
 
-    const restaurant = queryOne(`SELECT * FROM restaurants WHERE id = ? OR slug = ?`, [identifier, identifier]);
+    const restaurant = queryOne(`SELECT * FROM restaurants WHERE id = ? OR slug = ? OR merchant_user_id = ?`, [identifier, identifier, identifier]);
     if (!restaurant) {
       return res.status(404).json({ success: false, error: 'Business not found' });
     }
@@ -510,6 +514,10 @@ router.put('/:id', (req, res) => {
       service_charge_pct,
       razorpay_key_id,
       razorpay_key_secret,
+      cloud_domain,
+      upi_id,
+      bank_account,
+      bank_ifsc,
       is_active,
     } = req.body;
 
@@ -528,6 +536,10 @@ router.put('/:id', (req, res) => {
         service_charge_pct = COALESCE(?, service_charge_pct),
         razorpay_key_id = COALESCE(?, razorpay_key_id),
         razorpay_key_secret = COALESCE(?, razorpay_key_secret),
+        cloud_domain = COALESCE(?, cloud_domain),
+        upi_id = COALESCE(?, upi_id),
+        bank_account = COALESCE(?, bank_account),
+        bank_ifsc = COALESCE(?, bank_ifsc),
         is_active = COALESCE(?, is_active),
         updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
@@ -545,6 +557,10 @@ router.put('/:id', (req, res) => {
         service_charge_pct !== undefined ? parseFloat(service_charge_pct) : null,
         razorpay_key_id !== undefined ? razorpay_key_id.trim() : null,
         razorpay_key_secret !== undefined && razorpay_key_secret.trim() ? razorpay_key_secret.trim() : null,
+        cloud_domain !== undefined ? cloud_domain.trim() : null,
+        upi_id !== undefined ? upi_id.trim() : null,
+        bank_account !== undefined ? bank_account.trim() : null,
+        bank_ifsc !== undefined ? bank_ifsc.trim() : null,
         is_active !== undefined ? (is_active ? 1 : 0) : null,
         req.params.id,
       ]

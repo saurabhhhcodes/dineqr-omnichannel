@@ -18,6 +18,8 @@ import statsRouter from './routes/stats.js';
 import restaurantsRouter from './routes/restaurants.js';
 import walletRouter from './routes/wallet.js';
 import backupRouter from './routes/backup.js';
+import erpRouter from './routes/erp.js';
+import downloadsRouter from './routes/downloads.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,6 +51,8 @@ app.use('/api/invoice', invoiceRouter);
 app.use('/api/stats', statsRouter);
 app.use('/api/wallet', walletRouter);
 app.use('/api/backup', backupRouter);
+app.use('/api/erp', erpRouter);
+app.use('/api/downloads', downloadsRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

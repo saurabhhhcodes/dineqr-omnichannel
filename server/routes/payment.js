@@ -102,7 +102,7 @@ router.post('/test-keys', async (req, res) => {
 // POST /api/payment/razorpay/create-order - Create Razorpay order
 router.post('/create-order', async (req, res) => {
   try {
-    const { order_id } = req.body;
+    const { order_id, payment_method } = req.body;
     if (!order_id) {
       return res.status(400).json({ success: false, error: 'order_id is required' });
     }
@@ -111,6 +111,8 @@ router.post('/create-order', async (req, res) => {
     if (!order) {
       return res.status(404).json({ success: false, error: 'Order not found in database' });
     }
+
+    const selectedMethod = payment_method || order.payment_method || 'Razorpay Online';
 
     const restId = order.restaurant_id || 'rest_losteria';
     const { client, key_id, isConfigured, isCustom, restaurantName } = getRazorpayForRestaurant(restId);
@@ -127,8 +129,10 @@ router.post('/create-order', async (req, res) => {
         notes: {
           restaurant_id: restId,
           restaurant_name: restaurantName,
-          table_number: order.table_number,
+          table_number: order.table_number || 'Takeaway',
           order_id: order.id,
+          preferred_payment_method: selectedMethod,
+          platform: 'DineQR Omnichannel',
         },
       });
     } else {
@@ -144,22 +148,25 @@ router.post('/create-order', async (req, res) => {
         receipt: order.order_code,
         status: 'created',
         notes: {
-          table_number: order.table_number,
+          table_number: order.table_number || 'Takeaway',
           order_id: order.id,
           restaurant_id: restId,
+          preferred_payment_method: selectedMethod,
+          platform: 'DineQR Omnichannel',
         },
         created_at: Math.floor(Date.now() / 1000),
         mock: true,
       };
     }
 
-    // Save razorpay_order_id to DB
-    execute(`UPDATE orders SET razorpay_order_id = ? WHERE id = ?`, [rzpOrder.id, order.id]);
+    // Save razorpay_order_id and payment_method to DB
+    execute(`UPDATE orders SET razorpay_order_id = ?, payment_method = ? WHERE id = ?`, [rzpOrder.id, selectedMethod, order.id]);
 
     res.json({
       success: true,
       razorpay_order: rzpOrder,
       key_id,
+      preferred_payment_method: selectedMethod,
       is_mock: !isConfigured,
       is_direct_restaurant_payout: isCustom,
       restaurant_name: restaurantName,
@@ -168,6 +175,7 @@ router.post('/create-order', async (req, res) => {
         order_code: order.order_code,
         table_number: order.table_number,
         grand_total: order.grand_total,
+        payment_method: selectedMethod,
       },
     });
   } catch (error) {
@@ -179,7 +187,7 @@ router.post('/create-order', async (req, res) => {
 // POST /api/payment/razorpay/verify - Verify payment signature
 router.post('/verify', (req, res) => {
   try {
-    const { order_id, razorpay_order_id, razorpay_payment_id, razorpay_signature, is_mock } = req.body;
+    const { order_id, razorpay_order_id, razorpay_payment_id, razorpay_signature, is_mock, payment_method } = req.body;
 
     if (!order_id || !razorpay_payment_id) {
       return res.status(400).json({ success: false, error: 'Missing payment verification parameters' });
@@ -209,12 +217,12 @@ router.post('/verify', (req, res) => {
     execute(
       `UPDATE orders SET
         payment_status = 'PAID',
-        payment_method = 'RAZORPAY',
+        payment_method = COALESCE(?, payment_method, 'Razorpay Online'),
         razorpay_order_id = COALESCE(?, razorpay_order_id),
         razorpay_payment_id = ?,
         updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
-      [razorpay_order_id, razorpay_payment_id, order.id]
+      [payment_method || null, razorpay_order_id, razorpay_payment_id, order.id]
     );
 
     const updatedOrder = queryOne(`SELECT * FROM orders WHERE id = ?`, [order.id]);

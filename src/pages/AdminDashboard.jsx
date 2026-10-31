@@ -22,7 +22,14 @@ import {
   Calendar,
   AlertCircle,
   X,
-  Laptop
+  Laptop,
+  Server,
+  HardDrive,
+  CalendarCheck,
+  CalendarClock,
+  PackageCheck,
+  Truck,
+  Eye,
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
@@ -34,7 +41,14 @@ export function AdminDashboard() {
   const [rzpConfig, setRzpConfig] = useState(null);
   const [wallet, setWallet] = useState(null);
   const [backupSchedule, setBackupSchedule] = useState(null);
+  const [storageStatus, setStorageStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Local DB Browser Modal State
+  const [showBrowseModal, setShowBrowseModal] = useState(false);
+  const [browseTable, setBrowseTable] = useState('orders');
+  const [browseRecords, setBrowseRecords] = useState([]);
+  const [isSettingUpDb, setIsSettingUpDb] = useState(false);
 
   // Withdrawal Modal State
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
@@ -51,8 +65,9 @@ export function AdminDashboard() {
       fetch(`/api/payment/razorpay/config?restaurant_id=${activeRestaurant.id}`).then((r) => r.json()),
       fetch(`/api/wallet/balance?restaurant_id=${activeRestaurant.id}`).then((r) => r.json()),
       fetch(`/api/backup/schedule-status?restaurant_id=${activeRestaurant.id}`).then((r) => r.json()),
+      fetch(`/api/erp/storage/status`).then((r) => r.json()),
     ])
-      .then(([statsRes, rzpRes, walletRes, backupRes]) => {
+      .then(([statsRes, rzpRes, walletRes, backupRes, storageRes]) => {
         if (statsRes.success) setStats(statsRes.stats);
         if (rzpRes.success) setRzpConfig(rzpRes);
         if (walletRes.success) {
@@ -60,9 +75,42 @@ export function AdminDashboard() {
           setWithdrawAmount(walletRes.wallet.available_balance || '');
         }
         if (backupRes.success) setBackupSchedule(backupRes.schedule);
+        if (storageRes.success) setStorageStatus(storageRes);
       })
       .catch((err) => addToast('Failed to load dashboard: ' + err.message, 'error'))
       .finally(() => setIsLoading(false));
+  };
+
+  const handleSetupLocalDb = async () => {
+    setIsSettingUpDb(true);
+    try {
+      const res = await fetch('/api/erp/local-sqlite/setup', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        addToast('Local SQLite Engine verified and active!');
+        fetchDashboardData();
+      } else {
+        addToast(data.error || 'Setup failed', 'error');
+      }
+    } catch (err) {
+      addToast(err.message, 'error');
+    } finally {
+      setIsSettingUpDb(false);
+    }
+  };
+
+  const handleBrowseTable = async (tableName) => {
+    setBrowseTable(tableName);
+    try {
+      const res = await fetch(`/api/erp/storage/browse?table=${tableName}&restaurant_id=${activeRestaurant.id}`);
+      const data = await res.json();
+      if (data.success) {
+        setBrowseRecords(data.records || []);
+        setShowBrowseModal(true);
+      }
+    } catch (err) {
+      addToast('Failed to read table: ' + err.message, 'error');
+    }
   };
 
   useEffect(() => {
@@ -217,6 +265,161 @@ export function AdminDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Odoo-Competitive ERP Operations Suite Quick Launch */}
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+          <Link
+            to="/admin/floor-plan"
+            className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 transition flex flex-col justify-between group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition">
+              <Utensils className="w-5 h-5" />
+            </div>
+            <div className="mt-3">
+              <div className="text-xs font-black text-slate-900">Floor Plan</div>
+              <div className="text-[10px] text-slate-400">Drag & drop tables</div>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/reservations"
+            className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-purple-300 transition flex flex-col justify-between group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition">
+              <CalendarCheck className="w-5 h-5" />
+            </div>
+            <div className="mt-3">
+              <div className="text-xs font-black text-slate-900">Reservations</div>
+              <div className="text-[10px] text-slate-400">Guest bookings</div>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/staff"
+            className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-blue-300 transition flex flex-col justify-between group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition">
+              <Users className="w-5 h-5" />
+            </div>
+            <div className="mt-3">
+              <div className="text-xs font-black text-slate-900">Staff Shifts</div>
+              <div className="text-[10px] text-slate-400">Shift scheduler</div>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/inventory"
+            className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition flex flex-col justify-between group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition">
+              <PackageCheck className="w-5 h-5" />
+            </div>
+            <div className="mt-3">
+              <div className="text-xs font-black text-slate-900">Inventory</div>
+              <div className="text-[10px] text-slate-400">Stock & reorders</div>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/purchases"
+            className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-indigo-300 transition flex flex-col justify-between group"
+          >
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div className="mt-3">
+              <div className="text-xs font-black text-slate-900">Purchases</div>
+              <div className="text-[10px] text-slate-400">Vendor 3-way match</div>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/downloads"
+            className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-xs hover:shadow-md hover:border-amber-400 transition flex flex-col justify-between group text-white"
+          >
+            <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center group-hover:scale-110 transition">
+              <Laptop className="w-5 h-5" />
+            </div>
+            <div className="mt-3">
+              <div className="text-xs font-black text-white">Terminal Apps</div>
+              <div className="text-[10px] text-amber-300">EXE · APK · DMG · DEB</div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Local System Storage & Online Remote Access Center */}
+        {storageStatus && (
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-slate-900 text-amber-400 shadow-sm">
+                  <HardDrive className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-extrabold text-slate-900">
+                      Local System Storage & Online Remote Access
+                    </h2>
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                      Zero Cloud Fees
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Orders and business data are stored on this local computer in <code className="text-slate-800 font-mono font-bold bg-slate-100 px-1 py-0.5 rounded">./data/restaurant.db</code>. When online, administrators can inspect and sync remotely anytime.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleSetupLocalDb}
+                  disabled={isSettingUpDb}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition cursor-pointer"
+                >
+                  {isSettingUpDb ? 'Verifying...' : 'Configure Local SQLite'}
+                </button>
+
+                <button
+                  onClick={() => handleBrowseTable('orders')}
+                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Browse Raw Tables</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                <span className="text-[10px] text-slate-400 uppercase font-bold">Disk File Size</span>
+                <div className="text-lg font-black text-slate-900 mt-0.5">{storageStatus.local_size_kb} KB</div>
+                <span className="text-[10px] text-emerald-600 font-bold">Embedded SQLite DB</span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                <span className="text-[10px] text-slate-400 uppercase font-bold">Orders on Disk</span>
+                <div className="text-lg font-black text-slate-900 mt-0.5">{storageStatus.counts?.orders || 0}</div>
+                <span className="text-[10px] text-slate-500">Last: {storageStatus.last_order_stored}</span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                <span className="text-[10px] text-slate-400 uppercase font-bold">Inventory & Shifts</span>
+                <div className="text-lg font-black text-slate-900 mt-0.5">
+                  {(storageStatus.counts?.inventory_items || 0) + (storageStatus.counts?.staff_shifts || 0)} Items
+                </div>
+                <span className="text-[10px] text-slate-500">Tracked locally</span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                <span className="text-[10px] text-slate-400 uppercase font-bold">Remote Online Link</span>
+                <div className="text-xs font-mono font-bold text-sky-600 truncate mt-1">
+                  {storageStatus.remote_access_url}
+                </div>
+                <span className="text-[10px] text-emerald-600 font-bold">● Live Encrypted Tunnel</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Merchant Payouts & Withdrawable Wallet */}
         {wallet && (
@@ -465,6 +668,81 @@ export function AdminDashboard() {
                 </button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Raw Local Database Tables Browser Modal */}
+      {showBrowseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
+          <div
+            className="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200 max-h-[85vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-slate-900 text-amber-400">
+                  <Database className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-base">
+                    Local SQLite Store Inspector
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Live raw records from local file: ./data/restaurant.db
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {['orders', 'reservations', 'inventory_items', 'staff_shifts', 'purchase_orders', 'tables'].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => handleBrowseTable(t)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      browseTable === t ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setShowBrowseModal(false)}
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer ml-2"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-auto my-3 border border-slate-200 rounded-2xl">
+              {browseRecords.length === 0 ? (
+                <div className="p-8 text-center text-slate-400 text-xs">No records found in this table</div>
+              ) : (
+                <table className="w-full text-left text-[11px] font-mono">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase sticky top-0">
+                    <tr>
+                      {Object.keys(browseRecords[0]).slice(0, 7).map((col) => (
+                        <th key={col} className="p-2.5">{col}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {browseRecords.map((row, i) => (
+                      <tr key={i} className="hover:bg-slate-50">
+                        {Object.keys(browseRecords[0]).slice(0, 7).map((col) => (
+                          <td key={col} className="p-2.5 truncate max-w-xs">{String(row[col] ?? '')}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            <div className="text-right text-[11px] text-slate-400 pt-1">
+              Showing up to 50 recent records from local SQLite disk database · Zero Cloud Database Fees
+            </div>
           </div>
         </div>
       )}

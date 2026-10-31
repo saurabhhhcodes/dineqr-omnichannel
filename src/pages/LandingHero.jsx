@@ -21,7 +21,15 @@ import {
   Building2,
   Lock,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Video,
+  Monitor,
+  Smartphone,
+  Apple,
+  Terminal,
+  Zap,
+  Check,
+  X as XIcon,
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -96,11 +104,13 @@ export function LandingHero() {
 
       {/* Hero Section */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 text-center">
-        {/* Top Feature Pill */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 border border-slate-700/80 text-sky-400 text-xs font-semibold shadow-xl mb-6 hover:border-sky-500/50 transition">
-          <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-          <span>Universal Self-Checkout & Operations OS · Powered by Razorpay</span>
-          <ChevronRight className="w-3 h-3 text-slate-500" />
+        {/* Flat Pricing Banner */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-linear-to-r from-amber-500/20 via-orange-500/20 to-sky-500/20 border border-amber-500/40 text-amber-300 text-xs font-black shadow-xl mb-6">
+          <Zap className="w-4 h-4 text-amber-400" />
+          <span>Flat ₹1,000 / month · Unlimited Tables & Orders · Zero Cloud DB Fees</span>
+          <span className="bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full text-[10px] uppercase font-black ml-1">
+            60s Setup
+          </span>
         </div>
 
         {/* Headline */}
@@ -113,29 +123,37 @@ export function LandingHero() {
 
         {/* Subtitle */}
         <p className="mt-6 text-base sm:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed font-normal">
-          The all-in-one platform for <span className="text-white font-semibold">Clinics</span>,{' '}
+          The all-in-one operations suite for <span className="text-white font-semibold">Clinics</span>,{' '}
           <span className="text-white font-semibold">Restaurants</span>,{' '}
           <span className="text-white font-semibold">Gyms</span>, and{' '}
-          <span className="text-white font-semibold">Festivals</span>. Features 4K looping video catalogs, direct Razorpay merchant settlement, real-time queues, and a native Windows Desktop POS.
+          <span className="text-white font-semibold">Events</span>. Features 4K looping video catalogs, direct Razorpay UPI settlements, visual floor plans, inventory reorder alerts, and native desktop installers.
         </p>
 
         {/* CTA Buttons */}
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             to="/onboard"
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-black text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-sky-500/25 transition active:scale-98 cursor-pointer"
+            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-amber-500/25 transition active:scale-98 cursor-pointer"
           >
-            <span>Onboard Your Business Free</span>
+            <span>Subscribe for ₹1,000 / month</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
 
           <button
             onClick={() => handleLaunchDemo(selectedDemo)}
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm border border-slate-700 flex items-center justify-center gap-2.5 transition active:scale-98 cursor-pointer"
+            className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm border border-slate-700 flex items-center justify-center gap-2.5 transition active:scale-98 cursor-pointer"
           >
             <Play className="w-4 h-4 text-amber-400 fill-amber-400" />
             <span>Launch Live Interactive Demo</span>
           </button>
+
+          <Link
+            to="/admin/downloads"
+            className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800 text-sky-300 font-bold text-sm border border-sky-500/30 flex items-center justify-center gap-2 transition"
+          >
+            <Download className="w-4 h-4 text-sky-400" />
+            <span>Download EXE / APK / DMG</span>
+          </Link>
 
           <Link
             to="/super-admin"
@@ -158,7 +176,7 @@ export function LandingHero() {
           </div>
           <div className="flex items-center gap-2">
             <Laptop className="w-4 h-4 text-blue-400" />
-            <span>Native Windows POS & Thermal Printing</span>
+            <span>Native Windows (.exe) & Android (.apk)</span>
           </div>
           <div className="flex items-center gap-2">
             <Database className="w-4 h-4 text-purple-400" />
@@ -270,35 +288,143 @@ export function LandingHero() {
             <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
               <div className="font-bold text-white flex items-center gap-1.5">
                 <CreditCard className="w-4 h-4 text-sky-400" />
-                <span>Wallet & Withdrawals</span>
+                <span>Direct UPI & Razorpay</span>
               </div>
               <p className="text-slate-400 text-[11px]">
-                Payments land in Razorpay. Platform retains profit fee; merchants withdraw funds anytime after ₹500.
+                Google Pay, PhonePe, Paytm, and Cards route directly to the merchant account with instant settlements.
               </p>
             </div>
 
             <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
               <div className="font-bold text-white flex items-center gap-1.5">
                 <Laptop className="w-4 h-4 text-amber-400" />
-                <span>Windows POS Client</span>
+                <span>Native Multi-OS Packages</span>
               </div>
               <p className="text-slate-400 text-[11px]">
-                Reception desks run native Electron on Windows with silent ESC/POS thermal printing & F11 token kiosk.
+                Windows (.exe), Android (.apk), macOS (.dmg), and Linux (.deb) ready for immediate offline-first deployment.
               </p>
             </div>
 
             <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
               <div className="font-bold text-white flex items-center gap-1.5">
                 <Database className="w-4 h-4 text-purple-400" />
-                <span>31st Monthly Download</span>
+                <span>Zero Cloud Database Fees</span>
               </div>
               <p className="text-slate-400 text-[11px]">
-                Zero cloud database cost. Local SQLite downloads compile on the 31st of every month for local compliance.
+                Orders stored in local SQLite database on premise. Remote online access available anytime via cloud tunnel.
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Odoo vs DineQR Enterprise Comparison Section */}
+        <div className="mt-20 p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-8">
+          <div className="text-center max-w-3xl mx-auto space-y-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-amber-400">
+              Why Pay 20x More for Enterprise ERP?
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black text-white">
+              DineQR Omnichannel vs. Odoo Hospitality
+            </h2>
+            <p className="text-sm text-slate-400">
+              Full enterprise restaurant & retail parity at a flat ₹1,000 / month with zero per-user or database surcharges.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs md:text-sm">
+              <thead className="bg-slate-950 border-b border-slate-800 text-slate-400 font-extrabold uppercase">
+                <tr>
+                  <th className="py-4 px-5">Capability / Module</th>
+                  <th className="py-4 px-5 text-amber-400 font-black text-base">
+                    DineQR Omnichannel
+                  </th>
+                  <th className="py-4 px-5 text-slate-400">Odoo Enterprise</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800 text-slate-300 font-medium">
+                <tr>
+                  <td className="py-3.5 px-5 font-bold text-white">Subscription Pricing</td>
+                  <td className="py-3.5 px-5 text-amber-400 font-black">
+                    ₹1,000 / month flat (All Included)
+                  </td>
+                  <td className="py-3.5 px-5 text-slate-400">
+                    ₹20,000+ / mo ($240+/user/year + apps)
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-5 font-bold text-white">Visual Drag & Drop Floor Plans</td>
+                  <td className="py-3.5 px-5 text-emerald-400 font-bold flex items-center gap-1.5">
+                    <Check className="w-4 h-4 text-emerald-400" />
+                    <span>Included (/admin/floor-plan)</span>
+                  </td>
+                  <td className="py-3.5 px-5 text-slate-400">Requires POS Restaurant App</td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-5 font-bold text-white">Table Bookings & Reservations</td>
+                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
+                    <Check className="w-4 h-4 text-emerald-400 inline mr-1.5" />
+                    <span>Included (/admin/reservations)</span>
+                  </td>
+                  <td className="py-3.5 px-5 text-slate-400">Separate Appointments App</td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-5 font-bold text-white">Staff Planning & Shift Scheduler</td>
+                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
+                    <Check className="w-4 h-4 text-emerald-400 inline mr-1.5" />
+                    <span>Included (/admin/staff) with conflict checks</span>
+                  </td>
+                  <td className="py-3.5 px-5 text-slate-400">Separate Planning App</td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-5 font-bold text-white">Purchases & 3-Way Matching</td>
+                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
+                    <Check className="w-4 h-4 text-emerald-400 inline mr-1.5" />
+                    <span>Included (/admin/purchases)</span>
+                  </td>
+                  <td className="py-3.5 px-5 text-slate-400">Separate Purchase App</td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-5 font-bold text-white">Inventory & Replenishment Alerts</td>
+                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
+                    <Check className="w-4 h-4 text-emerald-400 inline mr-1.5" />
+                    <span>Included (/admin/inventory)</span>
+                  </td>
+                  <td className="py-3.5 px-5 text-slate-400">Separate Inventory App</td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-5 font-bold text-white">Cloud Database Costs</td>
+                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
+                    <span>₹0 (Local SQLite Storage on Premise)</span>
+                  </td>
+                  <td className="py-3.5 px-5 text-slate-400">
+                    Odoo.sh hosting fees apply
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-3.5 px-5 font-bold text-white">Native Standalone Packages</td>
+                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
+                    <span>Windows (.exe), Android (.apk), macOS (.dmg), Linux (.deb)</span>
+                  </td>
+                  <td className="py-3.5 px-5 text-slate-400">IoT Box hardware extra cost</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="pt-4 text-center">
+            <Link
+              to="/onboard"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/20 transition cursor-pointer"
+            >
+              <span>Get Started for ₹1,000 / month</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+export default LandingHero;
