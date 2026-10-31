@@ -12,7 +12,8 @@ import {
   RefreshCw,
   UtensilsCrossed,
   Receipt,
-  CheckCheck
+  CheckCheck,
+  Printer
 } from 'lucide-react';
 import { playOrderChime } from '../utils/audioAlert.js';
 import { useToast } from '../context/ToastContext.jsx';
@@ -23,10 +24,16 @@ export function AdminKitchen() {
   const { addToast } = useToast();
   const [orders, setOrders] = useState([]);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [autoPrintEnabled, setAutoPrintEnabled] = useState(true);
   const [filterStatus, setFilterStatus] = useState('ALL'); // ALL, RECEIVED, PREPARING, READY
   const [isUpdating, setIsUpdating] = useState(false);
 
   const prevOrderCountRef = useRef(0);
+  const autoPrintRef = useRef(autoPrintEnabled);
+
+  useEffect(() => {
+    autoPrintRef.current = autoPrintEnabled;
+  }, [autoPrintEnabled]);
 
   // Fetch active orders for this restaurant
   const fetchOrders = () => {
@@ -48,6 +55,23 @@ export function AdminKitchen() {
       .catch((err) => console.error('Failed to load orders:', err));
   };
 
+  const handlePrintTicket = async (orderId, orderCode) => {
+    try {
+      const res = await fetch(`/api/invoice/${orderId}/print`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`🖨️ ${data.message || `Thermal KOT printed for ${orderCode}`}`);
+      } else {
+        addToast(data.error || 'Failed to print KOT', 'error');
+      }
+    } catch (err) {
+      addToast('Print error: ' + err.message, 'error');
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
 
@@ -60,6 +84,19 @@ export function AdminKitchen() {
           playOrderChime();
         }
         addToast('🔔 New table order placed!', 'info');
+
+        try {
+          const payload = JSON.parse(e.data);
+          if (autoPrintRef.current && payload?.order?.id) {
+            fetch(`/api/invoice/${payload.order.id}/print`, { method: 'POST' })
+              .then((r) => r.json())
+              .then((d) => {
+                if (d.success) addToast(`🖨️ Auto-printed ticket: ${payload.order.order_code}`);
+              })
+              .catch(() => {});
+          }
+        } catch {}
+
         fetchOrders();
       });
 
@@ -170,6 +207,24 @@ export function AdminKitchen() {
                 Ready
               </button>
             </div>
+
+            {/* Auto-print toggle */}
+            <button
+              onClick={() => {
+                const next = !autoPrintEnabled;
+                setAutoPrintEnabled(next);
+                addToast(next ? '🖨️ Auto-print active on new orders' : 'Auto-print paused');
+              }}
+              className={`p-2.5 rounded-xl border transition cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
+                autoPrintEnabled
+                  ? 'bg-slate-800 border-orange-500/40 text-orange-400 hover:bg-slate-700'
+                  : 'bg-slate-800 border-slate-700 text-slate-500 hover:text-white'
+              }`}
+              title={autoPrintEnabled ? 'Hardware thermal auto-print active' : 'Auto-print off'}
+            >
+              <Printer className="w-4 h-4" />
+              <span className="hidden sm:inline">{autoPrintEnabled ? 'Auto-Print' : 'No Print'}</span>
+            </button>
 
             {/* Sound chime test / toggle */}
             <button
@@ -334,14 +389,24 @@ export function AdminKitchen() {
                         </span>
                       )}
                     </div>
-                    <Link
-                      to={`/invoice/${order.id}`}
-                      target="_blank"
-                      className="text-slate-400 hover:text-white flex items-center gap-1 transition text-[11px]"
-                    >
-                      <Receipt className="w-3.5 h-3.5" />
-                      <span>Invoice</span>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handlePrintTicket(order.id, order.order_code)}
+                        className="text-slate-400 hover:text-orange-400 flex items-center gap-1 transition text-[11px] cursor-pointer"
+                        title="Print 80mm ESC/POS KOT Slip"
+                      >
+                        <Printer className="w-3.5 h-3.5" />
+                        <span>Print KOT</span>
+                      </button>
+                      <Link
+                        to={`/invoice/${order.id}`}
+                        target="_blank"
+                        className="text-slate-400 hover:text-white flex items-center gap-1 transition text-[11px]"
+                      >
+                        <Receipt className="w-3.5 h-3.5" />
+                        <span>Invoice</span>
+                      </Link>
+                    </div>
                   </div>
 
                   {/* Action Pipeline Buttons */}

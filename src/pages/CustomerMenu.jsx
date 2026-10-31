@@ -54,23 +54,30 @@ export function CustomerMenu() {
     }
   }, [restaurantParam, restaurants, activeRestaurant]);
 
-  // 1. Resolve Table from URL query parameter
+  // 1. Resolve Table from URL query parameter (or Counter Scanner mode)
   useEffect(() => {
     const restId = currentRestaurant?.id || activeRestaurant?.id || 'rest_losteria';
     fetch(`/api/tables?restaurant_id=${restId}`)
       .then((r) => r.json())
       .then((data) => {
-        if (data.success && data.tables && data.tables.length > 0) {
+        if (data.success && data.tables) {
           setAvailableTables(data.tables);
           let matched = null;
-          if (tableParam) {
+          if (tableParam && tableParam !== 'counter' && tableParam !== 'takeaway') {
             matched = data.tables.find(
               (t) => t.id === tableParam || t.table_number.toLowerCase() === tableParam.toLowerCase()
             );
           }
-          // If tableParam matched a table belonging to this restaurant, use it.
-          // Otherwise, always select the first station of this specific restaurant!
-          setTable(matched || data.tables[0]);
+
+          if (tableParam === 'counter' || tableParam === 'takeaway' || (!tableParam && data.tables.length === 0)) {
+            setTable({ id: 'counter', table_number: 'Counter Pickup · Daily Token', section: 'Express Takeaway' });
+          } else if (matched) {
+            setTable(matched);
+          } else if (data.tables.length > 0) {
+            setTable(data.tables[0]);
+          } else {
+            setTable({ id: 'counter', table_number: 'Counter Pickup · Daily Token', section: 'Express Takeaway' });
+          }
         }
       })
       .catch((err) => console.error('Failed to load tables:', err));
@@ -145,7 +152,7 @@ export function CustomerMenu() {
             </div>
           </div>
 
-          {/* Current Table / Room Selector */}
+          {/* Current Table / Room / Counter Selector */}
           <div className="w-full md:w-auto bg-white/10 backdrop-blur-xl rounded-2xl p-3.5 border border-white/15 flex items-center justify-between gap-4 shadow-xl">
             <div className="text-left">
               <div className="text-[10px] text-amber-300 font-extrabold uppercase tracking-widest">
@@ -155,36 +162,36 @@ export function CustomerMenu() {
                   ? 'Workout Bay / Locker'
                   : currentRestaurant?.business_type === 'event'
                   ? 'VIP Lounge / Booth'
+                  : table?.id === 'counter'
+                  ? 'Service Station'
                   : 'Table Number'}
               </div>
               <div className="text-sm font-black text-white flex items-center gap-1.5 mt-0.5">
-                <Utensils className="w-4 h-4 text-amber-400" />
-                <span>
+                <Utensils className="w-4 h-4 text-amber-400 shrink-0" />
+                <span className="truncate max-w-[150px] sm:max-w-none">
                   {table
                     ? table.table_number
-                    : currentRestaurant?.business_type === 'clinic'
-                    ? 'Room 01'
-                    : currentRestaurant?.business_type === 'gym'
-                    ? 'Bay 01'
-                    : 'Table 01'}
+                    : 'Counter Pickup · Daily Token'}
                 </span>
                 {table?.section && (
-                  <span className="text-xs font-normal text-slate-300">({table.section})</span>
+                  <span className="text-xs font-normal text-slate-300 hidden sm:inline">({table.section})</span>
                 )}
               </div>
             </div>
 
             <select
-              value={table ? table.id : ''}
+              value={table ? table.id : 'counter'}
               onChange={(e) => {
-                const found = availableTables.find((t) => t.id === e.target.value);
-                setTable(found || null);
+                if (e.target.value === 'counter') {
+                  setTable({ id: 'counter', table_number: 'Counter Pickup · Daily Token', section: 'Express Takeaway' });
+                } else {
+                  const found = availableTables.find((t) => t.id === e.target.value);
+                  setTable(found || null);
+                }
               }}
-              className="bg-slate-900/90 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer shadow-inner"
+              className="bg-slate-900/90 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer shadow-inner shrink-0"
             >
-              <option value="">
-                {currentRestaurant?.business_type === 'clinic' ? 'Change Room / Token...' : 'Change Table...'}
-              </option>
+              <option value="counter">🚶 Counter / Token Mode</option>
               {availableTables.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.table_number} ({t.section})

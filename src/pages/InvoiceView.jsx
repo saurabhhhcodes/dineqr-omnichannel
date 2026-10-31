@@ -1,13 +1,18 @@
 // src/pages/InvoiceView.jsx - Printable GST Tax Invoice & POS Thermal Receipt
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Printer, ArrowLeft, Download, ShieldCheck, Utensils, Receipt, CheckCircle2 } from 'lucide-react';
+import { useParams, Link, useLocation } from 'react-router-dom';
+import { Printer, ArrowLeft, Download, ShieldCheck, Utensils, Receipt, CheckCircle2, Cpu } from 'lucide-react';
 
 export function InvoiceView() {
   const { orderId } = useParams();
+  const location = useLocation();
   const [invoiceData, setInvoiceData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [receiptMode, setReceiptMode] = useState('a4'); // 'a4' or 'thermal'
+  const [receiptMode, setReceiptMode] = useState(
+    location.search.includes('mode=thermal') ? 'thermal' : 'a4'
+  );
+  const [isHardwarePrinting, setIsHardwarePrinting] = useState(false);
+  const [hardwareMsg, setHardwareMsg] = useState(null);
 
   useEffect(() => {
     fetch(`/api/invoice/${orderId}`)
@@ -15,14 +20,41 @@ export function InvoiceView() {
       .then((data) => {
         if (data.success && data.invoice) {
           setInvoiceData(data.invoice);
+
+          if (location.search.includes('autoprint=true')) {
+            setTimeout(() => {
+              window.print();
+            }, 600);
+          }
         }
       })
       .catch((err) => console.error('Error loading invoice:', err))
       .finally(() => setIsLoading(false));
-  }, [orderId]);
+  }, [orderId, location.search]);
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleHardwarePrint = async () => {
+    setIsHardwarePrinting(true);
+    setHardwareMsg(null);
+    try {
+      const res = await fetch(`/api/invoice/${orderId}/print`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (data.success) {
+        setHardwareMsg(data.message || 'Dispatched to ESC/POS billing printer');
+      } else {
+        setHardwareMsg('Print error: ' + (data.error || 'Check printer connection'));
+      }
+    } catch (err) {
+      setHardwareMsg('Hardware printer unreachable: ' + err.message);
+    } finally {
+      setIsHardwarePrinting(false);
+    }
   };
 
   if (isLoading) {
@@ -81,14 +113,30 @@ export function InvoiceView() {
           </div>
 
           <button
+            onClick={handleHardwarePrint}
+            disabled={isHardwarePrinting}
+            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50"
+            title="Dispatch ESC/POS raw bytes to physical thermal billing machine (Port 9100)"
+          >
+            <Cpu className="w-3.5 h-3.5 text-amber-400" />
+            <span>{isHardwarePrinting ? 'Dispatching...' : 'Hardware Thermal POS'}</span>
+          </button>
+
+          <button
             onClick={handlePrint}
             className="px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold shadow-md shadow-orange-600/20 flex items-center gap-2 transition cursor-pointer"
           >
             <Printer className="w-4 h-4" />
-            <span>Print Invoice / Save PDF</span>
+            <span>Print Invoice / PDF</span>
           </button>
         </div>
       </div>
+
+      {hardwareMsg && (
+        <div className="max-w-3xl mx-auto mb-4 text-center text-xs font-bold text-slate-800 bg-amber-50 border border-amber-300 py-2 px-4 rounded-xl shadow-xs no-print animate-in fade-in">
+          {hardwareMsg}
+        </div>
+      )}
 
       {/* INVOICE CARD */}
       <div
@@ -108,6 +156,13 @@ export function InvoiceView() {
                 GSTIN: {restaurant.gstin} | FSSAI: {restaurant.fssai}
               </div>
             </div>
+
+            {(order.token_number || order.is_counter_order) && (
+              <div className="py-2.5 my-1 border-y-2 border-dashed border-slate-900 text-center font-black bg-slate-50">
+                <div className="text-[10px] uppercase tracking-widest text-slate-500">Customer Pickup Token</div>
+                <div className="text-2xl font-black mt-0.5 text-slate-950">TOKEN #{order.token_number || '1'}</div>
+              </div>
+            )}
 
             <div className="border-b border-dashed border-slate-300 pb-2 text-left text-[11px] space-y-0.5">
               <div className="flex justify-between">

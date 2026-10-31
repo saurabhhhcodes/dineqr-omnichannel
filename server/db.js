@@ -315,6 +315,16 @@ export function initDb() {
   ensureColumn('menu_items', 'video_url', "TEXT DEFAULT ''");
   ensureColumn('orders', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('orders', 'payment_method', "TEXT DEFAULT 'Razorpay / UPI'");
+  ensureColumn('orders', 'is_counter_order', "INTEGER DEFAULT 0");
+  ensureColumn('orders', 'token_number', "INTEGER DEFAULT 0");
+  ensureColumn('orders', 'printed_at', "DATETIME");
+  ensureColumn('orders', 'print_count', "INTEGER DEFAULT 0");
+  ensureColumn('restaurants', 'printer_type', "TEXT DEFAULT 'browser'");
+  ensureColumn('restaurants', 'printer_ip', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'printer_port', "INTEGER DEFAULT 9100");
+  ensureColumn('restaurants', 'paper_width', "TEXT DEFAULT '80mm'");
+  ensureColumn('restaurants', 'auto_print_bills', "INTEGER DEFAULT 1");
+  ensureColumn('restaurants', 'cash_drawer_kick', "INTEGER DEFAULT 1");
   ensureColumn('orders', 'split_type', "TEXT DEFAULT 'SINGLE'");
   ensureColumn('orders', 'split_shares', "INTEGER DEFAULT 1");
   ensureColumn('restaurants', 'razorpay_key_id', "TEXT DEFAULT ''");
@@ -348,6 +358,16 @@ export function initDb() {
   ensureColumn('restaurants', 'onboarding_status', "TEXT DEFAULT 'approved'");
   ensureColumn('restaurants', 'cloud_domain', "TEXT DEFAULT ''");
   ensureColumn('orders', 'payment_method', "TEXT DEFAULT 'Razorpay / UPI'");
+  ensureColumn('orders', 'is_counter_order', "INTEGER DEFAULT 0");
+  ensureColumn('orders', 'token_number', "INTEGER DEFAULT 0");
+  ensureColumn('orders', 'printed_at', "DATETIME");
+  ensureColumn('orders', 'print_count', "INTEGER DEFAULT 0");
+  ensureColumn('restaurants', 'printer_type', "TEXT DEFAULT 'browser'");
+  ensureColumn('restaurants', 'printer_ip', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'printer_port', "INTEGER DEFAULT 9100");
+  ensureColumn('restaurants', 'paper_width', "TEXT DEFAULT '80mm'");
+  ensureColumn('restaurants', 'auto_print_bills', "INTEGER DEFAULT 1");
+  ensureColumn('restaurants', 'cash_drawer_kick', "INTEGER DEFAULT 1");
 
   // Seed default restaurants
   for (const r of defaultRestaurants) {

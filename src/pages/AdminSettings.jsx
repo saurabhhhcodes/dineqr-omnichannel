@@ -11,7 +11,9 @@ import {
   Receipt,
   AlertCircle,
   HelpCircle,
-  ExternalLink
+  ExternalLink,
+  Printer,
+  Cpu
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -38,12 +40,20 @@ export function AdminSettings() {
     bank_account: '',
     bank_ifsc: '',
     cloud_domain: '',
+    printer_type: 'browser',
+    printer_ip: '',
+    printer_port: 9100,
+    paper_width: '80mm',
+    auto_print_bills: 1,
+    cash_drawer_kick: 1,
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isValidatingKeys, setIsValidatingKeys] = useState(false);
   const [keyValidationStatus, setKeyValidationStatus] = useState(null);
+  const [isTestingPrinter, setIsTestingPrinter] = useState(false);
+  const [printerStatusMsg, setPrinterStatusMsg] = useState(null);
 
   useEffect(() => {
     if (!activeRestaurant) return;
@@ -72,12 +82,46 @@ export function AdminSettings() {
             bank_account: r.bank_account || '',
             bank_ifsc: r.bank_ifsc || '',
             cloud_domain: r.cloud_domain || '',
+            printer_type: r.printer_type || 'browser',
+            printer_ip: r.printer_ip || '',
+            printer_port: r.printer_port || 9100,
+            paper_width: r.paper_width || '80mm',
+            auto_print_bills: r.auto_print_bills !== undefined ? r.auto_print_bills : 1,
+            cash_drawer_kick: r.cash_drawer_kick !== undefined ? r.cash_drawer_kick : 1,
           });
         }
       })
       .catch((err) => console.error('Failed to load settings:', err))
       .finally(() => setIsLoading(false));
   }, [activeRestaurant]);
+
+  const handleTestPrinter = async () => {
+    setIsTestingPrinter(true);
+    setPrinterStatusMsg(null);
+    try {
+      const res = await fetch('/api/invoice/test/print', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target_ip: formData.printer_ip,
+          target_port: formData.printer_port,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPrinterStatusMsg({ success: true, message: data.message });
+        addToast(`✅ ${data.message}`);
+      } else {
+        setPrinterStatusMsg({ success: false, message: data.error || 'Printer test failed' });
+        addToast(data.error || 'Failed to print', 'error');
+      }
+    } catch (err) {
+      setPrinterStatusMsg({ success: false, message: err.message });
+      addToast('Printer test failed: ' + err.message, 'error');
+    } finally {
+      setIsTestingPrinter(false);
+    }
+  };
 
   const handleTestRazorpay = async () => {
     if (!formData.razorpay_key_id) {
@@ -490,6 +534,139 @@ export function AdminSettings() {
               <p className="text-[11px] text-slate-400 mt-1.5">
                 Leave blank to automatically use the incoming request hostname (e.g. Cloudflare tunnel or Netlify edge).
               </p>
+            </div>
+          </div>
+
+          {/* BILLING MACHINE & THERMAL POS HARDWARE SETUP */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-orange-100 text-orange-600">
+                    <Printer className="w-5 h-5" />
+                  </div>
+                  <h2 className="text-base font-black text-slate-900">
+                    Billing Machine & Thermal POS Hardware Setup
+                  </h2>
+                  <span className="px-2 py-0.5 rounded-md bg-orange-100 text-orange-800 text-[10px] font-bold uppercase">
+                    ESC/POS Ready
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  Connect 80mm/58mm thermal billing machines (Epson, TVS, Citizen, Posiflex, Rongta, Sunmi). Bills and customer tokens are automatically printed upon order placement or payment.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleTestPrinter}
+                disabled={isTestingPrinter}
+                className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-md flex items-center gap-2 transition cursor-pointer disabled:opacity-50 shrink-0"
+              >
+                <Cpu className="w-4 h-4 text-amber-400" />
+                <span>{isTestingPrinter ? 'Testing Socket...' : 'Test Print Sample Slip'}</span>
+              </button>
+            </div>
+
+            {printerStatusMsg && (
+              <div
+                className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center gap-2 ${
+                  printerStatusMsg.success
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                    : 'bg-rose-50 text-rose-800 border border-rose-200'
+                }`}
+              >
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{printerStatusMsg.message}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Printer Interface / Protocol
+                </label>
+                <select
+                  value={formData.printer_type}
+                  onChange={(e) => setFormData({ ...formData, printer_type: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                >
+                  <option value="tcp">Direct Network TCP (Port 9100 ESC/POS)</option>
+                  <option value="usb">USB / Local Spooler Agent</option>
+                  <option value="browser">Browser Native Print Dialog</option>
+                </select>
+                <span className="text-[10px] text-slate-400 mt-1 block">Most billing machines use TCP port 9100</span>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Printer IP Address
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 192.168.1.100 or 127.0.0.1"
+                  value={formData.printer_ip}
+                  onChange={(e) => setFormData({ ...formData, printer_ip: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                />
+                <span className="text-[10px] text-slate-400 mt-1 block">Static IP on restaurant LAN</span>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Printer Port
+                </label>
+                <input
+                  type="number"
+                  placeholder="9100"
+                  value={formData.printer_port}
+                  onChange={(e) => setFormData({ ...formData, printer_port: parseInt(e.target.value, 10) || 9100 })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                />
+                <span className="text-[10px] text-slate-400 mt-1 block">Standard ESC/POS port 9100</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Thermal Paper Roll Width
+                </label>
+                <select
+                  value={formData.paper_width}
+                  onChange={(e) => setFormData({ ...formData, paper_width: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                >
+                  <option value="80mm">80mm (Standard 3-inch, 42 columns)</option>
+                  <option value="58mm">58mm (Compact 2-inch, 32 columns)</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-3 pt-6">
+                <input
+                  type="checkbox"
+                  id="auto_print_bills"
+                  checked={!!formData.auto_print_bills}
+                  onChange={(e) => setFormData({ ...formData, auto_print_bills: e.target.checked ? 1 : 0 })}
+                  className="w-4 h-4 rounded text-orange-600 focus:ring-orange-500 border-slate-300 cursor-pointer"
+                />
+                <label htmlFor="auto_print_bills" className="text-xs font-bold text-slate-700 cursor-pointer">
+                  Auto-Print on Order Placement / Payment
+                </label>
+              </div>
+
+              <div className="flex items-center gap-3 pt-6">
+                <input
+                  type="checkbox"
+                  id="cash_drawer_kick"
+                  checked={!!formData.cash_drawer_kick}
+                  onChange={(e) => setFormData({ ...formData, cash_drawer_kick: e.target.checked ? 1 : 0 })}
+                  className="w-4 h-4 rounded text-orange-600 focus:ring-orange-500 border-slate-300 cursor-pointer"
+                />
+                <label htmlFor="cash_drawer_kick" className="text-xs font-bold text-slate-700 cursor-pointer">
+                  Auto-Kick Cash Drawer (ESC p)
+                </label>
+              </div>
             </div>
           </div>
 

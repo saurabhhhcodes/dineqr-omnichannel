@@ -519,6 +519,12 @@ router.put('/:id', (req, res) => {
       bank_account,
       bank_ifsc,
       is_active,
+      printer_type,
+      printer_ip,
+      printer_port,
+      paper_width,
+      auto_print_bills,
+      cash_drawer_kick,
     } = req.body;
 
     execute(
@@ -541,6 +547,12 @@ router.put('/:id', (req, res) => {
         bank_account = COALESCE(?, bank_account),
         bank_ifsc = COALESCE(?, bank_ifsc),
         is_active = COALESCE(?, is_active),
+        printer_type = COALESCE(?, printer_type),
+        printer_ip = COALESCE(?, printer_ip),
+        printer_port = COALESCE(?, printer_port),
+        paper_width = COALESCE(?, paper_width),
+        auto_print_bills = COALESCE(?, auto_print_bills),
+        cash_drawer_kick = COALESCE(?, cash_drawer_kick),
         updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
       [
@@ -562,6 +574,12 @@ router.put('/:id', (req, res) => {
         bank_account !== undefined ? bank_account.trim() : null,
         bank_ifsc !== undefined ? bank_ifsc.trim() : null,
         is_active !== undefined ? (is_active ? 1 : 0) : null,
+        printer_type !== undefined ? printer_type : null,
+        printer_ip !== undefined ? printer_ip.trim() : null,
+        printer_port !== undefined ? parseInt(printer_port, 10) : null,
+        paper_width !== undefined ? paper_width : null,
+        auto_print_bills !== undefined ? (auto_print_bills ? 1 : 0) : null,
+        cash_drawer_kick !== undefined ? (cash_drawer_kick ? 1 : 0) : null,
         req.params.id,
       ]
     );

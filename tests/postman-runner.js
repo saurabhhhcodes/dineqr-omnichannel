@@ -521,6 +521,60 @@ async function runPostmanTestSuite() {
     assert.equal(data.restaurant.id, 'rest_losteria');
   });
 
+  // 26. Counter Order Placement & Daily Rotating Token Generation
+  await step('POST /api/orders -> Places counter order and assigns daily token number', async () => {
+    const res = await fetch(`${BASE_URL}/api/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurant_id: 'rest_losteria',
+        table_id: 'counter',
+        is_counter_order: 1,
+        customer_name: 'Dr. Vikram Malhotra',
+        customer_phone: '9876543210',
+        payment_method: 'Razorpay (Google Pay)',
+        items: [{ id: 'item_6', quantity: 2, notes: 'Crispy crust' }],
+      }),
+    });
+    assert.equal(res.status, 201);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.order.token_number > 0, 'Token number must be > 0');
+    assert.ok(data.order.table_number.includes('Counter · Token #'), 'Must format table number as Counter Token');
+    assert.equal(data.order.customer_name, 'Dr. Vikram Malhotra');
+  });
+
+  // 27. ESC/POS Hardware Billing Machine Dispatcher
+  await step('POST /api/invoice/test/print -> Dispatches ESC/POS byte buffers to POS printer', async () => {
+    const res = await fetch(`${BASE_URL}/api/invoice/test/print`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        target_ip: '127.0.0.1',
+        target_port: 9100,
+      }),
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.escpos_bytes_count > 100, 'Must generate valid binary ESC/POS buffer');
+    assert.equal(data.order_code, 'TEST-80MM');
+  });
+
+  // 28. Multi-Platform Distributables Catalog
+  await step('GET /api/downloads -> Returns catalog of EXE, APK, DMG, and DEB binaries', async () => {
+    const res = await fetch(`${BASE_URL}/api/downloads`);
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.releases.length >= 4, 'Must include at least 4 operating system packages');
+    const platforms = data.releases.map((r) => r.platform);
+    assert.ok(platforms.includes('windows'));
+    assert.ok(platforms.includes('android'));
+    assert.ok(platforms.includes('macos'));
+    assert.ok(platforms.includes('linux'));
+  });
+
   console.log(`\n🏁 Postman Test Suite Summary: ${passed}/${total} assertions passed!`);
   if (passed === total) {
     console.log('🎉 ALL POSTMAN COLLECTION ENDPOINTS VERIFIED AND PASSING 100%!\n');

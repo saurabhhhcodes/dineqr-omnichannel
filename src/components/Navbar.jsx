@@ -107,31 +107,34 @@ export function Navbar({ onOpenCart }) {
         {isCustomerView ? (
           <>
             {/* Business Brand on Digital Menu */}
-            <div className="flex items-center gap-3">
-              <Link to="/menu" className="flex items-center gap-2.5 group shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 sm:flex-initial">
+              <Link
+                to={`/menu?restaurant=${activeRestaurant?.slug || activeRestaurant?.id || 'rest_losteria'}`}
+                className="flex items-center gap-2 group min-w-0"
+              >
                 <div
-                  className={`w-10 h-10 rounded-2xl bg-gradient-to-tr ${brandGradient} flex items-center justify-center text-white shadow-md shadow-slate-900/10 group-hover:scale-105 transition`}
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr ${brandGradient} flex items-center justify-center text-white shadow-md shadow-slate-900/10 group-hover:scale-105 transition shrink-0`}
                 >
                   <BrandIcon className="w-5 h-5" />
                 </div>
-                <div>
-                  <div className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight leading-none group-hover:text-sky-600 transition">
-                    {activeRestaurant?.name || "L'Osteria Gourmet Bistro"}
+                <div className="min-w-0">
+                  <div className="font-extrabold text-slate-900 text-xs sm:text-base tracking-tight leading-none group-hover:text-sky-600 transition truncate max-w-[130px] sm:max-w-xs">
+                    {activeRestaurant?.name || "L'Osteria"}
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-0.5 font-medium hidden sm:block">
+                  <p className="text-[10px] text-slate-400 mt-0.5 font-medium hidden sm:block truncate max-w-xs">
                     {activeRestaurant?.tagline || 'Self-Ordering & Instant Payment Platform'}
                   </p>
                 </div>
               </Link>
             </div>
 
-            {/* Center Station / Room / Table Indicator */}
-            <div className="flex items-center gap-2">
+            {/* Center Station / Room / Table Indicator - Hidden on narrow mobile to prevent overlap */}
+            <div className="hidden md:flex items-center gap-2">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-900 text-xs font-bold shadow-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>{table ? table.table_number : defaultStationLabel}</span>
+                <span>{table ? table.table_number : 'Counter Pickup · Token Order'}</span>
                 {table?.section && (
-                  <span className="text-slate-500 font-normal hidden sm:inline">
+                  <span className="text-slate-500 font-normal">
                     · {table.section}
                   </span>
                 )}
@@ -139,7 +142,7 @@ export function Navbar({ onOpenCart }) {
             </div>
 
             {/* Right Customer Actions */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               {/* Call Staff Button */}
               <button
                 onClick={handleCallWaiter}
@@ -159,7 +162,7 @@ export function Navbar({ onOpenCart }) {
               {onOpenCart && (
                 <button
                   onClick={onOpenCart}
-                  className="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 active:scale-95 text-white text-xs font-black shadow-md shadow-sky-600/25 transition cursor-pointer"
+                  className="relative flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 active:scale-95 text-white text-xs font-black shadow-md shadow-sky-600/25 transition cursor-pointer shrink-0"
                 >
                   <ShoppingBag className="w-4 h-4" />
                   <span className="hidden sm:inline">{isClinic ? 'Bookings' : 'Cart'}</span>
@@ -169,32 +172,12 @@ export function Navbar({ onOpenCart }) {
                     </span>
                   ) : null}
                   {grandTotal > 0 && (
-                    <span className="hidden sm:inline border-l border-white/30 pl-2">
+                    <span className="border-l border-white/30 pl-2 text-xs font-black">
                       ₹{grandTotal}
                     </span>
                   )}
                 </button>
               )}
-
-              {/* Onboard / Join link for other businesses */}
-              <Link
-                to="/onboard"
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-xs"
-                title="Register your clinic, restaurant, gym, or festival"
-              >
-                <PlusCircle className="w-3.5 h-3.5 text-sky-400" />
-                <span>Join as Business</span>
-              </Link>
-
-              {/* Discrete Staff Portal link */}
-              <Link
-                to="/admin"
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition text-xs font-semibold flex items-center gap-1"
-                title="Switch to Staff / Management Portal"
-              >
-                <span className="hidden lg:inline text-[11px]">Staff Mode</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </Link>
             </div>
           </>
         ) : (

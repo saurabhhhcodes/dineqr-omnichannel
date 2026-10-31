@@ -14,7 +14,8 @@ import {
   Utensils,
   Download,
   Calendar,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Printer
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -64,6 +65,23 @@ export function AdminOrders() {
     const exportUrl = `/api/orders/export?${params.toString()}`;
     window.location.href = exportUrl;
     addToast('Generating Excel/CSV spreadsheet report...');
+  };
+
+  const handlePrintThermal = async (orderId, orderCode) => {
+    try {
+      const res = await fetch(`/api/invoice/${orderId}/print`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`🖨️ ${data.message || `Thermal bill printed for ${orderCode}`}`);
+      } else {
+        addToast(data.error || 'Failed to print bill', 'error');
+      }
+    } catch (err) {
+      addToast('Printer error: ' + err.message, 'error');
+    }
   };
 
   const filtered = orders.filter((o) => {
@@ -268,6 +286,13 @@ export function AdminOrders() {
 
                       <td className="py-3.5 px-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => handlePrintThermal(order.id, order.order_code)}
+                            className="p-1.5 rounded-lg bg-orange-50 hover:bg-orange-100 text-orange-700 transition cursor-pointer"
+                            title="Direct 80mm ESC/POS Thermal Print"
+                          >
+                            <Printer className="w-4 h-4" />
+                          </button>
                           <Link
                             to={`/invoice/${order.id}`}
                             className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition"

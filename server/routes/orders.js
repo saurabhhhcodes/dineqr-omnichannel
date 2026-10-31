@@ -245,12 +245,21 @@ router.post('/', (req, res) => {
       return res.status(400).json({ success: false, error: 'Cart is empty. Please add items to place an order.' });
     }
 
-    // Lookup table
+    // Lookup table or Counter Pickup Token
     let table = null;
-    let tableNumber = 'Takeaway / Bar';
     let resolvedRestId = restaurant_id || 'rest_losteria';
+    const isCounter = !table_id || table_id === 'counter' || table_id === 'takeaway' || table_id === 'walkin';
 
-    if (table_id) {
+    // Generate daily rotating token number
+    const todayTokenCount = queryOne(
+      `SELECT COUNT(*) as c FROM orders WHERE restaurant_id = ? AND date(created_at) = date('now')`,
+      [resolvedRestId]
+    )?.c || 0;
+    const tokenNumber = todayTokenCount + 1;
+
+    let tableNumber = `Counter · Token #${tokenNumber}`;
+
+    if (!isCounter && table_id) {
       table = queryOne(`SELECT * FROM tables WHERE id = ? OR table_number = ?`, [table_id, table_id]);
       if (table) {
         tableNumber = table.table_number;
@@ -311,15 +320,15 @@ router.post('/', (req, res) => {
       `INSERT INTO orders (
         id, restaurant_id, order_code, table_id, table_number, customer_name, customer_phone,
         status, payment_status, payment_method, subtotal, cgst, sgst, service_charge,
-        grand_total, special_instructions, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'RECEIVED', ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+        grand_total, special_instructions, is_counter_order, token_number, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'RECEIVED', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
       [
         orderId,
         resolvedRestId,
         orderCode,
         table ? table.id : null,
         tableNumber,
-        customer_name || 'Guest',
+        customer_name || (isCounter ? `Counter Guest #${tokenNumber}` : 'Guest'),
         customer_phone || '',
         payStatus,
         payMethod,
@@ -329,6 +338,8 @@ router.post('/', (req, res) => {
         serviceCharge,
         grandTotal,
         special_instructions || '',
+        isCounter ? 1 : 0,
+        tokenNumber,
       ]
     );
 

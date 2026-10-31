@@ -56,6 +56,12 @@ export function CartDrawer({ isOpen, onClose }) {
       return;
     }
 
+    const isCounter = !table || table.id === 'counter' || table.id === 'takeaway';
+    if (isCounter && !customerName.trim()) {
+      addToast('Please enter your name for your pickup token & bill', 'error');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -64,8 +70,9 @@ export function CartDrawer({ isOpen, onClose }) {
       // 1. Create order in backend local database
       const orderPayload = {
         restaurant_id: table?.restaurant_id || activeRestaurant?.id || 'rest_losteria',
-        table_id: table ? table.id : null,
-        customer_name: customerName.trim() || 'Guest',
+        table_id: isCounter ? null : (table ? table.id : null),
+        is_counter_order: isCounter ? 1 : 0,
+        customer_name: customerName.trim() || (isCounter ? 'Walk-in Guest' : 'Guest'),
         customer_phone: customerPhone.trim(),
         special_instructions: tableInstructions.trim(),
         payment_method: selectedMethodName,
@@ -270,38 +277,84 @@ export function CartDrawer({ isOpen, onClose }) {
                     ))}
                   </div>
 
-                  {/* Customer Information (Optional) */}
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-2.5">
-                    <div className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                      <span>Dining Details</span>
-                      <span className="text-[10px] text-slate-400 font-normal">For digital invoice</span>
-                    </div>
+                  {/* Customer Information & Token / Table Registration */}
+                  {(!table || table.id === 'counter' || table.id === 'takeaway') ? (
+                    <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2.5">
+                      <div className="text-xs font-bold text-amber-900 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <span>⚡ Counter Pickup & Token Slip</span>
+                        </span>
+                        <span className="text-[10px] bg-amber-200 text-amber-900 font-black px-1.5 py-0.5 rounded uppercase">
+                          Live Daily Token
+                        </span>
+                      </div>
 
-                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-amber-900 block">
+                          Customer Name <span className="text-rose-600">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Enter your name (e.g. Rahul Sharma)"
+                          value={customerName}
+                          onChange={(e) => setCustomerName(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-amber-300 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none font-medium text-slate-900"
+                        />
+                        <p className="text-[10px] text-amber-800">
+                          Your name will be printed on the token & bill so kitchen staff can call you when your order is ready.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 pt-0.5">
+                        <input
+                          type="tel"
+                          placeholder="Phone (optional)"
+                          value={customerPhone}
+                          onChange={(e) => setCustomerPhone(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Order note (optional)"
+                          value={tableInstructions}
+                          onChange={(e) => setTableInstructions(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-2.5">
+                      <div className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span>Dining Details</span>
+                        <span className="text-[10px] text-slate-400 font-normal">For digital invoice</span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          placeholder="Your Name (Optional)"
+                          value={customerName}
+                          onChange={(e) => setCustomerName(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                        />
+                        <input
+                          type="tel"
+                          placeholder="Phone Number"
+                          value={customerPhone}
+                          onChange={(e) => setCustomerPhone(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                        />
+                      </div>
+
                       <input
                         type="text"
-                        placeholder="Your Name (Optional)"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
-                      />
-                      <input
-                        type="tel"
-                        placeholder="Phone Number"
-                        value={customerPhone}
-                        onChange={(e) => setCustomerPhone(e.target.value)}
+                        placeholder="Special table requests or allergies..."
+                        value={tableInstructions}
+                        onChange={(e) => setTableInstructions(e.target.value)}
                         className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
                       />
                     </div>
-
-                    <input
-                      type="text"
-                      placeholder="Special table requests or allergies..."
-                      value={tableInstructions}
-                      onChange={(e) => setTableInstructions(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
-                    />
-                  </div>
+                  )}
 
                   {/* Payment Choice Selection */}
                   <div className="space-y-2">

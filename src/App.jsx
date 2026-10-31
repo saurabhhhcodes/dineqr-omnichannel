@@ -25,6 +25,7 @@ import { AdminStaff } from './pages/AdminStaff.jsx';
 import { AdminInventory } from './pages/AdminInventory.jsx';
 import { AdminPurchases } from './pages/AdminPurchases.jsx';
 import { AdminDownloads } from './pages/AdminDownloads.jsx';
+import { AdminAuthGate } from './components/AdminAuthGate.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -53,24 +54,24 @@ function AppContent() {
           <Route path="/onboard" element={<ClientOnboarding />} />
           <Route path="/join" element={<ClientOnboarding />} />
 
-          {/* Restaurant / Clinic / Gym Staff & Owner */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/kitchen" element={<AdminKitchen />} />
-          <Route path="/admin/tables" element={<AdminTables />} />
-          <Route path="/admin/menu" element={<AdminMenu />} />
-          <Route path="/admin/orders" element={<AdminOrders />} />
-          <Route path="/admin/floor-plan" element={<AdminFloorPlan />} />
-          <Route path="/admin/reservations" element={<AdminReservations />} />
-          <Route path="/admin/staff" element={<AdminStaff />} />
-          <Route path="/admin/inventory" element={<AdminInventory />} />
-          <Route path="/admin/purchases" element={<AdminPurchases />} />
-          <Route path="/admin/downloads" element={<AdminDownloads />} />
+          {/* Restaurant / Clinic / Gym Staff & Owner (Guarded by AdminAuthGate) */}
+          <Route path="/admin" element={<AdminAuthGate><AdminDashboard /></AdminAuthGate>} />
+          <Route path="/admin/kitchen" element={<AdminAuthGate><AdminKitchen /></AdminAuthGate>} />
+          <Route path="/admin/tables" element={<AdminAuthGate><AdminTables /></AdminAuthGate>} />
+          <Route path="/admin/menu" element={<AdminAuthGate><AdminMenu /></AdminAuthGate>} />
+          <Route path="/admin/orders" element={<AdminAuthGate><AdminOrders /></AdminAuthGate>} />
+          <Route path="/admin/floor-plan" element={<AdminAuthGate><AdminFloorPlan /></AdminAuthGate>} />
+          <Route path="/admin/reservations" element={<AdminAuthGate><AdminReservations /></AdminAuthGate>} />
+          <Route path="/admin/staff" element={<AdminAuthGate><AdminStaff /></AdminAuthGate>} />
+          <Route path="/admin/inventory" element={<AdminAuthGate><AdminInventory /></AdminAuthGate>} />
+          <Route path="/admin/purchases" element={<AdminAuthGate><AdminPurchases /></AdminAuthGate>} />
+          <Route path="/admin/downloads" element={<AdminAuthGate><AdminDownloads /></AdminAuthGate>} />
           <Route path="/downloads" element={<AdminDownloads />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/settings" element={<AdminAuthGate><AdminSettings /></AdminAuthGate>} />
 
           {/* Super Admin Fleet */}
-          <Route path="/super-admin" element={<SuperAdmin />} />
-          <Route path="/admin/super" element={<SuperAdmin />} />
+          <Route path="/super-admin" element={<AdminAuthGate><SuperAdmin /></AdminAuthGate>} />
+          <Route path="/admin/super" element={<AdminAuthGate><SuperAdmin /></AdminAuthGate>} />
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/menu" replace />} />

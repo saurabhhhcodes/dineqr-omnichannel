@@ -139,6 +139,21 @@ export function OrderConfirmation() {
           </button>
         </div>
 
+        {/* Token Banner for Counter / Scanner Customers */}
+        {(order.token_number || order.is_counter_order) && (
+          <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white rounded-3xl p-6 shadow-xl text-center space-y-2 border border-white/20 animate-in zoom-in-95">
+            <div className="text-[10px] font-black uppercase tracking-widest bg-black/25 rounded-full px-3 py-1 inline-block">
+              🎯 Counter Pickup Token
+            </div>
+            <div className="text-4xl sm:text-5xl font-black tracking-tight">
+              TOKEN #{order.token_number || '1'}
+            </div>
+            <p className="text-xs text-amber-100 font-medium max-w-sm mx-auto">
+              Guest: <strong className="text-white">{order.customer_name || 'Valued Guest'}</strong> · Please keep this screen open. Counter staff will call your token number when ready.
+            </p>
+          </div>
+        )}
+
         {/* Order Header Card */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm text-center">
           <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
