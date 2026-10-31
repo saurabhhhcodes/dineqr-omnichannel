@@ -58,3 +58,14 @@
     border: 1px solid #000 !important;
   }
 }
+
+/* Hide Netlify floating overlay badge so it never covers buttons or footer */
+[data-netlify-deploy-id],
+[class*="netlify-badge"],
+#netlify-badge,
+.netlify-badge,
+iframe[src*="netlify"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
