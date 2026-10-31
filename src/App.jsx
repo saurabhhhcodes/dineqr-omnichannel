@@ -25,6 +25,7 @@ import { AdminStaff } from './pages/AdminStaff.jsx';
 import { AdminInventory } from './pages/AdminInventory.jsx';
 import { AdminPurchases } from './pages/AdminPurchases.jsx';
 import { AdminDownloads } from './pages/AdminDownloads.jsx';
+import { SubscriptionPricing } from './pages/SubscriptionPricing.jsx';
 import { AdminAuthGate } from './components/AdminAuthGate.jsx';
 
 function AppContent() {
@@ -36,7 +37,7 @@ function AppContent() {
   const pageBg = isLandingPage ? 'bg-slate-950' : 'bg-slate-50';
 
   return (
-    <div className={`min-h-screen ${pageBg} flex flex-col font-sans w-full max-w-full overflow-x-hidden`}>
+    <div className={`min-h-screen ${pageBg} flex flex-col font-sans w-full max-w-full`}>
       {!isPrintOnly && (
         <Navbar onOpenCart={() => setIsCartOpen(true)} />
       )}
@@ -69,6 +70,9 @@ function AppContent() {
           <Route path="/admin/purchases" element={<AdminAuthGate><AdminPurchases /></AdminAuthGate>} />
           <Route path="/admin/downloads" element={<AdminAuthGate><AdminDownloads /></AdminAuthGate>} />
           <Route path="/downloads" element={<AdminDownloads />} />
+          <Route path="/pricing" element={<SubscriptionPricing />} />
+          <Route path="/subscription" element={<SubscriptionPricing />} />
+          <Route path="/admin/subscription" element={<AdminAuthGate><SubscriptionPricing /></AdminAuthGate>} />
           <Route path="/admin/settings" element={<AdminAuthGate><AdminSettings /></AdminAuthGate>} />
 
           {/* Super Admin Fleet */}

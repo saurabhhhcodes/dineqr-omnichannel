@@ -670,6 +670,164 @@ async function runPostmanTestSuite() {
     assert.equal(data.order.order_source, 'ZOMATO');
   });
 
+  // 34. Add Floor Plan Table
+  let createdFpTableId = null;
+  await step('POST /api/erp/floor-plan/table -> Add new table to floor plan', async () => {
+    const res = await fetch(`${BASE_URL}/api/erp/floor-plan/table`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurant_id: 'rest_losteria',
+        table_number: 'T-PM-99',
+        section: 'VIP Lounge',
+        capacity: 6,
+        shape: 'rect',
+        pos_x: 250,
+        pos_y: 180,
+      }),
+    });
+    assert.equal(res.status, 201);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.table.table_number, 'T-PM-99');
+    createdFpTableId = data.table.id;
+  });
+
+  // 35. Edit Floor Plan Table
+  await step('PUT /api/erp/floor-plan/table/:id -> Edit table capacity & shape', async () => {
+    const res = await fetch(`${BASE_URL}/api/erp/floor-plan/table/${createdFpTableId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        table_number: 'T-PM-Updated',
+        capacity: 8,
+        shape: 'circle',
+      }),
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.table.table_number, 'T-PM-Updated');
+    assert.equal(data.table.capacity, 8);
+  });
+
+  // 36. Delete Floor Plan Table
+  await step('DELETE /api/erp/floor-plan/table/:id -> Remove table from floor plan', async () => {
+    const res = await fetch(`${BASE_URL}/api/erp/floor-plan/table/${createdFpTableId}`, {
+      method: 'DELETE',
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+  });
+
+  // 37. Staff Attendance Clock-In & Duty Assignment
+  let createdAttId = null;
+  await step('POST /api/erp/staff-attendance/clock-in -> Record staff arrival and duty station', async () => {
+    const res = await fetch(`${BASE_URL}/api/erp/staff-attendance/clock-in`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurant_id: 'rest_losteria',
+        employee_name: 'Pooja Nair',
+        role: 'Waiter / Server',
+        current_activity: 'Table Service (Section B)',
+      }),
+    });
+    assert.equal(res.status, 201);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.attendance.employee_name, 'Pooja Nair');
+    assert.equal(data.attendance.status, 'ON_DUTY');
+    createdAttId = data.attendance.id;
+  });
+
+  // 38. Staff Attendance Activity Update
+  await step('PATCH /api/erp/staff-attendance/:id/activity -> Update staff activity to POS Cashier', async () => {
+    const res = await fetch(`${BASE_URL}/api/erp/staff-attendance/${createdAttId}/activity`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        current_activity: 'POS Billing Counter & Cash Register',
+      }),
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.attendance.current_activity, 'POS Billing Counter & Cash Register');
+  });
+
+  // 39. Staff Attendance Clock-Out
+  await step('POST /api/erp/staff-attendance/clock-out -> Clock out staff with timestamp', async () => {
+    const res = await fetch(`${BASE_URL}/api/erp/staff-attendance/clock-out`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: createdAttId,
+        notes: 'Shift completed successfully',
+      }),
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.attendance.status, 'CLOCKED_OUT');
+  });
+
+  // 40. Monthly Subscription Status
+  await step('GET /api/subscription/status -> Check monthly ₹1,000 / ₹1,500 plans', async () => {
+    const res = await fetch(`${BASE_URL}/api/subscription/status?restaurant_id=rest_losteria`);
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.available_plans.length >= 2);
+  });
+
+  // 41. Monthly Subscription Order Creation
+  let subOrderId = null;
+  await step('POST /api/subscription/create-order -> Create monthly subscription checkout order', async () => {
+    const res = await fetch(`${BASE_URL}/api/subscription/create-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurant_id: 'rest_losteria',
+        plan_id: 'starter_1000',
+      }),
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.amount, 1000);
+    subOrderId = data.order_id;
+  });
+
+  // 42. Monthly Subscription Verification
+  await step('POST /api/subscription/verify -> Verify subscription payment & 30-day renewal', async () => {
+    const res = await fetch(`${BASE_URL}/api/subscription/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurant_id: 'rest_losteria',
+        plan_id: 'starter_1000',
+        razorpay_order_id: subOrderId,
+        razorpay_payment_id: 'pay_pm_sub_valid_123',
+      }),
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.status, 'active');
+  });
+
+  // 43. Download Permanent Local SQLite Backup
+  await step('GET /api/erp/local-sqlite/export -> Export permanent binary snapshot of restaurant.db', async () => {
+    const res = await fetch(`${BASE_URL}/api/erp/local-sqlite/export`);
+    assert.equal(res.status, 200);
+    const disp = res.headers.get('content-disposition') || '';
+    assert.ok(disp.includes('restaurant-local-store.db'));
+    const buf = await res.arrayBuffer();
+    assert.ok(buf.byteLength > 1000, 'Expected valid SQLite database binary file');
+  });
+
   console.log(`\n🏁 Postman Test Suite Summary: ${passed}/${total} assertions passed!`);
   if (passed === total) {
     console.log('🎉 ALL POSTMAN COLLECTION ENDPOINTS VERIFIED AND PASSING 100%!\n');

@@ -16,6 +16,13 @@ import {
   CheckCircle2,
   AlertCircle,
   HelpCircle,
+  Edit2,
+  Trash2,
+  X,
+  Circle,
+  Square,
+  QrCode,
+  Layers,
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -30,6 +37,19 @@ export function AdminFloorPlan() {
   const [selectedTable, setSelectedTable] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Modals state
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Add / Edit form fields
+  const [formTableNumber, setFormTableNumber] = useState('');
+  const [formSection, setFormSection] = useState('Main Dining');
+  const [formCapacity, setFormCapacity] = useState(4);
+  const [formShape, setFormShape] = useState('circle');
+  const [formWidth, setFormWidth] = useState(90);
+  const [formHeight, setFormHeight] = useState(90);
 
   // Dragging state
   const canvasRef = useRef(null);
@@ -49,6 +69,10 @@ export function AdminFloorPlan() {
       if (data.success) {
         setFloorTables(data.floor_tables || []);
         setHasUnsavedChanges(false);
+        if (selectedTable) {
+          const found = data.floor_tables.find((t) => t.id === selectedTable.id);
+          setSelectedTable(found || null);
+        }
       }
     } catch (err) {
       console.error('Failed to load floor plan:', err);
@@ -98,6 +122,7 @@ export function AdminFloorPlan() {
     setDraggingTableId(null);
   };
 
+  // Save batch layout coordinates
   const handleSaveLayout = async () => {
     setIsSaving(true);
     try {
@@ -132,6 +157,136 @@ export function AdminFloorPlan() {
     }
   };
 
+  // Add new table handler
+  const handleOpenAddModal = () => {
+    const nextNum = floorTables.length + 1;
+    setFormTableNumber(`T-${nextNum < 10 ? '0' + nextNum : nextNum}`);
+    setFormSection(sections[1] || 'Main Dining');
+    setFormCapacity(4);
+    setFormShape('circle');
+    setFormWidth(90);
+    setFormHeight(90);
+    setShowAddModal(true);
+  };
+
+  const handleAddTableSubmit = async (e) => {
+    e.preventDefault();
+    if (!formTableNumber.trim()) {
+      addToast('Table number is required', 'error');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Find a free spot on the canvas
+      const existingCount = floorTables.length;
+      const col = existingCount % 4;
+      const row = Math.floor(existingCount / 4);
+      const posX = 40 + col * 140;
+      const posY = 40 + row * 140;
+
+      const res = await fetch('/api/erp/floor-plan/table', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          restaurant_id: activeRestaurant?.id || 'rest_losteria',
+          table_number: formTableNumber.trim(),
+          name: `Table ${formTableNumber.trim()}`,
+          section: formSection.trim() || 'Main Dining',
+          capacity: parseInt(formCapacity) || 4,
+          shape: formShape,
+          width: parseInt(formWidth) || 90,
+          height: parseInt(formHeight) || 90,
+          pos_x: posX,
+          pos_y: posY,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        addToast(`✅ Table ${formTableNumber} added to floor plan!`);
+        setShowAddModal(false);
+        fetchFloorPlan();
+      } else {
+        addToast(data.error || 'Failed to add table', 'error');
+      }
+    } catch (err) {
+      addToast(err.message, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Edit table handler
+  const handleOpenEditModal = (table) => {
+    setSelectedTable(table);
+    setFormTableNumber(table.table_number || '');
+    setFormSection(table.section || 'Main Dining');
+    setFormCapacity(table.capacity || 4);
+    setFormShape(table.shape || 'circle');
+    setFormWidth(table.width || 90);
+    setFormHeight(table.height || 90);
+    setShowEditModal(true);
+  };
+
+  const handleEditTableSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedTable) return;
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`/api/erp/floor-plan/table/${selectedTable.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          table_number: formTableNumber.trim(),
+          name: `Table ${formTableNumber.trim()}`,
+          section: formSection.trim(),
+          capacity: parseInt(formCapacity) || 4,
+          shape: formShape,
+          width: parseInt(formWidth) || (formShape === 'circle' ? 90 : 110),
+          height: parseInt(formHeight) || 90,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        addToast(`✅ Table ${formTableNumber} updated!`);
+        setShowEditModal(false);
+        fetchFloorPlan();
+      } else {
+        addToast(data.error || 'Failed to update table', 'error');
+      }
+    } catch (err) {
+      addToast(err.message, 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Delete table handler
+  const handleDeleteTable = async (table) => {
+    if (!window.confirm(`Are you sure you want to remove ${table.table_number || 'this table'} from the floor plan?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/erp/floor-plan/table/${table.id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`🗑️ Table ${table.table_number} removed.`);
+        setSelectedTable(null);
+        fetchFloorPlan();
+      } else {
+        addToast(data.error || 'Failed to remove table', 'error');
+      }
+    } catch (err) {
+      addToast(err.message, 'error');
+    }
+  };
+
   const totalSeats = floorTables.reduce((acc, t) => acc + (t.capacity || 2), 0);
   const activeTablesCount = floorTables.filter((t) => t.active_orders > 0).length;
   const totalFloorRevenue = floorTables.reduce((acc, t) => acc + (t.active_bill_total || 0), 0);
@@ -154,7 +309,7 @@ export function AdminFloorPlan() {
                 Visual Floor Plan & Seating Layout
               </h1>
               <p className="text-xs text-slate-500">
-                Drag and position dining tables, monitor live orders, and optimize seat capacity
+                Add, edit, drag, and configure dining tables. Monitor live guest tabs in real time.
               </p>
             </div>
           </div>
@@ -176,6 +331,16 @@ export function AdminFloorPlan() {
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
 
+          {/* Add Table Button */}
+          <button
+            onClick={handleOpenAddModal}
+            className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-2 transition cursor-pointer shadow-md"
+          >
+            <Plus className="w-4 h-4 text-amber-400" />
+            <span>Add New Table</span>
+          </button>
+
+          {/* Save Layout Button */}
           <button
             onClick={handleSaveLayout}
             disabled={isSaving || !hasUnsavedChanges}
@@ -244,7 +409,7 @@ export function AdminFloorPlan() {
       {/* Visual Floor Canvas */}
       <div
         ref={canvasRef}
-        className="relative w-full h-[580px] bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl"
+        className="relative w-full h-[600px] bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl"
         style={{
           backgroundImage: 'radial-gradient(#334155 1px, transparent 1px)',
           backgroundSize: '24px 24px',
@@ -253,7 +418,7 @@ export function AdminFloorPlan() {
         {/* Floor Canvas HUD Overlays */}
         <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 text-xs text-slate-300">
           <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-          <span>Click & drag any table to rearrange dining room</span>
+          <span>Click to inspect & edit · Drag to position tables</span>
         </div>
 
         <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
@@ -278,16 +443,16 @@ export function AdminFloorPlan() {
               style={{
                 left: `${table.pos_x}px`,
                 top: `${table.pos_y}px`,
-                width: `${table.width || 100}px`,
-                height: `${table.height || 100}px`,
+                width: `${table.width || (isCircle ? 90 : 110)}px`,
+                height: `${table.height || 90}px`,
               }}
-              className={`absolute cursor-move select-none flex flex-col items-center justify-center p-2 text-center transition-shadow shadow-lg ${
+              className={`absolute cursor-move select-none flex flex-col items-center justify-center p-2 text-center transition-all shadow-lg ${
                 isCircle ? 'rounded-full' : 'rounded-2xl'
               } ${
                 isOccupied
-                  ? 'bg-linear-to-b from-amber-500 to-amber-600 text-slate-950 border-2 border-amber-300 ring-4 ring-amber-500/20 shadow-amber-500/30'
+                  ? 'bg-gradient-to-b from-amber-500 to-amber-600 text-slate-950 border-2 border-amber-300 ring-4 ring-amber-500/20 shadow-amber-500/30'
                   : 'bg-slate-800 text-white border-2 border-slate-700 hover:border-slate-500'
-              } ${isSelected ? 'ring-4 ring-sky-400 ring-offset-2 ring-offset-slate-900 scale-105' : ''}`}
+              } ${isSelected ? 'ring-4 ring-sky-400 ring-offset-2 ring-offset-slate-900 scale-105 z-20' : 'z-10'}`}
             >
               <span className="text-xs font-black tracking-tight uppercase">
                 {table.table_number || table.table_name}
@@ -316,12 +481,17 @@ export function AdminFloorPlan() {
       {selectedTable && (
         <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-bottom-2 duration-200">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-lg">
+            <div className={`w-12 h-12 flex items-center justify-center font-black text-lg ${
+              selectedTable.shape === 'circle' ? 'rounded-full' : 'rounded-2xl'
+            } ${selectedTable.active_orders > 0 ? 'bg-amber-500 text-slate-950' : 'bg-slate-900 text-white'}`}>
               {selectedTable.table_number}
             </div>
             <div>
-              <div className="font-extrabold text-base text-slate-900">
-                {selectedTable.table_name || `Table ${selectedTable.table_number}`}
+              <div className="font-extrabold text-base text-slate-900 flex items-center gap-2">
+                <span>{selectedTable.table_name || `Table ${selectedTable.table_number}`}</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 uppercase">
+                  {selectedTable.shape || 'circle'}
+                </span>
               </div>
               <div className="text-xs text-slate-500 mt-0.5">
                 Section: <strong className="text-slate-700">{selectedTable.section}</strong> · Capacity: {selectedTable.capacity} guests · Position: ({selectedTable.pos_x}px, {selectedTable.pos_y}px)
@@ -329,9 +499,9 @@ export function AdminFloorPlan() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 flex-wrap">
             {selectedTable.active_orders > 0 ? (
-              <div className="px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
+              <div className="px-3.5 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
                 Active Tab: ₹{selectedTable.active_bill_total || 0} ({selectedTable.active_orders} orders)
               </div>
             ) : (
@@ -339,14 +509,305 @@ export function AdminFloorPlan() {
                 Ready for Seating
               </span>
             )}
+
+            {/* Edit Table Button */}
+            <button
+              onClick={() => handleOpenEditModal(selectedTable)}
+              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
+            >
+              <Edit2 className="w-3.5 h-3.5 text-slate-600" />
+              <span>Edit Details</span>
+            </button>
+
+            {/* Delete Table Button */}
+            <button
+              onClick={() => handleDeleteTable(selectedTable)}
+              className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 transition cursor-pointer"
+              title="Delete table from floor plan"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+
+            {/* Live QR Link */}
             <a
               href={`/menu?restaurant=${activeRestaurant?.id || 'rest_losteria'}&table=${selectedTable.table_id}`}
               target="_blank"
               rel="noreferrer"
-              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
             >
-              Open Digital QR Menu
+              <QrCode className="w-3.5 h-3.5 text-amber-400" />
+              <span>Open QR Menu</span>
             </a>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ADD NEW TABLE */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+                  <Plus className="w-4 h-4" />
+                </div>
+                <h3 className="font-extrabold text-base text-slate-900">Add New Dining Table</h3>
+              </div>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddTableSubmit} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Table Number / Label *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. T-12, Table 5, Rooftop Bar"
+                  value={formTableNumber}
+                  maxLength={15}
+                  onChange={(e) => setFormTableNumber(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-amber-500 font-bold"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Floor Section
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Main Dining, Patio"
+                    value={formSection}
+                    maxLength={25}
+                    onChange={(e) => setFormSection(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-amber-500 font-semibold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Seats / Capacity
+                  </label>
+                  <select
+                    value={formCapacity}
+                    onChange={(e) => setFormCapacity(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-amber-500 font-bold bg-white cursor-pointer"
+                  >
+                    {[2, 4, 6, 8, 10, 12, 16].map((c) => (
+                      <option key={c} value={c}>{c} Guests ({c}p)</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Visual Shape
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormShape('circle');
+                      setFormWidth(90);
+                      setFormHeight(90);
+                    }}
+                    className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 text-xs font-bold transition cursor-pointer ${
+                      formShape === 'circle'
+                        ? 'border-amber-500 bg-amber-50 text-amber-900 ring-2 ring-amber-500/20'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Circle className="w-4 h-4 text-amber-500" />
+                    <span>Round Circle (90px)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormShape('rect');
+                      setFormWidth(110);
+                      setFormHeight(85);
+                    }}
+                    className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 text-xs font-bold transition cursor-pointer ${
+                      formShape === 'rect'
+                        ? 'border-amber-500 bg-amber-50 text-amber-900 ring-2 ring-amber-500/20'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Square className="w-4 h-4 text-amber-500" />
+                    <span>Rectangle (110x85)</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-bold text-xs transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition shadow-md shadow-amber-500/20 cursor-pointer"
+                >
+                  {isSubmitting ? 'Adding...' : 'Add to Floor Plan'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: EDIT EXISTING TABLE */}
+      {showEditModal && selectedTable && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center font-bold">
+                  <Edit2 className="w-4 h-4" />
+                </div>
+                <h3 className="font-extrabold text-base text-slate-900">
+                  Edit Table: {selectedTable.table_number}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditTableSubmit} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Table Number / Label *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formTableNumber}
+                  maxLength={15}
+                  onChange={(e) => setFormTableNumber(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-amber-500 font-bold"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Floor Section
+                  </label>
+                  <input
+                    type="text"
+                    value={formSection}
+                    maxLength={25}
+                    onChange={(e) => setFormSection(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-amber-500 font-semibold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Seats / Capacity
+                  </label>
+                  <select
+                    value={formCapacity}
+                    onChange={(e) => setFormCapacity(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-amber-500 font-bold bg-white cursor-pointer"
+                  >
+                    {[2, 4, 6, 8, 10, 12, 16].map((c) => (
+                      <option key={c} value={c}>{c} Guests ({c}p)</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Visual Shape
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormShape('circle');
+                      setFormWidth(90);
+                      setFormHeight(90);
+                    }}
+                    className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 text-xs font-bold transition cursor-pointer ${
+                      formShape === 'circle'
+                        ? 'border-amber-500 bg-amber-50 text-amber-900 ring-2 ring-amber-500/20'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Circle className="w-4 h-4 text-amber-500" />
+                    <span>Round Circle (90px)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormShape('rect');
+                      setFormWidth(110);
+                      setFormHeight(85);
+                    }}
+                    className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 text-xs font-bold transition cursor-pointer ${
+                      formShape === 'rect'
+                        ? 'border-amber-500 bg-amber-50 text-amber-900 ring-2 ring-amber-500/20'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Square className="w-4 h-4 text-amber-500" />
+                    <span>Rectangle (110x85)</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditModal(false);
+                    handleDeleteTable(selectedTable);
+                  }}
+                  className="px-3 py-2 text-rose-600 hover:bg-rose-50 rounded-xl font-bold text-xs flex items-center gap-1 transition cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete</span>
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditModal(false)}
+                    className="px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-bold text-xs transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition shadow-md shadow-amber-500/20 cursor-pointer"
+                  >
+                    {isSubmitting ? 'Saving...' : 'Update Table'}
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       )}

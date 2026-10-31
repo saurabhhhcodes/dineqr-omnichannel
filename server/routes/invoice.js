@@ -47,11 +47,33 @@ function generateEscPosBuffer(order, items, restaurant, widthChars = 42) {
   // Align Left
   chunks.push(Buffer.from([0x1b, 0x61, 0x00]));
 
+  // Aggregator Delivery Header (if online partner order)
+  if (order.order_source && order.order_source !== 'DINE_IN' && order.order_source !== 'DIRECT') {
+    chunks.push(Buffer.from([0x1b, 0x45, 0x01])); // Bold ON
+    chunks.push(Buffer.from(`*** ${order.order_source} ONLINE DELIVERY ***\n`, 'utf8'));
+    if (order.aggregator_order_id) {
+      chunks.push(Buffer.from(`Platform Ref: #${order.aggregator_order_id}\n`, 'utf8'));
+    }
+    if (order.aggregator_rider_name) {
+      chunks.push(Buffer.from(`Delivery Rider: ${order.aggregator_rider_name}\n`, 'utf8'));
+      if (order.aggregator_rider_phone) {
+        chunks.push(Buffer.from(`Rider Contact: ${order.aggregator_rider_phone}\n`, 'utf8'));
+      }
+    }
+    chunks.push(Buffer.from([0x1b, 0x45, 0x00])); // Bold OFF
+    chunks.push(Buffer.from('-'.repeat(widthChars) + '\n', 'utf8'));
+  }
+
   // Token or Table Header (Bold)
   chunks.push(Buffer.from([0x1b, 0x45, 0x01])); // Bold ON
-  const stationOrToken = order.token_number
-    ? `TOKEN NUMBER: #${order.token_number}`
-    : `STATION / TABLE: ${order.table_number}`;
+  let stationOrToken = '';
+  if (order.order_source && order.order_source !== 'DINE_IN' && order.order_source !== 'DIRECT') {
+    stationOrToken = `DISPATCH CHANNEL: ${order.order_source} EXPRESS`;
+  } else if (order.token_number) {
+    stationOrToken = `TOKEN NUMBER: #${order.token_number}`;
+  } else {
+    stationOrToken = `STATION / TABLE: ${order.table_number}`;
+  }
   chunks.push(Buffer.from(`${stationOrToken}\n`, 'utf8'));
   chunks.push(Buffer.from([0x1b, 0x45, 0x00])); // Bold OFF
 

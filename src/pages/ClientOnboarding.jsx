@@ -19,7 +19,12 @@ import {
   ExternalLink,
   Laptop,
   Check,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Key,
+  Users,
+  Zap,
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
@@ -80,19 +85,28 @@ export function ClientOnboarding() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdResult, setCreatedResult] = useState(null);
 
-  // Form State
-  const [businessType, setBusinessType] = useState('clinic');
-  const [stationType, setStationType] = useState('room');
+  // Form State with Strict Input Limits
+  const [businessType, setBusinessType] = useState('restaurant');
+  const [stationType, setStationType] = useState('table');
   const [name, setName] = useState('');
+  const [ownerName, setOwnerName] = useState('');
   const [tagline, setTagline] = useState('');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [gstin, setGstin] = useState('');
-  const [stationCount, setStationCount] = useState(4);
-  const [adminPin, setAdminPin] = useState('1234');
+  const [stationCount, setStationCount] = useState(6);
 
-  // Payment Setup State
+  // Security Credentials
+  const [adminPassword, setAdminPassword] = useState('admin123');
+  const [showPassword, setShowPassword] = useState(false);
+  const [adminPin, setAdminPin] = useState('1234');
+  const [staffPin, setStaffPin] = useState('1234');
+
+  // Plan Selection (₹1,000 vs ₹1,500)
+  const [selectedPlan, setSelectedPlan] = useState('Essential Restaurant Suite (₹1,000/mo)');
+
+  // Direct Payouts Setup
   const [razorpayKeyId, setRazorpayKeyId] = useState('rzp_test_TK088i9wgJLbAg');
   const [razorpayKeySecret, setRazorpayKeySecret] = useState('DyRucfn1FimHG6vcWs6CyePr');
   const [upiId, setUpiId] = useState('');
@@ -100,7 +114,7 @@ export function ClientOnboarding() {
   const [bankIfsc, setBankIfsc] = useState('');
   const [settlementType, setSettlementType] = useState('direct');
 
-  // Razorpay Key Validation State
+  // Key validation state
   const [isValidatingKeys, setIsValidatingKeys] = useState(false);
   const [keyValidationStatus, setKeyValidationStatus] = useState(null);
 
@@ -127,8 +141,8 @@ export function ClientOnboarding() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          key_id: razorpayKeyId,
-          key_secret: razorpayKeySecret,
+          key_id: razorpayKeyId.trim(),
+          key_secret: razorpayKeySecret.trim(),
         }),
       });
       const data = await res.json();
@@ -162,27 +176,43 @@ export function ClientOnboarding() {
       return;
     }
 
+    if (phone.trim() && phone.replace(/[^\d]/g, '').length !== 10) {
+      addToast('Please provide a valid 10-digit mobile number', 'warning');
+      setStep(2);
+      return;
+    }
+
+    if (!adminPassword || adminPassword.length < 6) {
+      addToast('Admin Password must be at least 6 characters', 'error');
+      setStep(2);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const res = await fetch('/api/restaurants/onboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: name.trim(),
+          name: name.trim().substring(0, 60),
+          owner_name: ownerName.trim().substring(0, 50),
           business_type: businessType,
           station_type: stationType,
-          tagline: tagline.trim(),
-          address: address.trim(),
-          phone: phone.trim(),
-          email: email.trim(),
-          gstin: gstin.trim(),
-          station_count: stationCount,
-          admin_pin: adminPin.trim() || '1234',
+          tagline: tagline.trim().substring(0, 80),
+          address: address.trim().substring(0, 120),
+          phone: phone.trim().substring(0, 15),
+          email: email.trim().substring(0, 80),
+          gstin: gstin.trim().toUpperCase().substring(0, 15),
+          station_count: parseInt(stationCount) || 6,
+          admin_password: adminPassword.trim().substring(0, 32),
+          admin_pin: adminPin.trim().substring(0, 6) || '1234',
+          staff_pin: staffPin.trim().substring(0, 6) || '1234',
+          subscription_plan: selectedPlan,
           razorpay_key_id: razorpayKeyId.trim(),
           razorpay_key_secret: razorpayKeySecret.trim(),
           upi_id: upiId.trim(),
           bank_account: bankAccount.trim(),
-          bank_ifsc: bankIfsc.trim(),
+          bank_ifsc: bankIfsc.trim().toUpperCase().substring(0, 11),
           settlement_type: settlementType,
         }),
       });
@@ -191,14 +221,16 @@ export function ClientOnboarding() {
       if (data.success) {
         setCreatedResult(data);
         await refreshRestaurants();
-        setActiveRestaurant(data.restaurant);
-        addToast(`🎉 ${data.restaurant.name} onboarded successfully!`);
+        if (data.restaurant) {
+          setActiveRestaurant(data.restaurant);
+        }
+        addToast(`🎉 ${data.restaurant?.name || name} registered successfully!`);
         setStep(4);
       } else {
         addToast(data.error || 'Failed to onboard business', 'error');
       }
     } catch (err) {
-      addToast('Network error during onboarding: ' + err.message, 'error');
+      addToast('Network error during registration: ' + err.message, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -209,30 +241,30 @@ export function ClientOnboarding() {
       <div className="max-w-4xl mx-auto">
         {/* Header Title */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/20 text-sky-400 text-xs font-semibold mb-3">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Universal QR Self-Checkout & POS Platform</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/20 text-amber-400 text-xs font-bold mb-3">
+            <Zap className="w-3.5 h-3.5" />
+            <span>₹1,000 / month Flat Business Onboarding · 60-Second Setup</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-            Join as Admin & Setup Your Business
+            Register Your Restaurant & Cafe POS
           </h1>
           <p className="text-slate-400 mt-2 text-sm sm:text-base max-w-xl mx-auto">
-            Launch your self-ordering QR catalog, configure direct Razorpay payouts, and run operations on desktop, mobile, or Windows POS.
+            Get your instant digital QR menu, visual floor plan, live kitchen display (KDS), and dedicated login ID.
           </p>
 
           {/* Stepper Indicator */}
           <div className="flex items-center justify-center gap-3 mt-8">
             {[
-              { num: 1, label: 'Select Industry' },
-              { num: 2, label: 'Profile & Stations' },
-              { num: 3, label: 'Razorpay & Payouts' },
-              { num: 4, label: 'Ready & Launch' },
+              { num: 1, label: 'Choose Business' },
+              { num: 2, label: 'Identity & Security' },
+              { num: 3, label: 'Plan & Payouts' },
+              { num: 4, label: 'Launch POS' },
             ].map((s) => (
               <div key={s.num} className="flex items-center gap-2">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition ${
                     step === s.num
-                      ? 'bg-sky-500 text-white ring-4 ring-sky-500/20'
+                      ? 'bg-amber-500 text-slate-950 ring-4 ring-amber-500/20 font-black'
                       : step > s.num
                       ? 'bg-emerald-500 text-white'
                       : 'bg-slate-800 text-slate-400'
@@ -240,7 +272,7 @@ export function ClientOnboarding() {
                 >
                   {step > s.num ? <Check className="w-4 h-4" /> : s.num}
                 </div>
-                <span className={`text-xs font-medium hidden sm:inline ${step === s.num ? 'text-white' : 'text-slate-500'}`}>
+                <span className={`text-xs font-medium hidden sm:inline ${step === s.num ? 'text-white font-bold' : 'text-slate-500'}`}>
                   {s.label}
                 </span>
                 {s.num < 4 && <div className="w-4 sm:w-8 h-0.5 bg-slate-800" />}
@@ -252,9 +284,9 @@ export function ClientOnboarding() {
         {/* STEP 1: SELECT INDUSTRY */}
         {step === 1 && (
           <div className="bg-slate-800/80 border border-slate-700/80 rounded-3xl p-6 sm:p-8 backdrop-blur-md shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-2">Step 1: Choose Your Industry / Business Type</h2>
+            <h2 className="text-xl font-bold text-white mb-2">Step 1: Choose Your Business Category</h2>
             <p className="text-slate-400 text-xs sm:text-sm mb-6">
-              The platform customizes your vocabulary, station designations (Rooms vs Tables vs Bays), and billing formats accordingly.
+              Select your venue type. Vocabulary, tables, and billing tax structures will be tailored to your workflow.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -267,7 +299,7 @@ export function ClientOnboarding() {
                     onClick={() => handleSelectIndustry(ind)}
                     className={`p-5 rounded-2xl border-2 transition cursor-pointer flex flex-col justify-between ${
                       isSelected
-                        ? 'border-sky-500 bg-sky-950/30 ring-2 ring-sky-500/30'
+                        ? 'border-amber-500 bg-amber-950/20 ring-2 ring-amber-500/30'
                         : 'border-slate-700/60 bg-slate-800/40 hover:border-slate-600 hover:bg-slate-800'
                     }`}
                   >
@@ -286,7 +318,7 @@ export function ClientOnboarding() {
 
                     <div className="mt-4 pt-4 border-t border-slate-700/50 flex items-center justify-between text-xs">
                       <span className="text-slate-500">Includes starter:</span>
-                      <span className="text-sky-300 font-semibold">{ind.sampleItem}</span>
+                      <span className="text-amber-300 font-semibold">{ind.sampleItem}</span>
                     </div>
                   </div>
                 );
@@ -297,359 +329,418 @@ export function ClientOnboarding() {
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-sky-500/20 transition cursor-pointer"
+                className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer"
               >
-                <span>Continue to Profile</span>
+                <span>Continue to Profile & Security</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* STEP 2: BUSINESS IDENTITY & STATIONS */}
+        {/* STEP 2: BUSINESS IDENTITY & SECURITY CREDENTIALS */}
         {step === 2 && (
           <div className="bg-slate-800/80 border border-slate-700/80 rounded-3xl p-6 sm:p-8 backdrop-blur-md shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-2">Step 2: Business Profile & Stations</h2>
+            <h2 className="text-xl font-bold text-white mb-2">Step 2: Business Profile & Security Pins</h2>
             <p className="text-slate-400 text-xs sm:text-sm mb-6">
-              Enter your official brand identity and how many physical spots (rooms, tables, lockers, booths) you want to generate QR codes for.
+              Enter owner details, passwords, and staff PINs. All fields enforce strict length validation to prevent overflow.
             </p>
 
             <div className="space-y-4">
+              {/* Business Name & Owner Name */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Official Business Name *
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      Official Business / Restaurant Name *
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-mono">{name.length}/60</span>
+                  </div>
                   <input
                     type="text"
                     required
-                    placeholder={
-                      businessType === 'clinic'
-                        ? 'e.g. LifeCare Multi-Specialty Clinic'
-                        : businessType === 'gym'
-                        ? 'e.g. Titan Strength Club'
-                        : businessType === 'event'
-                        ? 'e.g. ElectroVibe Festival 2026'
-                        : 'e.g. Bella Italia Bistro'
-                    }
+                    maxLength={60}
+                    placeholder="e.g. Royal Spice Bistro & Cafe"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-sky-500"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Tagline / Subtitle
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      Owner / Managing Partner Name
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-mono">{ownerName.length}/50</span>
+                  </div>
                   <input
                     type="text"
-                    placeholder="e.g. OPD Consultations, Blood Panels & Pharmacy"
-                    value={tagline}
-                    onChange={(e) => setTagline(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-sky-500"
+                    maxLength={50}
+                    placeholder="e.g. Rajesh Sharma"
+                    value={ownerName}
+                    onChange={(e) => setOwnerName(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
 
+              {/* Tagline & Address */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Contact Phone Number
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      Tagline / Concept
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-mono">{tagline.length}/80</span>
+                  </div>
                   <input
                     type="text"
-                    placeholder="+91 98765 43210"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-sky-500"
+                    maxLength={80}
+                    placeholder="e.g. Artisanal Wood-Fired Kitchen"
+                    value={tagline}
+                    onChange={(e) => setTagline(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Official Email
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      Physical Restaurant Address
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-mono">{address.length}/120</span>
+                  </div>
+                  <input
+                    type="text"
+                    maxLength={120}
+                    placeholder="Plot 42, 100ft Road, Indiranagar, Bengaluru - 560038"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+              </div>
+
+              {/* Phone (10 digits) & Email */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      Contact Mobile Number (10 Digits) *
+                    </label>
+                    <span className="text-[10px] text-amber-400 font-mono">{phone.replace(/[^\d]/g, '').length}/10</span>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="9876543210"
+                      maxLength={10}
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value.replace(/[^\d]/g, ''))}
+                      className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500 font-mono tracking-wider"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      Official Email
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-mono">{email.length}/80</span>
+                  </div>
                   <input
                     type="email"
-                    placeholder="reception@yourdomain.com"
+                    maxLength={80}
+                    placeholder="orders@yourrestaurant.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-sky-500"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Physical Location / Address
-                </label>
-                <input
-                  type="text"
-                  placeholder="Suite 201, Commercial Center, Indiranagar, Bengaluru - 560038"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-sky-500"
-                />
+              {/* SECURITY & CREDENTIALS SECTION */}
+              <div className="pt-4 border-t border-slate-700/60">
+                <div className="flex items-center gap-2 mb-3">
+                  <Lock className="w-4 h-4 text-amber-400" />
+                  <h3 className="text-sm font-bold text-white">Owner Password & Staff Security PINs</h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Admin Password */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      Admin Password (min 6 chars) *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        minLength={6}
+                        maxLength={32}
+                        value={adminPassword}
+                        onChange={(e) => setAdminPassword(e.target.value)}
+                        className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500 font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Master Admin PIN */}
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Admin Security PIN *
+                      </label>
+                      <span className="text-[10px] text-slate-400 font-mono">{adminPin.length}/6</span>
+                    </div>
+                    <input
+                      type="password"
+                      required
+                      maxLength={6}
+                      placeholder="1234"
+                      value={adminPin}
+                      onChange={(e) => setAdminPin(e.target.value.replace(/[^\d]/g, ''))}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500 font-mono tracking-widest text-center"
+                    />
+                  </div>
+
+                  {/* Staff Shift PIN */}
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="text-xs font-semibold text-slate-300">
+                        Staff Clock-In PIN *
+                      </label>
+                      <span className="text-[10px] text-slate-400 font-mono">{staffPin.length}/6</span>
+                    </div>
+                    <input
+                      type="password"
+                      required
+                      maxLength={6}
+                      placeholder="1234"
+                      value={staffPin}
+                      onChange={(e) => setStaffPin(e.target.value.replace(/[^\d]/g, ''))}
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500 font-mono tracking-widest text-center"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              {/* Station Count & GSTIN */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Station Type
+                    Initial Dining Tables / Stations to Generate
                   </label>
                   <select
-                    value={stationType}
-                    onChange={(e) => setStationType(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-sky-500 cursor-pointer"
+                    value={stationCount}
+                    onChange={(e) => setStationCount(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500 cursor-pointer"
                   >
-                    <option value="room">Consultation Room (Clinics)</option>
-                    <option value="token">Token Counter (Labs / OPD)</option>
-                    <option value="table">Dining Table (Restaurants/Cafes)</option>
-                    <option value="bay">Workout Bay (Gyms)</option>
-                    <option value="locker">Locker Number (Clubs)</option>
-                    <option value="booth">VIP Booth (Events/Festivals)</option>
+                    {[2, 4, 6, 8, 10, 12, 16, 20].map((num) => (
+                      <option key={num} value={num}>
+                        {num} {businessType === 'clinic' ? 'Rooms' : 'Dining Tables'}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Initial Station Count
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="30"
-                    value={stationCount}
-                    onChange={(e) => setStationCount(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-sky-500"
-                  />
-                  <span className="text-[11px] text-slate-500 mt-1 block">Generates QR Placards 1 to {stationCount}</span>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Admin Staff Access PIN
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-semibold text-slate-300">
+                      GSTIN Tax ID (Optional)
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-mono">{gstin.length}/15</span>
+                  </div>
                   <input
                     type="text"
-                    maxLength={6}
-                    value={adminPin}
-                    onChange={(e) => setAdminPin(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-sky-500"
+                    maxLength={15}
+                    placeholder="29ABCDE1234F1Z5"
+                    value={gstin}
+                    onChange={(e) => setGstin(e.target.value.toUpperCase())}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500 font-mono uppercase"
                   />
-                  <span className="text-[11px] text-slate-500 mt-1 block">Default: 1234</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 flex items-center justify-between">
+            <div className="mt-8 flex justify-between">
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="px-5 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
+                className="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-sm font-semibold transition"
               >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
+                Back
               </button>
 
               <button
                 type="button"
-                onClick={() => {
-                  if (!name.trim()) {
-                    addToast('Please enter your Business Name', 'error');
-                    return;
-                  }
-                  setStep(3);
-                }}
-                className="px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-sky-500/20 transition cursor-pointer"
+                onClick={() => setStep(3)}
+                className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer"
               >
-                <span>Continue to Payment Setup</span>
+                <span>Continue to Subscription Plan</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* STEP 3: RAZORPAY & PAYMENT METHODS */}
+        {/* STEP 3: SUBSCRIPTION PLAN & RAZORPAY PAYOUTS */}
         {step === 3 && (
           <div className="bg-slate-800/80 border border-slate-700/80 rounded-3xl p-6 sm:p-8 backdrop-blur-md shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-white">Step 3: Direct Payment & Razorpay Setup</h2>
-                <p className="text-slate-400 text-xs sm:text-sm mt-1">
-                  Connect your Razorpay account so customer payments land directly in your bank account with zero delay.
-                </p>
-              </div>
-              <div className="p-3 rounded-2xl bg-[#0c2340] border border-sky-500/30 text-sky-400 flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-sky-400" />
-                <span className="text-xs font-bold hidden sm:inline">Direct Merchant Gateway</span>
-              </div>
-            </div>
+            <h2 className="text-xl font-bold text-white mb-2">Step 3: Select Plan & Direct Bank Payouts</h2>
+            <p className="text-slate-400 text-xs sm:text-sm mb-6">
+              Pick your monthly subscription. All guest QR payments settle directly into your bank account with zero platform commission.
+            </p>
 
-            <div className="space-y-5">
-              {/* Razorpay Credentials Card */}
-              <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-700/80 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm font-bold text-sky-300">
-                    <CreditCard className="w-4 h-4" />
-                    <span>Razorpay API Credentials</span>
-                  </div>
-                  <span className="text-[11px] font-semibold text-slate-400">
-                    Pre-filled with test credentials
+            {/* Plan Selector */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              <div
+                onClick={() => setSelectedPlan('Essential Restaurant Suite (₹1,000/mo)')}
+                className={`p-5 rounded-2xl border-2 transition cursor-pointer ${
+                  selectedPlan.includes('1,000')
+                    ? 'border-amber-500 bg-amber-950/20 ring-2 ring-amber-500/20'
+                    : 'border-slate-700 bg-slate-900/50 hover:border-slate-600'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                    Starter
                   </span>
+                  <span className="text-lg font-black text-white">₹1,000 <span className="text-xs text-slate-400 font-normal">/ mo</span></span>
                 </div>
+                <h4 className="font-extrabold text-sm text-white">Essential Restaurant Suite</h4>
+                <p className="text-xs text-slate-400 mt-1">Unlimited QR menus, visual floor plan, KDS, thermal billing, and local SQLite DB.</p>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      Razorpay Key ID *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="rzp_test_..."
-                      value={razorpayKeyId}
-                      onChange={(e) => {
-                        setRazorpayKeyId(e.target.value);
-                        setKeyValidationStatus(null);
-                      }}
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-sky-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      Razorpay Key Secret *
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Enter Key Secret"
-                      value={razorpayKeySecret}
-                      onChange={(e) => {
-                        setRazorpayKeySecret(e.target.value);
-                        setKeyValidationStatus(null);
-                      }}
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-sky-500"
-                    />
-                  </div>
+              <div
+                onClick={() => setSelectedPlan('Omnichannel Pro Delivery Suite (₹1,500/mo)')}
+                className={`p-5 rounded-2xl border-2 transition cursor-pointer ${
+                  selectedPlan.includes('1,500')
+                    ? 'border-purple-500 bg-purple-950/20 ring-2 ring-purple-500/20'
+                    : 'border-slate-700 bg-slate-900/50 hover:border-slate-600'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30">
+                    Omnichannel Pro
+                  </span>
+                  <span className="text-lg font-black text-white">₹1,500 <span className="text-xs text-slate-400 font-normal">/ mo</span></span>
                 </div>
+                <h4 className="font-extrabold text-sm text-white">Pro Omnichannel Delivery</h4>
+                <p className="text-xs text-slate-400 mt-1">Includes Zomato & Swiggy webhook streaming, standalone desktop apps, and priority support.</p>
+              </div>
+            </div>
 
-                {/* Validation Test Button */}
-                <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={handleTestRazorpayKeys}
-                    disabled={isValidatingKeys}
-                    className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                  >
-                    {isValidatingKeys ? (
-                      <span>Testing connection...</span>
-                    ) : (
-                      <>
-                        <ShieldCheck className="w-4 h-4" />
-                        <span>Test & Validate Razorpay Keys</span>
-                      </>
-                    )}
-                  </button>
+            {/* Direct Payouts Config */}
+            <div className="p-5 rounded-2xl bg-slate-900 border border-slate-700/80 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-emerald-400" />
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                    Customer Razorpay / UPI Direct Bank Settlement
+                  </h4>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleTestRazorpayKeys}
+                  disabled={isValidatingKeys}
+                  className="px-3 py-1 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-400/30 text-[11px] font-bold transition cursor-pointer"
+                >
+                  {isValidatingKeys ? 'Verifying...' : 'Test Keys'}
+                </button>
+              </div>
 
-                  {keyValidationStatus && (
-                    <div
-                      className={`text-xs font-medium px-3 py-1.5 rounded-xl flex items-center gap-1.5 ${
-                        keyValidationStatus.valid
-                          ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-300'
-                          : 'bg-rose-950/60 border border-rose-500/40 text-rose-300'
-                      }`}
-                    >
-                      {keyValidationStatus.valid ? (
-                        <>
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                          <span>{keyValidationStatus.message}</span>
-                        </>
-                      ) : (
-                        <>
-                          <AlertCircle className="w-4 h-4 text-rose-400" />
-                          <span>{keyValidationStatus.error}</span>
-                        </>
-                      )}
-                    </div>
-                  )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Razorpay Key ID</label>
+                  <input
+                    type="text"
+                    value={razorpayKeyId}
+                    onChange={(e) => setRazorpayKeyId(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs focus:border-sky-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Razorpay Key Secret</label>
+                  <input
+                    type="password"
+                    value={razorpayKeySecret}
+                    onChange={(e) => setRazorpayKeySecret(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs focus:border-sky-500 outline-none"
+                  />
                 </div>
               </div>
 
-              {/* UPI & Bank Settlement Fallback */}
-              <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-700/80 space-y-4">
-                <div className="flex items-center gap-2 text-sm font-bold text-slate-200">
-                  <Smartphone className="w-4 h-4 text-purple-400" />
-                  <span>Direct UPI & Bank Settlement Details</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Merchant UPI ID (e.g. yourname@okhdfcbank)</label>
+                  <input
+                    type="text"
+                    placeholder="restaurant@upi"
+                    value={upiId}
+                    onChange={(e) => setUpiId(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs outline-none"
+                  />
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      Direct UPI VPA ID
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. drgupta@okhdfcbank"
-                      value={upiId}
-                      onChange={(e) => setUpiId(e.target.value)}
-                      className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-sky-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      Settlement Bank Account #
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 987654321012"
-                      value={bankAccount}
-                      onChange={(e) => setBankAccount(e.target.value)}
-                      className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-sky-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      Bank IFSC Code
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. HDFC0001234"
-                      value={bankIfsc}
-                      onChange={(e) => setBankIfsc(e.target.value)}
-                      className="w-full px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs uppercase focus:outline-none focus:border-sky-500"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Bank Account Number</label>
+                  <input
+                    type="text"
+                    maxLength={18}
+                    placeholder="91234567890123"
+                    value={bankAccount}
+                    onChange={(e) => setBankAccount(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Bank IFSC Code</label>
+                  <input
+                    type="text"
+                    maxLength={11}
+                    placeholder="HDFC0001234"
+                    value={bankIfsc}
+                    onChange={(e) => setBankIfsc(e.target.value.toUpperCase())}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono text-xs outline-none uppercase"
+                  />
                 </div>
               </div>
             </div>
 
-            <div className="mt-8 flex items-center justify-between">
+            <div className="mt-8 flex justify-between">
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="px-5 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
+                className="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-sm font-semibold transition"
               >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back</span>
+                Back
               </button>
 
               <button
                 type="button"
                 onClick={handleCompleteOnboarding}
                 disabled={isSubmitting}
-                className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition cursor-pointer disabled:opacity-50"
+                className="px-7 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm flex items-center gap-2 shadow-xl shadow-amber-500/25 transition cursor-pointer"
               >
                 {isSubmitting ? (
-                  <span>Provisioning Your System...</span>
+                  <span>Registering Your Restaurant...</span>
                 ) : (
                   <>
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Launch & Activate Digital QR System</span>
+                    <span>Confirm & Launch Restaurant POS</span>
+                    <Sparkles className="w-4 h-4" />
                   </>
                 )}
               </button>
@@ -657,80 +748,67 @@ export function ClientOnboarding() {
           </div>
         )}
 
-        {/* STEP 4: CELEBRATION & READY TO USE */}
+        {/* STEP 4: LAUNCH & ACCESS CREDENTIALS */}
         {step === 4 && createdResult && (
-          <div className="bg-slate-800/90 border border-emerald-500/30 rounded-3xl p-8 backdrop-blur-md shadow-2xl text-center space-y-6">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto ring-8 ring-emerald-500/10">
-              <CheckCircle2 className="w-8 h-8" />
+          <div className="bg-slate-800/80 border border-slate-700/80 rounded-3xl p-6 sm:p-10 backdrop-blur-md shadow-2xl text-center space-y-6">
+            <div className="w-16 h-16 rounded-3xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-10 h-10" />
             </div>
 
             <div>
-              <h2 className="text-2xl font-black text-white">
-                {createdResult.restaurant.name} is Live!
+              <h2 className="text-2xl sm:text-3xl font-black text-white">
+                🎉 Welcome to DineQR, {createdResult.restaurant?.name}!
               </h2>
-              <p className="text-slate-300 text-sm mt-1 max-w-md mx-auto">
-                Your QR menus, direct Razorpay settlement, and station placards have been provisioned and ready for your customers and staff.
+              <p className="text-slate-400 text-sm mt-1 max-w-lg mx-auto">
+                Your restaurant is registered on our platform. Your tables, QR menus, floor plan, and local SQLite database have been provisioned.
               </p>
             </div>
 
-            {/* Quick Access Credentials Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-left max-w-3xl mx-auto">
-              <div className="p-4 rounded-2xl bg-slate-900 border border-amber-500/40">
-                <span className="text-[11px] text-amber-400 uppercase font-black">Merchant User ID</span>
-                <div className="text-xl font-mono font-black text-white mt-0.5">
-                  {createdResult.restaurant.merchant_user_id || 'MER-84920'}
-                </div>
-                <span className="text-[11px] text-slate-400">Use for portal login</span>
+            {/* Credentials Card */}
+            <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 text-left max-w-lg mx-auto space-y-3 font-mono text-xs">
+              <div className="flex justify-between border-b border-slate-800 pb-2">
+                <span className="text-slate-400">Merchant User ID:</span>
+                <span className="font-bold text-amber-400">{createdResult.restaurant?.merchant_user_id}</span>
               </div>
-
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-700">
-                <span className="text-[11px] text-slate-400 uppercase font-semibold">Staff Access PIN</span>
-                <div className="text-xl font-mono font-bold text-amber-400 mt-0.5">{adminPin}</div>
-                <span className="text-[11px] text-slate-500">Security passcode</span>
+              <div className="flex justify-between border-b border-slate-800 pb-2">
+                <span className="text-slate-400">Admin Password:</span>
+                <span className="font-bold text-white">{adminPassword}</span>
               </div>
-
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-700">
-                <span className="text-[11px] text-slate-400 uppercase font-semibold">Subscription Plan</span>
-                <div className="text-xl font-bold text-emerald-400 mt-0.5">₹1,000 / mo</div>
-                <span className="text-[11px] text-emerald-500">Flat rate active</span>
+              <div className="flex justify-between border-b border-slate-800 pb-2">
+                <span className="text-slate-400">Master Admin PIN:</span>
+                <span className="font-bold text-sky-400">{adminPin}</span>
               </div>
-
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-700">
-                <span className="text-[11px] text-slate-400 uppercase font-semibold">Active Stations</span>
-                <div className="text-xl font-bold text-white mt-0.5">{stationCount} {stationType}s</div>
-                <span className="text-[11px] text-sky-400">QR codes generated</span>
+              <div className="flex justify-between border-b border-slate-800 pb-2">
+                <span className="text-slate-400">Staff Duty PIN:</span>
+                <span className="font-bold text-emerald-400">{staffPin}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Subscription Plan:</span>
+                <span className="font-bold text-purple-400">{selectedPlan}</span>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveRestaurant(createdResult.restaurant);
-                  navigate('/admin/orders');
-                }}
-                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 transition cursor-pointer"
-              >
-                <Laptop className="w-4 h-4" />
-                <span>One-Click Login to Dashboard</span>
-              </button>
-
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
               <Link
-                to="/admin/tables"
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm flex items-center justify-center gap-2 transition"
+                to="/admin/floor-plan"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg transition"
               >
-                <QrCode className="w-4 h-4" />
-                <span>Print QR Placards</span>
+                <span>Open Visual Floor Plan</span>
+                <ArrowRight className="w-4 h-4" />
               </Link>
 
               <Link
-                to={`/menu?restaurant=${createdResult.restaurant.slug || createdResult.restaurant.id}&table=stn_${createdResult.restaurant.id}_1`}
-                target="_blank"
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold text-sm flex items-center justify-center gap-2 transition"
+                to="/admin/kitchen"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700 transition"
               >
-                <ExternalLink className="w-4 h-4" />
-                <span>Test Live QR Menu</span>
+                <span>Go to Kitchen KDS</span>
+              </Link>
+
+              <Link
+                to="/admin/staff"
+                className="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition"
+              >
+                <span>Staff Duty Clock-In</span>
               </Link>
             </div>
           </div>
@@ -739,3 +817,5 @@ export function ClientOnboarding() {
     </div>
   );
 }
+
+export default ClientOnboarding;

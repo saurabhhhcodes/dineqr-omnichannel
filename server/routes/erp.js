@@ -3,7 +3,7 @@ import express from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { queryAll, queryOne, execute, db } from '../db.js';
+import { queryAll, queryOne, execute, db, initDb } from '../db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,6 +56,143 @@ router.put('/floor-plan', (req, res) => {
     }
 
     res.json({ success: true, message: 'Floor plan layout saved successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/erp/floor-plan/table - Add new table to floor plan and master table registry
+router.post('/floor-plan/table', (req, res) => {
+  try {
+    const {
+      restaurant_id = 'rest_losteria',
+      table_number,
+      name,
+      section = 'Main Dining',
+      capacity = 4,
+      shape = 'circle',
+      pos_x = 200,
+      pos_y = 150,
+      width = 90,
+      height = 90,
+    } = req.body;
+
+    if (!table_number) {
+      return res.status(400).json({ success: false, error: 'Table number/label is required' });
+    }
+
+    const tableId = 'tbl_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+    const fpId = 'fp_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+    const tableName = name || `Table ${table_number}`;
+
+    // 1. Insert into tables master registry
+    execute(
+      `INSERT INTO tables (id, restaurant_id, table_number, name, section, capacity) VALUES (?, ?, ?, ?, ?, ?)`,
+      [tableId, restaurant_id, table_number, tableName, section, parseInt(capacity) || 4]
+    );
+
+    // 2. Insert into floor_plan_tables layout registry
+    execute(
+      `INSERT INTO floor_plan_tables (id, restaurant_id, table_id, pos_x, pos_y, shape, width, height, zone)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [fpId, restaurant_id, tableId, pos_x, pos_y, shape, width, height, section]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: `Table ${table_number} added to floor plan`,
+      table: {
+        id: fpId,
+        table_id: tableId,
+        restaurant_id,
+        table_number,
+        table_name: tableName,
+        section,
+        capacity: parseInt(capacity) || 4,
+        pos_x,
+        pos_y,
+        shape,
+        width,
+        height,
+        active_orders: 0,
+        active_bill_total: 0,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// PUT /api/erp/floor-plan/table/:id - Edit specific floor plan table parameters
+router.put('/floor-plan/table/:id', (req, res) => {
+  try {
+    const fpId = req.params.id;
+    const {
+      table_number,
+      name,
+      section,
+      capacity,
+      shape,
+      width,
+      height,
+      pos_x,
+      pos_y,
+    } = req.body;
+
+    const fp = queryOne(`SELECT * FROM floor_plan_tables WHERE id = ? OR table_id = ?`, [fpId, fpId]);
+    if (!fp) {
+      return res.status(404).json({ success: false, error: 'Floor plan table not found' });
+    }
+
+    // Update floor_plan_tables
+    execute(
+      `UPDATE floor_plan_tables SET
+        shape = COALESCE(?, shape),
+        width = COALESCE(?, width),
+        height = COALESCE(?, height),
+        pos_x = COALESCE(?, pos_x),
+        pos_y = COALESCE(?, pos_y),
+        zone = COALESCE(?, zone)
+       WHERE id = ?`,
+      [shape, width, height, pos_x, pos_y, section, fp.id]
+    );
+
+    // Update tables registry
+    execute(
+      `UPDATE tables SET
+        table_number = COALESCE(?, table_number),
+        name = COALESCE(?, name),
+        section = COALESCE(?, section),
+        capacity = COALESCE(?, capacity)
+       WHERE id = ?`,
+      [table_number, name, section, capacity, fp.table_id]
+    );
+
+    const updated = queryOne(
+      `SELECT fp.*, t.table_number, t.name as table_name, t.capacity, t.section
+       FROM floor_plan_tables fp JOIN tables t ON t.id = fp.table_id WHERE fp.id = ?`,
+      [fp.id]
+    );
+
+    res.json({ success: true, message: 'Table updated successfully', table: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// DELETE /api/erp/floor-plan/table/:id - Delete table from floor plan and registry
+router.delete('/floor-plan/table/:id', (req, res) => {
+  try {
+    const fpId = req.params.id;
+    const fp = queryOne(`SELECT * FROM floor_plan_tables WHERE id = ? OR table_id = ?`, [fpId, fpId]);
+    if (!fp) {
+      return res.status(404).json({ success: false, error: 'Floor plan table not found' });
+    }
+
+    execute(`DELETE FROM floor_plan_tables WHERE id = ?`, [fp.id]);
+    execute(`DELETE FROM tables WHERE id = ?`, [fp.table_id]);
+
+    res.json({ success: true, message: 'Table removed from floor plan' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -236,6 +373,133 @@ router.delete('/staff-shifts/:id', (req, res) => {
   try {
     execute(`DELETE FROM staff_shifts WHERE id = ?`, [req.params.id]);
     res.json({ success: true, message: 'Shift deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// 3B. STAFF LIVE CLOCK-IN & ACTIVITY LEDGER
+// ==========================================
+
+// GET /api/erp/staff-attendance - List staff clock-ins and live duty status
+router.get('/staff-attendance', (req, res) => {
+  try {
+    const restId = req.query.restaurant_id || 'rest_losteria';
+    const logs = queryAll(
+      `SELECT * FROM staff_attendance WHERE restaurant_id = ? ORDER BY clock_in_time DESC LIMIT 100`,
+      [restId]
+    );
+    const activeStaff = logs.filter((s) => s.status === 'ON_DUTY');
+
+    res.json({
+      success: true,
+      active_count: activeStaff.length,
+      active_staff: activeStaff,
+      attendance_logs: logs,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/erp/staff-attendance/clock-in - Record staff arrival and starting duty
+router.post('/staff-attendance/clock-in', (req, res) => {
+  try {
+    const {
+      restaurant_id = 'rest_losteria',
+      employee_name,
+      staff_pin,
+      role = 'Server / Waiter',
+      current_activity = 'Floor Briefing & Table Setup',
+      notes = '',
+    } = req.body;
+
+    if (!employee_name || !employee_name.trim()) {
+      return res.status(400).json({ success: false, error: 'Employee name is required' });
+    }
+
+    const id = 'att_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+
+    execute(
+      `INSERT INTO staff_attendance (
+        id, restaurant_id, employee_name, staff_pin, role, current_activity, notes, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'ON_DUTY')`,
+      [id, restaurant_id, employee_name.trim(), staff_pin || '1234', role, current_activity, notes]
+    );
+
+    const record = queryOne(`SELECT * FROM staff_attendance WHERE id = ?`, [id]);
+    res.status(201).json({
+      success: true,
+      message: `${employee_name} clocked in successfully!`,
+      attendance: record,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// PATCH /api/erp/staff-attendance/:id/activity - Update what staff is currently doing
+router.patch('/staff-attendance/:id/activity', (req, res) => {
+  try {
+    const { current_activity, notes, status } = req.body;
+    if (!current_activity) {
+      return res.status(400).json({ success: false, error: 'Current activity is required' });
+    }
+
+    execute(
+      `UPDATE staff_attendance SET
+        current_activity = ?,
+        notes = COALESCE(?, notes),
+        status = COALESCE(?, status)
+       WHERE id = ?`,
+      [current_activity, notes, status, req.params.id]
+    );
+
+    const updated = queryOne(`SELECT * FROM staff_attendance WHERE id = ?`, [req.params.id]);
+    res.json({
+      success: true,
+      message: 'Staff activity updated',
+      attendance: updated,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/erp/staff-attendance/clock-out - Record clock-out timestamp
+router.post('/staff-attendance/clock-out', (req, res) => {
+  try {
+    const { id, employee_name, restaurant_id, notes } = req.body;
+    let targetId = id;
+
+    if (!targetId && employee_name) {
+      const active = queryOne(
+        `SELECT id FROM staff_attendance WHERE employee_name = ? AND status = 'ON_DUTY' ORDER BY clock_in_time DESC`,
+        [employee_name]
+      );
+      if (active) targetId = active.id;
+    }
+
+    if (!targetId) {
+      return res.status(400).json({ success: false, error: 'Attendance record ID or active employee name required' });
+    }
+
+    execute(
+      `UPDATE staff_attendance SET
+        clock_out_time = CURRENT_TIMESTAMP,
+        status = 'CLOCKED_OUT',
+        notes = CASE WHEN ? IS NOT NULL AND ? != '' THEN notes || ' | ' || ? ELSE notes END
+       WHERE id = ?`,
+      [notes, notes, notes, targetId]
+    );
+
+    const updated = queryOne(`SELECT * FROM staff_attendance WHERE id = ?`, [targetId]);
+    res.json({
+      success: true,
+      message: `${updated?.employee_name || 'Staff member'} clocked out successfully.`,
+      attendance: updated,
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -497,16 +761,27 @@ router.post('/split-bill', (req, res) => {
 // 7. ONE-CLICK LOCAL SQLITE DB INITIALIZER
 // ==========================================
 
-// POST /api/erp/local-sqlite/setup - Configure on-premise local SQLite engine
+// POST /api/erp/local-sqlite/setup - Configure on-premise local SQLite engine (auto-creates if missing)
 router.post('/local-sqlite/setup', (req, res) => {
   try {
-    const dataDir = path.resolve(__dirname, '../../data');
+    const dataDir = process.env.VERCEL ? '/tmp/data' : path.resolve(__dirname, '../../data');
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
     const dbPath = path.join(dataDir, 'restaurant.db');
+
+    // Run schema init & tables ensure
+    initDb();
+
     const isReady = fs.existsSync(dbPath);
     const size = isReady ? fs.statSync(dbPath).size : 0;
 
-    // Run quick integrity check
+    // Run quick integrity check and count records
     const check = queryOne(`PRAGMA integrity_check`);
+    const restCount = queryOne(`SELECT COUNT(*) as count FROM restaurants`)?.count || 0;
+    const tableCount = queryOne(`SELECT COUNT(*) as count FROM tables`)?.count || 0;
+    const menuCount = queryOne(`SELECT COUNT(*) as count FROM menu_items`)?.count || 0;
+    const orderCount = queryOne(`SELECT COUNT(*) as count FROM orders`)?.count || 0;
 
     res.json({
       success: true,
@@ -516,13 +791,38 @@ router.post('/local-sqlite/setup', (req, res) => {
       file_size_bytes: size,
       integrity: check ? check.integrity_check : 'ok',
       zero_cloud_cost_active: true,
+      stats: {
+        restaurants: restCount,
+        tables: tableCount,
+        menu_items: menuCount,
+        orders: orderCount,
+      },
       message: 'Local SQLite On-Premise Engine is active, verified, and operational with zero cloud database cost.',
       instructions: [
         '1. Database stores all records locally in ./data/restaurant.db',
         '2. No AWS RDS, Neon, or Supabase cloud bills',
         '3. Automatic end-of-month (31st) compliance archives (.json & .db) available in Merchant Dashboard',
+        '4. Data remains permanently on your local disk even if cloud subscription ends',
       ],
     });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/erp/local-sqlite/export - Download permanent binary copy of local restaurant.db
+router.get('/local-sqlite/export', (req, res) => {
+  try {
+    const dataDir = process.env.VERCEL ? '/tmp/data' : path.resolve(__dirname, '../../data');
+    const dbPath = path.join(dataDir, 'restaurant.db');
+    if (!fs.existsSync(dbPath)) {
+      initDb();
+    }
+
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', 'attachment; filename="restaurant-local-store.db"');
+    const stream = fs.createReadStream(dbPath);
+    stream.pipe(res);
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

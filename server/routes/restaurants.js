@@ -20,6 +20,7 @@ router.post('/onboard', (req, res) => {
   try {
     const {
       name,
+      owner_name = '',
       slug,
       business_type = 'restaurant',
       station_type = 'table',
@@ -35,19 +36,34 @@ router.post('/onboard', (req, res) => {
       bank_account = '',
       bank_ifsc = '',
       admin_pin = '1234',
+      staff_pin = '1234',
+      admin_password = 'admin123',
       station_count = 4,
+      subscription_plan = 'Essential Restaurant Suite',
     } = req.body;
 
-    if (!name) {
+    if (!name || !name.trim()) {
       return res.status(400).json({ success: false, error: 'Business name is required' });
     }
 
-    const finalSlug = slug ? slugify(slug) : slugify(name);
+    // Word & Character Limits Enforced
+    const safeName = name.trim().substring(0, 60);
+    const safeOwner = (owner_name || '').trim().substring(0, 50) || 'Business Owner';
+    const safeTagline = (tagline || '').trim().substring(0, 80);
+    const safeAddress = (address || '').trim().substring(0, 120);
+    const safePhone = (phone || '').replace(/[^\d+]/g, '').substring(0, 15);
+    const safeEmail = (email || '').trim().substring(0, 80);
+    const safeGstin = (gstin || '').trim().toUpperCase().substring(0, 15);
+    const safePin = (admin_pin || '1234').replace(/[^\d]/g, '').substring(0, 6) || '1234';
+    const safeStaffPin = (staff_pin || '1234').replace(/[^\d]/g, '').substring(0, 6) || '1234';
+    const safePassword = (admin_password || 'admin123').trim().substring(0, 32);
+
+    const finalSlug = slug ? slugify(slug) : slugify(safeName);
 
     // Check duplicate slug
     const existing = queryOne(`SELECT id FROM restaurants WHERE slug = ?`, [finalSlug]);
     if (existing) {
-      return res.status(400).json({ success: false, error: `URL identifier "${finalSlug}" is already taken` });
+      return res.status(400).json({ success: false, error: `URL identifier "${finalSlug}" is already taken. Please choose another name or slug.` });
     }
 
     const id = 'biz_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
@@ -72,25 +88,29 @@ router.post('/onboard', (req, res) => {
     }
 
     const merchantUserId = 'MER-' + Math.floor(10000 + Math.random() * 90000);
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 30);
+    const expiryIso = expiryDate.toISOString();
 
     execute(
       `INSERT INTO restaurants (
-        id, name, slug, business_type, station_type, tagline, address, phone, email, gstin, fssai, currency,
+        id, name, owner_name, slug, business_type, station_type, tagline, address, phone, email, gstin, fssai, currency,
         cgst_pct, sgst_pct, service_charge_pct, razorpay_key_id, razorpay_key_secret, upi_id, bank_account, bank_ifsc,
-        admin_pin, admin_password, commission_pct, settlement_type, onboarding_status, is_active,
-        merchant_user_id, subscription_plan
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', 1, ?, '1000_MONTHLY')`,
+        admin_pin, staff_pin, admin_password, commission_pct, settlement_type, onboarding_status, is_active,
+        merchant_user_id, subscription_plan, subscription_status, subscription_expires_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', 1, ?, ?, 'active', ?)`,
       [
         id,
-        name,
+        safeName,
+        safeOwner,
         finalSlug,
         business_type,
         station_type,
-        tagline || defaultTagline,
-        address || 'Commercial Hub, Main Road',
-        phone || '+91 98000 11223',
-        email || `admin@${finalSlug}.com`,
-        gstin || '',
+        safeTagline || defaultTagline,
+        safeAddress || 'Commercial Hub, Main Road',
+        safePhone || '+91 98000 11223',
+        safeEmail || `admin@${finalSlug}.com`,
+        safeGstin,
         '',
         currency,
         cgst,
@@ -101,15 +121,18 @@ router.post('/onboard', (req, res) => {
         upi_id ? upi_id.trim() : '',
         bank_account ? bank_account.trim() : '',
         bank_ifsc ? bank_ifsc.trim() : '',
-        admin_pin || '1234',
-        'admin123',
+        safePin,
+        safeStaffPin,
+        safePassword,
         2.0,
         'direct',
         merchantUserId,
+        subscription_plan,
+        expiryIso,
       ]
     );
 
-    // Auto-create stations / tables
+    // Auto-create stations / tables and floor plan layout
     const count = Math.max(1, Math.min(20, parseInt(station_count) || 4));
     const stationLabel =
       station_type === 'room'
@@ -128,9 +151,23 @@ router.post('/onboard', (req, res) => {
       const numStr = i < 10 ? `0${i}` : `${i}`;
       const stationName = `${stationLabel} ${numStr}`;
       const tblId = 'stn_' + id + '_' + i;
+      const fpId = 'fp_' + id + '_' + i;
+
+      // Position tables in an organized grid (columns of 3)
+      const col = (i - 1) % 3;
+      const row = Math.floor((i - 1) / 3);
+      const posX = 60 + col * 160;
+      const posY = 60 + row * 160;
+
       execute(
         `INSERT INTO tables (id, restaurant_id, table_number, name, section, capacity) VALUES (?, ?, ?, ?, ?, ?)`,
         [tblId, id, stationName, stationName, 'Main Section', 4]
+      );
+
+      execute(
+        `INSERT INTO floor_plan_tables (id, restaurant_id, table_id, pos_x, pos_y, shape, width, height, zone)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [fpId, id, tblId, posX, posY, 'circle', 90, 90, 'Main Section']
       );
     }
 

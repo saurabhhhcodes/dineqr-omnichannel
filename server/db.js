@@ -308,11 +308,31 @@ export function initDb() {
     );
   `);
 
+  // 14. Staff Live Attendance, Clock-in & Activity Ledger
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS staff_attendance (
+      id TEXT PRIMARY KEY,
+      restaurant_id TEXT DEFAULT 'rest_losteria',
+      employee_name TEXT NOT NULL,
+      staff_pin TEXT,
+      role TEXT DEFAULT 'Server',
+      clock_in_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+      clock_out_time DATETIME,
+      current_activity TEXT DEFAULT 'Arrived at Restaurant / Floor Briefing',
+      notes TEXT,
+      status TEXT DEFAULT 'ON_DUTY', -- ON_DUTY, ON_BREAK, CLOCKED_OUT
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
   // Apply migrations for columns in case of existing database
   ensureColumn('tables', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('categories', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('menu_items', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('menu_items', 'video_url', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'subscription_expires_at', "DATETIME");
+  ensureColumn('restaurants', 'staff_pin', "TEXT DEFAULT '1234'");
+  ensureColumn('restaurants', 'owner_name', "TEXT DEFAULT 'Restaurant Owner'");
   ensureColumn('orders', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('orders', 'payment_method', "TEXT DEFAULT 'Razorpay / UPI'");
   ensureColumn('orders', 'is_counter_order', "INTEGER DEFAULT 0");

@@ -34,6 +34,49 @@ import {
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
+const VIDEO_SUITE = [
+  {
+    id: 'restaurant_kds',
+    title: 'Restaurant Operations & Kitchen KDS',
+    subtitle: 'Table QR Ordering to Live Chef Ticket Chimes',
+    badge: 'Restaurant & Cafe',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80',
+    tags: ['Table QR Codes', 'Kitchen KDS', 'ESC/POS Printer', 'Razorpay UPI'],
+    description: 'Customers scan table QR codes, view 4K looping food dishes, and pay via UPI. Orders stream to kitchen KDS screens with audio bells and auto-cutting thermal bills.',
+  },
+  {
+    id: 'hotel_floor_plan',
+    title: 'Hotel Management & Floor Plans',
+    subtitle: 'Visual Drag & Drop Tables, Room Service & Split Bills',
+    badge: 'Hotels & Fine Dining',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80',
+    tags: ['Interactive Floor Plan', 'Room Service QR', 'Split Invoicing', 'Table Bookings'],
+    description: 'Design custom floor layouts matching your physical premises. Rearrange tables with drag-and-drop, manage room service dispatch, and split guest checks.',
+  },
+  {
+    id: 'bar_pub_speed',
+    title: 'High-Velocity Bar & Pub Concessions',
+    subtitle: 'Zero Bar Line-Ups with Cashless Speed-Ordering',
+    badge: 'Bars & Pubs',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=1200&q=80',
+    tags: ['Cashless Bar', 'Drink Queue Tokens', 'Instant Settlements', 'Zero Waiter Delay'],
+    description: 'Patrons scan counter codes at busy bars to order craft beers and cocktails without waiting for bartenders to bring cards or change.',
+  },
+  {
+    id: 'fast_food_tokens',
+    title: 'Fast Food, Bakery & Counter Pickups',
+    subtitle: 'Daily Token Call Screens & Instant Takeaway Bills',
+    badge: 'QSR & Food Courts',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=1200&q=80',
+    tags: ['Token Call Screen', 'Takeaway QR', 'GST Invoices', 'Local SQLite Backup'],
+    description: 'Display live daily pickup tokens (#01, #02) on overhead screens. Complete order processing in seconds with zero paper waste.',
+  },
+];
+
 const VERTICAL_DEMOS = [
   {
     id: 'rest_apex_clinic',
@@ -90,6 +133,7 @@ export function LandingHero() {
   const { setActiveRestaurant, restaurants } = useRestaurant();
   const { addToast } = useToast();
   const [selectedDemo, setSelectedDemo] = useState(VERTICAL_DEMOS[0]);
+  const [selectedVideo, setSelectedVideo] = useState(VIDEO_SUITE[0]);
 
   const handleLaunchDemo = (demo) => {
     const matched = restaurants.find((r) => r.id === demo.id);
@@ -181,6 +225,110 @@ export function LandingHero() {
           <div className="flex items-center gap-2">
             <Database className="w-4 h-4 text-purple-400" />
             <span>Zero-Cost Local SQLite + 31st Monthly Download</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ENTERPRISE VIDEO SHOWCASE SUITE */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 sm:mt-20">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-500/10 border border-rose-400/20 text-rose-400 text-xs font-bold mb-2">
+            <Video className="w-3.5 h-3.5" />
+            <span>Interactive Platform Video Demos</span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl font-black text-white">
+            See DineQR in Real Restaurant & Hotel Action
+          </h2>
+          <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-xl mx-auto">
+            Watch how customer QR table scans, live kitchen display chimes, and visual floor plans operate seamlessly in real time.
+          </p>
+        </div>
+
+        {/* Video Tabs Selector */}
+        <div className="flex items-center justify-center gap-2 flex-wrap mb-6">
+          {VIDEO_SUITE.map((v) => (
+            <button
+              key={v.id}
+              onClick={() => setSelectedVideo(v)}
+              className={`px-4 py-2 rounded-2xl text-xs font-bold transition cursor-pointer flex items-center gap-2 ${
+                selectedVideo.id === v.id
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/20 ring-2 ring-amber-400'
+                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>{v.title}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Video Player Card */}
+        <div className="bg-gradient-to-br from-slate-900 to-slate-950 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Left: Video Player */}
+          <div className="lg:col-span-7 rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl relative bg-black aspect-video group">
+            <video
+              key={selectedVideo.videoUrl}
+              src={selectedVideo.videoUrl}
+              poster={selectedVideo.posterUrl}
+              controls
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-amber-300 border border-amber-400/30">
+              🔴 Live Demonstration: {selectedVideo.badge}
+            </div>
+          </div>
+
+          {/* Right: Feature Highlights & CTA */}
+          <div className="lg:col-span-5 space-y-5">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                {selectedVideo.badge}
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-white mt-1">
+                {selectedVideo.title}
+              </h3>
+              <p className="text-xs font-semibold text-slate-300 mt-1">
+                {selectedVideo.subtitle}
+              </p>
+            </div>
+
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+              {selectedVideo.description}
+            </p>
+
+            {/* Tag Pills */}
+            <div className="flex flex-wrap gap-2">
+              {selectedVideo.tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-[11px] font-semibold flex items-center gap-1.5"
+                >
+                  <Check className="w-3 h-3 text-emerald-400" />
+                  <span>{tag}</span>
+                </span>
+              ))}
+            </div>
+
+            <div className="pt-3 flex flex-col sm:flex-row items-center gap-3">
+              <Link
+                to="/onboard"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer"
+              >
+                <span>Get Started for ₹1,000 / month</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+
+              <Link
+                to="/pricing"
+                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition"
+              >
+                <span>View All Plans</span>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
