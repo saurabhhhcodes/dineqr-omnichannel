@@ -7,9 +7,8 @@ const router = express.Router();
 // GET /api/menu - Get categories and items for a restaurant
 router.get('/', (req, res) => {
   try {
-    const { vegOnly, category, search, admin, restaurant_id } = req.query;
-
-    const restId = restaurant_id || 'rest_losteria';
+    const { vegOnly, category, search, admin } = req.query;
+    const restId = req.query.restaurant_id || req.query.restaurant || 'rest_losteria';
 
     let itemQuery = `SELECT * FROM menu_items WHERE 1=1`;
     const params = [];
@@ -71,7 +70,7 @@ router.get('/', (req, res) => {
 // GET /api/menu/categories - Categories list for a restaurant
 router.get('/categories', (req, res) => {
   try {
-    const restId = req.query.restaurant_id || 'rest_losteria';
+    const restId = req.query.restaurant_id || req.query.restaurant || 'rest_losteria';
     const categories = queryAll(
       `SELECT * FROM categories
        WHERE restaurant_id = ? OR restaurant_id = (SELECT id FROM restaurants WHERE slug = ?)

@@ -1,4 +1,4 @@
-// src/pages/AdminDashboard.jsx - Executive overview & system analytics
+// src/pages/AdminDashboard.jsx - Executive overview, merchant payouts wallet, and 31st monthly local DB archive
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -14,7 +14,15 @@ import {
   ArrowRight,
   Flame,
   Clock,
-  Sparkles
+  Sparkles,
+  Download,
+  Wallet,
+  ArrowDownToLine,
+  CheckCircle2,
+  Calendar,
+  AlertCircle,
+  X,
+  Laptop
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
@@ -24,48 +32,110 @@ export function AdminDashboard() {
   const { addToast } = useToast();
   const [stats, setStats] = useState(null);
   const [rzpConfig, setRzpConfig] = useState(null);
+  const [wallet, setWallet] = useState(null);
+  const [backupSchedule, setBackupSchedule] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  // Withdrawal Modal State
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [withdrawalReceipt, setWithdrawalReceipt] = useState(null);
+
+  const fetchDashboardData = () => {
     if (!activeRestaurant) return;
     setIsLoading(true);
 
     Promise.all([
       fetch(`/api/stats?restaurant_id=${activeRestaurant.id}`).then((r) => r.json()),
       fetch(`/api/payment/razorpay/config?restaurant_id=${activeRestaurant.id}`).then((r) => r.json()),
+      fetch(`/api/wallet/balance?restaurant_id=${activeRestaurant.id}`).then((r) => r.json()),
+      fetch(`/api/backup/schedule-status?restaurant_id=${activeRestaurant.id}`).then((r) => r.json()),
     ])
-      .then(([statsRes, rzpRes]) => {
+      .then(([statsRes, rzpRes, walletRes, backupRes]) => {
         if (statsRes.success) setStats(statsRes.stats);
         if (rzpRes.success) setRzpConfig(rzpRes);
+        if (walletRes.success) {
+          setWallet(walletRes.wallet);
+          setWithdrawAmount(walletRes.wallet.available_balance || '');
+        }
+        if (backupRes.success) setBackupSchedule(backupRes.schedule);
       })
-      .catch((err) => addToast('Failed to load stats: ' + err.message, 'error'))
+      .catch((err) => addToast('Failed to load dashboard: ' + err.message, 'error'))
       .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
   }, [activeRestaurant]);
 
+  const handleWithdraw = async (e) => {
+    e.preventDefault();
+    if (!withdrawAmount || parseFloat(withdrawAmount) < 500) {
+      addToast('Minimum withdrawal amount is ₹500', 'error');
+      return;
+    }
+
+    setIsWithdrawing(true);
+    try {
+      const res = await fetch('/api/wallet/withdraw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          restaurant_id: activeRestaurant.id,
+          amount: parseFloat(withdrawAmount),
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setWithdrawalReceipt(data.withdrawal);
+        addToast(data.message);
+        fetchDashboardData();
+      } else {
+        addToast(data.error || 'Withdrawal failed', 'error');
+      }
+    } catch (err) {
+      addToast('Error: ' + err.message, 'error');
+    } finally {
+      setIsWithdrawing(false);
+    }
+  };
+
+  const handleDownloadComplianceBackup = () => {
+    window.open(`/api/backup/download?restaurant_id=${activeRestaurant.id}`, '_blank');
+    addToast('Downloading monthly local compliance backup (.json)...');
+  };
+
+  const handleDownloadRawSqlite = () => {
+    window.open(`/api/backup/sqlite?restaurant_id=${activeRestaurant.id}`, '_blank');
+    addToast('Downloading local SQLite database file (.db)...');
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8 pb-20">
+    <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8 pb-24">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Welcome Header */}
-        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-amber-950 text-white rounded-3xl p-6 sm:p-8 shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-slate-800">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold uppercase tracking-wider mb-2">
-              Restaurant Manager Suite
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30 text-xs font-bold uppercase tracking-wider mb-2">
+              Enterprise Operations Suite
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
               {activeRestaurant?.name || "L'Osteria Bistro"} Command Center
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
-              {activeRestaurant?.tagline || 'Real-time table QR codes, contactless ordering, live kitchen display system'} with automated GST tax invoices and Razorpay direct payouts.
+              {activeRestaurant?.tagline || 'Contactless QR ordering, token queue, and live POS operations'} with direct Razorpay payouts and zero-cloud-cost local database storage.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <Link
               to="/admin/kitchen"
-              className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md transition flex items-center gap-2"
+              className="px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-black text-xs shadow-md transition flex items-center gap-2"
             >
               <ChefHat className="w-4 h-4" />
-              <span>Launch Live KDS</span>
+              <span>Launch Live Queue / KDS</span>
             </Link>
 
             <Link
@@ -73,7 +143,7 @@ export function AdminDashboard() {
               className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition flex items-center gap-2"
             >
               <QrCode className="w-4 h-4" />
-              <span>Manage Tables & QRs</span>
+              <span>Station QR Placards</span>
             </Link>
           </div>
         </div>
@@ -84,14 +154,14 @@ export function AdminDashboard() {
           <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs flex items-center justify-between">
             <div>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Total Revenue
+                Total Gross Volume
               </span>
               <div className="text-2xl font-black text-slate-900 mt-1">
-                ₹{stats ? stats.total_revenue : '...'}
+                ₹{stats ? stats.total_revenue.toLocaleString('en-IN') : '...'}
               </div>
               <div className="text-[11px] text-emerald-600 font-semibold mt-0.5 flex items-center gap-1">
                 <TrendingUp className="w-3.5 h-3.5" />
-                <span>Verified via Razorpay / POS</span>
+                <span>Verified via Razorpay</span>
               </div>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -99,32 +169,32 @@ export function AdminDashboard() {
             </div>
           </div>
 
-          {/* Active Orders */}
+          {/* Active Orders / Tokens */}
           <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs flex items-center justify-between">
             <div>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Active in Kitchen
+                Active in Queue
               </span>
               <div className="text-2xl font-black text-amber-600 mt-1">
-                {stats ? stats.active_orders : 0} Tickets
+                {stats ? stats.active_orders : 0} Orders
               </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Cooking & Queue</div>
+              <div className="text-[11px] text-slate-400 mt-0.5">Live tickets pending</div>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
               <ChefHat className="w-6 h-6" />
             </div>
           </div>
 
-          {/* Table Occupancy */}
+          {/* Station Occupancy */}
           <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs flex items-center justify-between">
             <div>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Tables Active
+                Active Stations
               </span>
               <div className="text-2xl font-black text-slate-900 mt-1">
-                {stats ? stats.occupied_tables : 0} / {stats ? stats.total_tables : 8}
+                {stats ? stats.occupied_tables : 0} / {stats ? stats.total_tables : 4}
               </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Seated dining groups</div>
+              <div className="text-[11px] text-slate-400 mt-0.5">Tables, Rooms & Bays</div>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center">
               <Users className="w-6 h-6" />
@@ -140,7 +210,7 @@ export function AdminDashboard() {
               <div className="text-2xl font-black text-slate-900 mt-1">
                 {stats ? stats.total_orders : 0}
               </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Stored in SQLite DB</div>
+              <div className="text-[11px] text-slate-400 mt-0.5">Stored in local SQLite DB</div>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center">
               <Receipt className="w-6 h-6" />
@@ -148,169 +218,256 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        {/* System Architecture & Status Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* SQLite Local Database */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                <Database className="w-5 h-5" />
+        {/* Merchant Payouts & Withdrawable Wallet */}
+        {wallet && (
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200">
+                  <Wallet className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                    <span>Merchant Payouts & Withdrawable Balance</span>
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                      Razorpay Settlement
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Payments received through QR orders land in your ledger. Withdraw anytime to your verified bank account after reaching ₹{wallet.min_withdrawal_threshold}.
+                  </p>
+                </div>
               </div>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] uppercase">
-                Active & Synced
-              </span>
+
+              <button
+                onClick={() => {
+                  setWithdrawalReceipt(null);
+                  setShowWithdrawModal(true);
+                }}
+                disabled={!wallet.can_withdraw}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ArrowDownToLine className="w-4 h-4" />
+                <span>Withdraw to Bank Account</span>
+              </button>
             </div>
-            <div>
-              <h3 className="font-extrabold text-slate-900 text-sm">System Local Database</h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Powered by native node:sqlite engine in data/restaurant.db with zero cloud dependencies.
-              </p>
-            </div>
-            <div className="pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-500">
-              Tables, Orders, Items, Invoices: <b>Persistent</b>
+
+            {/* Financial Ledger Breakdown Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-left">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Available Payout Balance
+                </span>
+                <div className="text-2xl font-black text-emerald-600 mt-1">
+                  ₹{wallet.available_balance.toLocaleString('en-IN')}
+                </div>
+                <span className="text-[10px] text-slate-400 mt-0.5 block">
+                  {wallet.can_withdraw ? 'Ready to withdraw' : `Threshold: Min ₹${wallet.min_withdrawal_threshold}`}
+                </span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Gross GMV Collected
+                </span>
+                <div className="text-2xl font-black text-slate-900 mt-1">
+                  ₹{wallet.total_gmv.toLocaleString('en-IN')}
+                </div>
+                <span className="text-[10px] text-slate-400 mt-0.5 block">Total customer receipts</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Platform Fee Deducted
+                </span>
+                <div className="text-2xl font-black text-slate-700 mt-1">
+                  ₹{wallet.platform_commission_deducted.toLocaleString('en-IN')}
+                </div>
+                <span className="text-[10px] text-sky-600 font-semibold mt-0.5 block">
+                  {wallet.platform_commission_pct}% platform fee (Profit)
+                </span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  Settlement Bank Account
+                </span>
+                <div className="text-lg font-mono font-bold text-slate-900 mt-1">
+                  {wallet.settlement_bank_account}
+                </div>
+                <span className="text-[10px] text-slate-500 mt-0.5 block">
+                  IFSC: {wallet.settlement_ifsc}
+                </span>
+              </div>
             </div>
           </div>
+        )}
 
-          {/* Razorpay Gateway */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center">
-                <CreditCard className="w-5 h-5" />
-              </div>
-              <span className="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold text-[10px] uppercase">
-                {rzpConfig?.configured ? 'Live / Test Key' : 'Simulation Ready'}
-              </span>
-            </div>
-            <div>
-              <h3 className="font-extrabold text-slate-900 text-sm">Razorpay Integration</h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Supports UPI (GPay/PhonePe), Credit/Debit Cards, and NetBanking with HMAC signature verification.
-              </p>
-            </div>
-            <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-500">
-              Key ID: <span className="font-mono font-semibold">{rzpConfig?.key_id || 'rzp_test_simulated'}</span>
-            </div>
-          </div>
-
-          {/* GST & Invoicing Compliance */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px] uppercase">
-                GST Compliant
-              </span>
-            </div>
-            <div>
-              <h3 className="font-extrabold text-slate-900 text-sm">GST Tax Invoicing</h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Automatic 5% GST computation (2.5% CGST + 2.5% SGST) with 80mm thermal receipt & A4 print formats.
-              </p>
-            </div>
-            <div className="pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-500">
-              GSTIN: <b>29ABCDE1234F1Z5</b> · FSSAI: <b>11223344556677</b>
-            </div>
-          </div>
-        </div>
-
-        {/* Popular Dishes & Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Top Selling Dishes */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Flame className="w-5 h-5 text-amber-600" />
-                <h3 className="font-extrabold text-slate-900 text-base">Top Selling Dishes</h3>
-              </div>
-              <span className="text-xs font-semibold text-slate-500">By sales volume</span>
-            </div>
-
-            {stats?.top_items?.length ? (
-              <div className="divide-y divide-slate-100">
-                {stats.top_items.map((it, idx) => (
-                  <div key={idx} className="py-3 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-lg bg-slate-100 text-slate-700 font-black flex items-center justify-center text-xs">
-                        #{idx + 1}
-                      </span>
-                      <span className="font-bold text-slate-900">{it.name}</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-black text-slate-900">{it.total_sold} ordered</div>
-                      <div className="text-[11px] text-slate-400">₹{it.total_amount}</div>
-                    </div>
+        {/* Zero Cloud Cost Local Database & Monthly 31st Download Section */}
+        {backupSchedule && (
+          <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-indigo-500/30 shadow-xl space-y-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-indigo-600 text-white shadow-lg">
+                  <Database className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-extrabold text-white">
+                      Zero-Cloud-Cost Local Database & Monthly 31st Archive
+                    </h2>
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                      ₹0 Cloud Bills
+                    </span>
                   </div>
-                ))}
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Your complete order database and patient records are saved locally. High-level aggregates sync to the Super Admin's free MongoDB cluster, and your full compliance backup automatically compiles on the 31st of every month for local download.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                <button
+                  onClick={handleDownloadComplianceBackup}
+                  className="px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-sky-500/20 cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download Monthly JSON Archive</span>
+                </button>
+
+                <button
+                  onClick={handleDownloadRawSqlite}
+                  className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition border border-slate-700 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Database className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Raw SQLite (.db)</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+              <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-1">
+                <div className="text-[11px] font-semibold text-slate-400">Current Monthly Period</div>
+                <div className="font-bold text-white text-sm">{backupSchedule.current_period}</div>
+                <span className="text-[10px] text-emerald-400">Next Auto Archive: {backupSchedule.next_download_date}</span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-1">
+                <div className="text-[11px] font-semibold text-slate-400">Monthly Records Logged</div>
+                <div className="font-bold text-white text-sm">{backupSchedule.total_monthly_records} Orders / Tokens</div>
+                <span className="text-[10px] text-slate-400">Volume: ₹{backupSchedule.total_volume.toLocaleString('en-IN')}</span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-1">
+                <div className="text-[11px] font-semibold text-slate-400">Super Admin Sync Architecture</div>
+                <div className="font-bold text-sky-300 text-sm">{backupSchedule.super_admin_sync}</div>
+                <span className="text-[10px] text-purple-300">Local privacy preserved</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Bank Payout Withdrawal Modal */}
+      {showWithdrawModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
+          <div
+            className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+                  <Wallet className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base">Instant Bank Withdrawal</h3>
+                  <p className="text-xs text-slate-500">Direct settlement from Razorpay</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowWithdrawModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {withdrawalReceipt ? (
+              <div className="text-center space-y-4 py-2">
+                <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <div>
+                  <h4 className="font-black text-slate-900 text-lg">
+                    ₹{withdrawalReceipt.amount.toLocaleString('en-IN')} Transferred!
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Settled to Bank A/C {withdrawalReceipt.bank_account_masked}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left text-xs space-y-1.5 font-mono">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Bank UTR Reference:</span>
+                    <span className="font-bold text-slate-900">{withdrawalReceipt.utr_number}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Status:</span>
+                    <span className="font-bold text-emerald-600">IMPS SETTLED</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowWithdrawModal(false)}
+                  className="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs"
+                >
+                  Done
+                </button>
               </div>
             ) : (
-              <div className="py-10 text-center text-slate-400 text-xs">
-                Dishes will rank here as customers order from tables!
-              </div>
+              <form onSubmit={handleWithdraw} className="space-y-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Withdrawal Amount (₹)
+                  </label>
+                  <input
+                    type="number"
+                    step="1"
+                    min="500"
+                    max={wallet.available_balance}
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-lg font-black text-slate-900 focus:outline-none focus:border-emerald-500"
+                  />
+                  <span className="text-[11px] text-slate-500 mt-1 block">
+                    Available: ₹{wallet.available_balance.toLocaleString('en-IN')} · Min: ₹500
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+                  <div className="flex justify-between">
+                    <span>Depositing to:</span>
+                    <span className="font-bold text-slate-900">{wallet.settlement_bank_account}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Bank IFSC:</span>
+                    <span className="font-mono text-slate-900">{wallet.settlement_ifsc}</span>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isWithdrawing || parseFloat(withdrawAmount) < 500}
+                  className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition disabled:opacity-50 cursor-pointer"
+                >
+                  {isWithdrawing ? 'Processing Settlement...' : `Confirm & Withdraw ₹${withdrawAmount || 0}`}
+                </button>
+              </form>
             )}
           </div>
-
-          {/* Quick Actions Hub */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-3">
-            <h3 className="font-extrabold text-slate-900 text-base mb-2">Quick Navigation</h3>
-
-            <Link
-              to="/menu?table=tbl_1"
-              target="_blank"
-              className="p-3.5 rounded-2xl border border-slate-200 hover:border-amber-400 hover:bg-amber-50/40 transition flex items-center justify-between group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
-                  <Utensils className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-slate-900 group-hover:text-orange-600 transition">
-                    Test Customer Digital Menu (Table 01)
-                  </div>
-                  <div className="text-[11px] text-slate-500">Preview what customers experience when scanning QR</div>
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition" />
-            </Link>
-
-            <Link
-              to="/admin/tables"
-              className="p-3.5 rounded-2xl border border-slate-200 hover:border-amber-400 hover:bg-amber-50/40 transition flex items-center justify-between group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center">
-                  <QrCode className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-slate-900 group-hover:text-amber-600 transition">
-                    Generate New Table QRs & Stand Cards
-                  </div>
-                  <div className="text-[11px] text-slate-500">Add tables, print tent cards and download PNGs</div>
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition" />
-            </Link>
-
-            <Link
-              to="/admin/kitchen"
-              className="p-3.5 rounded-2xl border border-slate-200 hover:border-amber-400 hover:bg-amber-50/40 transition flex items-center justify-between group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center">
-                  <ChefHat className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-slate-900 group-hover:text-amber-600 transition">
-                    Open Kitchen Display Screen (KDS)
-                  </div>
-                  <div className="text-[11px] text-slate-500">Live order queue with audio chime alerts</div>
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition" />
-            </Link>
-          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -18,6 +18,7 @@ import { AdminSettings } from './pages/AdminSettings.jsx';
 import { AdminDashboard } from './pages/AdminDashboard.jsx';
 import { SuperAdmin } from './pages/SuperAdmin.jsx';
 import { ClientOnboarding } from './pages/ClientOnboarding.jsx';
+import { LandingHero } from './pages/LandingHero.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -33,10 +34,11 @@ function AppContent() {
 
       <div className="flex-1">
         <Routes>
-          {/* Default redirect to customer digital menu */}
-          <Route path="/" element={<Navigate to="/menu" replace />} />
+          {/* Universal Hero / Landing Portal */}
+          <Route path="/" element={<LandingHero />} />
+          <Route path="/home" element={<LandingHero />} />
 
-          {/* Customer Facing */}
+          {/* Customer & Patient Facing Digital Menu */}
           <Route path="/menu" element={<CustomerMenu />} />
           <Route path="/order/:orderId" element={<OrderConfirmation />} />
           <Route path="/invoice/:orderId" element={<InvoiceView />} />

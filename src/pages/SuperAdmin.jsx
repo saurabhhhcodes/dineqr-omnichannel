@@ -265,7 +265,7 @@ export function SuperAdmin() {
 
         {/* Global KPI Cards */}
         {overview && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-400">Total Platform GMV</span>
@@ -274,12 +274,23 @@ export function SuperAdmin() {
               <div className="text-2xl font-black text-white mt-1.5">
                 ₹{overview.total_gmv?.toLocaleString('en-IN') || 0}
               </div>
-              <span className="text-[11px] text-emerald-400">Settled through Razorpay</span>
+              <span className="text-[11px] text-emerald-400">Processed via Razorpay</span>
             </div>
 
             <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-400">Total Orders / Bookings</span>
+                <span className="text-xs font-semibold text-slate-400">Platform Net Profit</span>
+                <Percent className="w-4 h-4 text-amber-400" />
+              </div>
+              <div className="text-2xl font-black text-amber-300 mt-1.5">
+                ₹{Math.round((overview.total_gmv * 0.02) * 100) / 100}
+              </div>
+              <span className="text-[11px] text-amber-400/80">Commission Retained (2%)</span>
+            </div>
+
+            <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-400">Orders & Bookings</span>
                 <Receipt className="w-4 h-4 text-sky-400" />
               </div>
               <div className="text-2xl font-black text-white mt-1.5">{overview.total_orders || 0}</div>
@@ -288,7 +299,7 @@ export function SuperAdmin() {
 
             <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-400">Onboarded Businesses</span>
+                <span className="text-xs font-semibold text-slate-400">Client Organizations</span>
                 <Building2 className="w-4 h-4 text-purple-400" />
               </div>
               <div className="text-2xl font-black text-white mt-1.5">{tenants.length}</div>
@@ -298,13 +309,44 @@ export function SuperAdmin() {
             <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-400">Active QR Stations</span>
-                <QrCode className="w-4 h-4 text-amber-400" />
+                <QrCode className="w-4 h-4 text-sky-400" />
               </div>
               <div className="text-2xl font-black text-white mt-1.5">{overview.total_tables || 0}</div>
-              <span className="text-[11px] text-amber-400">Tables, Rooms & Bays</span>
+              <span className="text-[11px] text-sky-400">Tables, Rooms & Bays</span>
             </div>
           </div>
         )}
+
+        {/* Free MongoDB & 31st Monthly Local Database Architecture Banner */}
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-purple-950/40 via-slate-900 to-indigo-950/40 border border-purple-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-purple-600 text-white shadow-lg">
+              <Database className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="font-bold text-white text-sm flex items-center gap-2">
+                <span>Free MongoDB Cluster Sync & 31st Monthly Local Downloads</span>
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                  Zero Cloud DB Fees
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Client databases are stored locally on premise. On the 31st of every month, clients download local compliance archives, while high-level metrics sync to the free MongoDB cluster.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href="/api/backup/sqlite"
+              download
+              className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download Master SQLite</span>
+            </a>
+          </div>
+        </div>
 
         {/* Windows Desktop Client Support Banner */}
         <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-950/60 via-slate-900 to-indigo-950/60 border border-blue-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

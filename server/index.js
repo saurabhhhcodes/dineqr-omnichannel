@@ -16,12 +16,17 @@ import paymentRouter from './routes/payment.js';
 import invoiceRouter from './routes/invoice.js';
 import statsRouter from './routes/stats.js';
 import restaurantsRouter from './routes/restaurants.js';
+import walletRouter from './routes/wallet.js';
+import backupRouter from './routes/backup.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Trust reverse proxies (Cloudflare, Vercel, Nginx) for accurate HTTPS detection
+app.set('trust proxy', true);
 
 // Initialize database & tables
 initDb();
@@ -42,6 +47,8 @@ app.use('/api/orders', ordersRouter);
 app.use('/api/payment/razorpay', paymentRouter);
 app.use('/api/invoice', invoiceRouter);
 app.use('/api/stats', statsRouter);
+app.use('/api/wallet', walletRouter);
+app.use('/api/backup', backupRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -71,8 +78,12 @@ app.get('{*path}', (req, res) => {
   }
 });
 
-// Start listening
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 DineQR Platform Server running on http://localhost:${PORT}`);
-  console.log(`📡 Real-time Kitchen SSE ready at http://localhost:${PORT}/api/events`);
-});
+// Start listening if not running in a serverless environment (e.g. Vercel)
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 DineQR Platform Server running on http://localhost:${PORT}`);
+    console.log(`📡 Real-time Kitchen SSE ready at http://localhost:${PORT}/api/events`);
+  });
+}
+
+export default app;

@@ -40,7 +40,9 @@ export function AdminTables() {
   const fetchTables = () => {
     if (!activeRestaurant) return;
     setIsLoading(true);
-    fetch(`/api/tables?restaurant_id=${activeRestaurant.id}`)
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const query = useLanIp ? 'useLan=true' : (origin ? `baseUrl=${encodeURIComponent(origin)}` : '');
+    fetch(`/api/tables?restaurant_id=${activeRestaurant.id}${query ? `&${query}` : ''}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.success && data.tables) {
@@ -54,11 +56,14 @@ export function AdminTables() {
 
   useEffect(() => {
     fetchTables();
-  }, [activeRestaurant]);
+  }, [activeRestaurant, useLanIp]);
 
   const handleOpenPlacard = async (table) => {
     try {
-      const queryParam = useLanIp ? '?useLan=true' : '';
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const queryParam = useLanIp 
+        ? '?useLan=true' 
+        : (origin ? `?baseUrl=${encodeURIComponent(origin)}` : '');
       const res = await fetch(`/api/tables/${table.id}/qr${queryParam}`);
       const data = await res.json();
       if (data.success) {
@@ -388,6 +393,7 @@ export function AdminTables() {
       {selectedPlacardTable && (
         <TablePlacard
           table={selectedPlacardTable}
+          restaurant={activeRestaurant}
           qrDataUrl={qrDataUrl}
           targetUrl={selectedPlacardTable.menu_url}
           onClose={() => setSelectedPlacardTable(null)}

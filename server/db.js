@@ -13,8 +13,8 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Database file path inside project data/ directory
-const DATA_DIR = path.resolve(__dirname, '../data');
+// Database file path: on Vercel use writable /tmp/data, otherwise use project data/ directory
+const DATA_DIR = process.env.VERCEL ? '/tmp/data' : path.resolve(__dirname, '../data');
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
@@ -182,6 +182,37 @@ export function initDb() {
     );
   `);
 
+  // 7. Merchant Wallets (Balances, Commission & Profits)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS wallets (
+      restaurant_id TEXT PRIMARY KEY,
+      balance REAL DEFAULT 0,
+      total_earned REAL DEFAULT 0,
+      total_commission REAL DEFAULT 0,
+      total_withdrawn REAL DEFAULT 0,
+      min_withdrawal REAL DEFAULT 500,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+    );
+  `);
+
+  // 8. Bank Withdrawals & Payouts
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS withdrawals (
+      id TEXT PRIMARY KEY,
+      restaurant_id TEXT NOT NULL,
+      amount REAL NOT NULL,
+      fee REAL DEFAULT 0,
+      net_amount REAL NOT NULL,
+      bank_account TEXT NOT NULL,
+      bank_ifsc TEXT NOT NULL,
+      status TEXT DEFAULT 'SETTLED',
+      utr_number TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+    );
+  `);
+
   // Apply migrations for columns in case of existing database
   ensureColumn('tables', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('categories', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
@@ -311,6 +342,27 @@ export function initDb() {
           item.calories,
           item.tags,
         ]
+      );
+    }
+  }
+
+  // Ensure wallet exists for all restaurants and sync balances
+  const allRestaurants = queryAll(`SELECT id, commission_pct FROM restaurants`);
+  for (const r of allRestaurants) {
+    const w = queryOne(`SELECT * FROM wallets WHERE restaurant_id = ?`, [r.id]);
+    if (!w) {
+      const stats = queryOne(
+        `SELECT COALESCE(SUM(grand_total), 0) as paid_total FROM orders WHERE restaurant_id = ? AND payment_status = 'PAID'`,
+        [r.id]
+      );
+      const gmv = stats ? stats.paid_total : 0;
+      const commissionPct = r.commission_pct || 2.0;
+      const commission = (gmv * commissionPct) / 100;
+      const netEarned = gmv - commission;
+      execute(
+        `INSERT INTO wallets (restaurant_id, balance, total_earned, total_commission, total_withdrawn, min_withdrawal)
+         VALUES (?, ?, ?, ?, 0, 500)`,
+        [r.id, netEarned, netEarned, commission]
       );
     }
   }

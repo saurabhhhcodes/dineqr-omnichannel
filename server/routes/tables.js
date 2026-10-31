@@ -26,8 +26,14 @@ function getBaseUrl(req) {
     const port = req.socket.localPort || 3001;
     return `http://${getLocalIp()}:${port}`;
   }
-  const host = req.get('host');
-  const protocol = req.protocol || 'http';
+  const forwardedProto = req.get('x-forwarded-proto');
+  const forwardedHost = req.get('x-forwarded-host');
+  const host = forwardedHost || req.get('host');
+  // Detect protocol: prioritize x-forwarded-proto, then req.protocol, or auto-detect https for cloudflare/production domains
+  let protocol = forwardedProto || req.protocol || 'http';
+  if (host && (host.includes('trycloudflare.com') || host.includes('vercel.app') || host.includes('render.com') || host.includes('axonflow.in'))) {
+    protocol = 'https';
+  }
   return `${protocol}://${host}`;
 }
 
@@ -121,12 +127,12 @@ router.get('/:id/qr', async (req, res) => {
       errorCorrectionLevel: 'H',
       type: 'image/png',
       quality: 0.95,
-      margin: 2,
+      margin: 3,
       color: {
         dark: '#0f172a',
         light: '#ffffff',
       },
-      width: parseInt(req.query.size || '400', 10),
+      width: parseInt(req.query.size || '450', 10),
     };
 
     const format = req.query.format || 'json';

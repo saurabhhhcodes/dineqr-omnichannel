@@ -60,16 +60,17 @@ export function CustomerMenu() {
     fetch(`/api/tables?restaurant_id=${restId}`)
       .then((r) => r.json())
       .then((data) => {
-        if (data.success && data.tables) {
+        if (data.success && data.tables && data.tables.length > 0) {
           setAvailableTables(data.tables);
+          let matched = null;
           if (tableParam) {
-            const matched = data.tables.find(
+            matched = data.tables.find(
               (t) => t.id === tableParam || t.table_number.toLowerCase() === tableParam.toLowerCase()
             );
-            if (matched) {
-              setTable(matched);
-            }
           }
+          // If tableParam matched a table belonging to this restaurant, use it.
+          // Otherwise, always select the first station of this specific restaurant!
+          setTable(matched || data.tables[0]);
         }
       })
       .catch((err) => console.error('Failed to load tables:', err));
@@ -107,19 +108,41 @@ export function CustomerMenu() {
         <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-black tracking-widest uppercase">
-                Interactive Video Menu
+                {currentRestaurant?.business_type === 'clinic'
+                  ? '🏥 Certified Medical OPD & Lab'
+                  : currentRestaurant?.business_type === 'gym'
+                  ? '🏋️ Premium Strength & Nutrition Bar'
+                  : currentRestaurant?.business_type === 'event'
+                  ? '🎪 Official Festival VIP Service'
+                  : '🍽️ Artisanal Kitchen & Video Menu'}
               </span>
-              <span className="text-slate-400 text-xs font-medium">· Contactless Ordering</span>
+              <span className="text-emerald-400 text-xs font-semibold flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Open Now</span>
+              </span>
+              <span className="text-slate-400 text-xs font-medium hidden sm:inline">
+                · ★ 4.9 (450+ verified ratings)
+              </span>
             </div>
+
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
               {currentRestaurant?.name || "L'Osteria Gourmet Bistro"}
             </h1>
+
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl font-normal leading-relaxed">
-              {currentRestaurant?.tagline || "Authentic Italian wood-fired pizzas, handcrafted pastas, and artisanal tapas."} Tap any dish to view ingredients, chef notes, and live video previews!
+              {currentRestaurant?.tagline || "Authentic culinary selections and quick self-ordering."}
+              <span className="hidden sm:inline text-slate-400 ml-1">
+                Tap items to toggle between live video loops and high-res photos!
+              </span>
             </p>
+
+            <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 pt-0.5">
+              <span>📍 {currentRestaurant?.address || 'Indiranagar, Bengaluru'}</span>
+              <span>· ⚡ Instant Razorpay & UPI Settlement</span>
+            </div>
           </div>
 
           {/* Current Table / Room Selector */}
