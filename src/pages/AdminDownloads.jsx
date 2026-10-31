@@ -228,6 +228,49 @@ export function AdminDownloads() {
         ))}
       </div>
 
+      {/* macOS Gatekeeper First-Time Launch Guide */}
+      <div className="p-6 rounded-3xl bg-amber-50/80 border border-amber-200 text-amber-950 space-y-3 shadow-xs">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-amber-200 text-amber-800 flex items-center justify-center font-bold">
+            <Apple className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="font-extrabold text-sm text-amber-950">
+              macOS First-Time Launch Guide ("Apple could not verify DineQR...")
+            </h4>
+            <p className="text-xs text-amber-800">
+              Because DineQR is distributed directly for on-premise business terminals outside the Mac App Store, macOS Gatekeeper verifies un-notarized apps on first launch.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs">
+          <div className="p-3.5 bg-white rounded-2xl border border-amber-200/80 shadow-xs space-y-1">
+            <span className="font-black text-amber-900 block">Method 1 (Fastest - 5 Seconds)</span>
+            <p className="text-slate-600 leading-relaxed text-[11px]">
+              Drag to Applications. <strong>Right-Click (or Control + Click)</strong> DineQR, choose <strong>Open</strong>, then click <strong>Open</strong> in the dialog. macOS will remember your permission!
+            </p>
+          </div>
+
+          <div className="p-3.5 bg-white rounded-2xl border border-amber-200/80 shadow-xs space-y-1">
+            <span className="font-black text-amber-900 block">Method 2 (System Settings)</span>
+            <p className="text-slate-600 leading-relaxed text-[11px]">
+              Open <strong>System Settings &gt; Privacy & Security</strong>. Scroll to <strong>Security</strong>, and click <strong>"Open Anyway"</strong> next to DineQR.
+            </p>
+          </div>
+
+          <div className="p-3.5 bg-white rounded-2xl border border-amber-200/80 shadow-xs space-y-1">
+            <span className="font-black text-amber-900 block">Method 3 (Terminal One-Liner)</span>
+            <p className="text-slate-600 leading-relaxed text-[11px]">
+              Open Terminal and remove the quarantine attribute:
+              <code className="block mt-1 bg-slate-900 text-amber-300 p-1.5 rounded-lg font-mono text-[10px]">
+                xattr -cr /Applications/DineQR.app
+              </code>
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* On-Premise Architecture & Remote Access Protocol Card */}
       <div className="p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 text-white shadow-xl space-y-4">
         <div className="flex items-center justify-between">

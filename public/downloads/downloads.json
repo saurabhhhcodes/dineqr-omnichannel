@@ -11,9 +11,9 @@
       "filename": "DineQR-Terminal-Setup.exe",
       "download_url": "/api/downloads/DineQR-Terminal-Setup.exe",
       "size_kb": 2,
-      "sha256": "227c48e3c74fc341110de177deb691da964eb3e63b63c3218fcd84177ca69985",
+      "sha256": "3e76a0eeabca3bda34e4286e21c1be732c4073c72afb241bd9c937b3eea99e2d",
       "version": "1.0.0",
-      "released_at": "2026-10-31T11:51:10.150Z"
+      "released_at": "2026-10-31T12:57:21.343Z"
     },
     {
       "name": "DineQR-POS-Terminal.apk",
@@ -25,9 +25,9 @@
       "filename": "DineQR-POS-Terminal.apk",
       "download_url": "/api/downloads/DineQR-POS-Terminal.apk",
       "size_kb": 3,
-      "sha256": "2ba8603e905fa5eb738ef8a0f83a558d8d9a15c32c820162d781ba32fac097b1",
+      "sha256": "91f1cfae8d3f9fe1169f5b216e92a61afb18188b3ad6d23f6d8d67781bfb1d95",
       "version": "1.0.0",
-      "released_at": "2026-10-31T11:51:10.153Z"
+      "released_at": "2026-10-31T12:57:21.345Z"
     },
     {
       "name": "DineQR-macOS-Universal.dmg",
@@ -38,10 +38,10 @@
       "description": "Native Mac application bundle with drag-and-drop Applications install.",
       "filename": "DineQR-macOS-Universal.dmg",
       "download_url": "/api/downloads/DineQR-macOS-Universal.dmg",
-      "size_kb": 18,
-      "sha256": "103585c33895dfeabdba23c9f692ea4a842a0a0ad578f274c36dfeeb2f5cf72b",
+      "size_kb": 20,
+      "sha256": "ef44d53e9e6b909b0f2f250d9290e7d96dfe9884ac1e0640f4171766850db03b",
       "version": "1.0.0",
-      "released_at": "2026-10-31T11:51:10.154Z"
+      "released_at": "2026-10-31T12:57:21.345Z"
     },
     {
       "name": "dineqr-terminal_1.0.0_amd64.deb",
@@ -53,9 +53,9 @@
       "filename": "dineqr-terminal_1.0.0_amd64.deb",
       "download_url": "/api/downloads/dineqr-terminal_1.0.0_amd64.deb",
       "size_kb": 0,
-      "sha256": "0d04b40714431df5a73b7f6ace3031973413ccbf7d04d349426d1456943f7675",
+      "sha256": "165422a1e09049e902a1a0285472edb8472b6d83ddb300c38d855cb3ead45cad",
       "version": "1.0.0",
-      "released_at": "2026-10-31T11:51:10.154Z"
+      "released_at": "2026-10-31T12:57:21.345Z"
     }
   ]
 }

@@ -32,9 +32,11 @@ function AppContent() {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const isPrintOnly = location.pathname.startsWith('/invoice') && location.search.includes('print=true');
+  const isLandingPage = location.pathname === '/' || location.pathname === '/home';
+  const pageBg = isLandingPage ? 'bg-slate-950' : 'bg-slate-50';
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className={`min-h-screen ${pageBg} flex flex-col font-sans w-full max-w-full overflow-x-hidden`}>
       {!isPrintOnly && (
         <Navbar onOpenCart={() => setIsCartOpen(true)} />
       )}

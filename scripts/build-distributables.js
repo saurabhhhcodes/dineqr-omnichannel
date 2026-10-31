@@ -289,6 +289,41 @@ fs.writeFileSync(path.join(contentsDir, 'Info.plist'), plist);
 fs.writeFileSync(path.join(macosBinDir, 'DineQR'), macLauncherScript);
 fs.chmodSync(path.join(macosBinDir, 'DineQR'), '755');
 
+// Ad-hoc codesign the .app bundle for macOS executable integrity
+try {
+  execSync(`codesign --force --deep --sign - "${appDir}"`, { stdio: 'pipe' });
+  console.log('✅ Ad-hoc codesigned DineQR.app bundle');
+} catch (e) {
+  console.warn('⚠️ codesign notice:', e.message);
+}
+
+// Add First-Time Launch Instructions file inside the DMG
+const macDmgReadme = `DineQR Terminal - macOS First-Time Launch Instructions
+======================================================
+Because DineQR is distributed directly for on-premise restaurant
+and clinic use (outside the Apple Mac App Store), macOS Gatekeeper
+protects against un-notarized apps on the first launch.
+
+TO OPEN DINEQR ON MAC:
+----------------------
+Method 1 (Recommended - 5 Seconds):
+1. Drag "DineQR" into your "Applications" folder.
+2. In Applications, RIGHT-CLICK (or Control + Click) "DineQR".
+3. Select "Open" from the context menu.
+4. When prompted, click "Open".
+(You only need to do this once. Afterwards, click normally).
+
+Method 2 (System Settings):
+1. Go to Apple Menu > System Settings > Privacy & Security.
+2. Scroll to "Security".
+3. Under "DineQR was blocked", click "Open Anyway".
+
+Method 3 (Terminal One-Liner):
+Open Terminal and run:
+xattr -cr /Applications/DineQR.app
+`;
+fs.writeFileSync(path.join(macDir, 'First-Time-Launch-Guide.txt'), macDmgReadme);
+
 // Create Applications symlink for standard macOS DMG drag-and-drop installer
 try {
   fs.symlinkSync('/Applications', path.join(macDir, 'Applications'));
