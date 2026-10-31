@@ -229,44 +229,74 @@ export function AdminDownloads() {
       </div>
 
       {/* macOS Gatekeeper First-Time Launch Guide */}
-      <div className="p-6 rounded-3xl bg-amber-50/80 border border-amber-200 text-amber-950 space-y-3 shadow-xs">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-amber-200 text-amber-800 flex items-center justify-center font-bold">
-            <Apple className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="font-extrabold text-sm text-amber-950">
-              macOS First-Time Launch Guide ("Apple could not verify DineQR...")
-            </h4>
-            <p className="text-xs text-amber-800">
-              Because DineQR is distributed directly for on-premise business terminals outside the Mac App Store, macOS Gatekeeper verifies un-notarized apps on first launch.
-            </p>
+      <div className="p-6 md:p-8 rounded-3xl bg-amber-500/10 border border-amber-500/30 text-amber-950 space-y-4 shadow-sm">
+        <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black shadow-md shadow-amber-500/20 shrink-0">
+              <Apple className="w-6 h-6" />
+            </div>
+            <div>
+              <h4 className="font-extrabold text-base text-slate-900 flex items-center gap-2 flex-wrap">
+                <span>macOS First-Time Launch Guide</span>
+                <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 border border-amber-300">
+                  Gatekeeper Resolution
+                </span>
+              </h4>
+              <p className="text-xs text-slate-600 mt-0.5">
+                If macOS displays <em>"Apple could not verify DineQR is free of malware..."</em>, choose any of the 3 quick verified methods below:
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs">
-          <div className="p-3.5 bg-white rounded-2xl border border-amber-200/80 shadow-xs space-y-1">
-            <span className="font-black text-amber-900 block">Method 1 (Fastest - 5 Seconds)</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-1 text-xs">
+          <div className="p-4 bg-white rounded-2xl border border-amber-200 shadow-xs space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-black text-amber-950 text-xs uppercase tracking-wide">Method 1 (Easiest - 1 Click)</span>
+              <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[9px] font-black">Inside DMG</span>
+            </div>
             <p className="text-slate-600 leading-relaxed text-[11px]">
-              Drag to Applications. <strong>Right-Click (or Control + Click)</strong> DineQR, choose <strong>Open</strong>, then click <strong>Open</strong> in the dialog. macOS will remember your permission!
+              Open the downloaded <strong>DineQR-macOS-Universal.dmg</strong> and double-click <strong>"Install & Open DineQR.command"</strong>.
+            </p>
+            <p className="text-slate-500 text-[10px] leading-relaxed">
+              It copies the app to <code className="text-amber-800 bg-amber-50 px-1 py-0.5 rounded font-mono">/Applications</code>, removes the quarantine flag, and launches DineQR automatically.
             </p>
           </div>
 
-          <div className="p-3.5 bg-white rounded-2xl border border-amber-200/80 shadow-xs space-y-1">
-            <span className="font-black text-amber-900 block">Method 2 (System Settings)</span>
+          <div className="p-4 bg-white rounded-2xl border border-amber-200 shadow-xs space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-black text-amber-950 text-xs uppercase tracking-wide">Method 2 (System Settings)</span>
+              <span className="px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[9px] font-black">macOS UI</span>
+            </div>
             <p className="text-slate-600 leading-relaxed text-[11px]">
-              Open <strong>System Settings &gt; Privacy & Security</strong>. Scroll to <strong>Security</strong>, and click <strong>"Open Anyway"</strong> next to DineQR.
+              Open <strong>System Settings &gt; Privacy & Security</strong>.
+            </p>
+            <p className="text-slate-600 leading-relaxed text-[11px]">
+              Scroll down to <strong>Security</strong>, find <em>"DineQR was blocked"</em>, and click the <strong>"Open Anyway"</strong> button. Enter your Touch ID or password.
             </p>
           </div>
 
-          <div className="p-3.5 bg-white rounded-2xl border border-amber-200/80 shadow-xs space-y-1">
-            <span className="font-black text-amber-900 block">Method 3 (Terminal One-Liner)</span>
+          <div className="p-4 bg-white rounded-2xl border border-amber-200 shadow-xs space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-black text-amber-950 text-xs uppercase tracking-wide">Method 3 (Terminal One-Liner)</span>
+              <span className="px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 text-[9px] font-black">Instant</span>
+            </div>
             <p className="text-slate-600 leading-relaxed text-[11px]">
-              Open Terminal and remove the quarantine attribute:
-              <code className="block mt-1 bg-slate-900 text-amber-300 p-1.5 rounded-lg font-mono text-[10px]">
-                xattr -cr /Applications/DineQR.app
-              </code>
+              Drag DineQR to Applications, open <strong>Terminal</strong>, and run:
             </p>
+            <div className="flex items-center justify-between bg-slate-900 text-amber-300 p-2 rounded-xl font-mono text-[10px]">
+              <span className="truncate">xattr -cr /Applications/DineQR.app</span>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText('xattr -cr /Applications/DineQR.app');
+                  addToast('Terminal command copied!');
+                }}
+                className="text-amber-400 hover:text-white ml-1 shrink-0 cursor-pointer"
+                title="Copy terminal command"
+              >
+                <Copy className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

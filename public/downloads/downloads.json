@@ -11,9 +11,9 @@
       "filename": "DineQR-Terminal-Setup.exe",
       "download_url": "/api/downloads/DineQR-Terminal-Setup.exe",
       "size_kb": 2,
-      "sha256": "3e76a0eeabca3bda34e4286e21c1be732c4073c72afb241bd9c937b3eea99e2d",
+      "sha256": "ef869b791bff7e69bf12502e4fe29ca0139cbeda14591357ff78bee8bf451a60",
       "version": "1.0.0",
-      "released_at": "2026-10-31T12:57:21.343Z"
+      "released_at": "2026-10-31T13:07:10.458Z"
     },
     {
       "name": "DineQR-POS-Terminal.apk",
@@ -25,9 +25,9 @@
       "filename": "DineQR-POS-Terminal.apk",
       "download_url": "/api/downloads/DineQR-POS-Terminal.apk",
       "size_kb": 3,
-      "sha256": "91f1cfae8d3f9fe1169f5b216e92a61afb18188b3ad6d23f6d8d67781bfb1d95",
+      "sha256": "26388b4a1506dfedd3034b06249800e1619a237f8e0fea0e0db0397f75bb2904",
       "version": "1.0.0",
-      "released_at": "2026-10-31T12:57:21.345Z"
+      "released_at": "2026-10-31T13:07:10.462Z"
     },
     {
       "name": "DineQR-macOS-Universal.dmg",
@@ -39,9 +39,9 @@
       "filename": "DineQR-macOS-Universal.dmg",
       "download_url": "/api/downloads/DineQR-macOS-Universal.dmg",
       "size_kb": 20,
-      "sha256": "ef44d53e9e6b909b0f2f250d9290e7d96dfe9884ac1e0640f4171766850db03b",
+      "sha256": "608dd36c89be2b85b700f81f0e1559c267e28fcc317f437cc0fe95aed4e9f0b1",
       "version": "1.0.0",
-      "released_at": "2026-10-31T12:57:21.345Z"
+      "released_at": "2026-10-31T13:07:10.462Z"
     },
     {
       "name": "dineqr-terminal_1.0.0_amd64.deb",
@@ -53,9 +53,9 @@
       "filename": "dineqr-terminal_1.0.0_amd64.deb",
       "download_url": "/api/downloads/dineqr-terminal_1.0.0_amd64.deb",
       "size_kb": 0,
-      "sha256": "165422a1e09049e902a1a0285472edb8472b6d83ddb300c38d855cb3ead45cad",
+      "sha256": "acc60a36289635b4bd3d11ac06d7da406ce9b48356dba0779bfb0fdfc17827d4",
       "version": "1.0.0",
-      "released_at": "2026-10-31T12:57:21.345Z"
+      "released_at": "2026-10-31T13:07:10.462Z"
     }
   ]
 }

@@ -320,7 +320,7 @@ export function Navbar({ onOpenCart }) {
         </div>
 
         {/* Core Operations Tabs (Compact, fits all desktop viewports with zero horizontal overflow) */}
-        <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold text-slate-600">
+        <nav className="hidden xl:flex items-center gap-1 text-xs font-semibold text-slate-600">
           <Link
             to="/admin/kitchen"
             className={`relative px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 ${
@@ -489,6 +489,158 @@ export function Navbar({ onOpenCart }) {
             <span className="hidden sm:inline">Live QR View</span>
           </Link>
         </div>
+      </div>
+
+      {/* Admin Sub-Navigation Pill Bar for Tablets & Mobile (<1280px viewports like 942px, 768px, 390px) */}
+      <div className="xl:hidden bg-slate-900 border-t border-slate-800/90 px-3 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap shadow-inner w-full max-w-full">
+        <Link
+          to="/admin/kitchen"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname.startsWith('/admin/kitchen')
+              ? 'bg-sky-500 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          {isClinic ? <Stethoscope className="w-3.5 h-3.5" /> : <ChefHat className="w-3.5 h-3.5 text-amber-400" />}
+          <span>{isClinic ? 'Queue' : 'KDS'}</span>
+          {activeOrdersCount > 0 && (
+            <span className="inline-flex items-center justify-center px-1.5 py-0.2 text-[10px] font-black bg-rose-600 text-white rounded-full">
+              {activeOrdersCount}
+            </span>
+          )}
+        </Link>
+
+        <Link
+          to="/admin/floor-plan"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname.startsWith('/admin/floor-plan')
+              ? 'bg-amber-500 text-slate-950 shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span>Floor Plan</span>
+        </Link>
+
+        <Link
+          to="/admin/tables"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname.startsWith('/admin/tables')
+              ? 'bg-amber-400 text-slate-950 shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <QrCode className="w-3.5 h-3.5" />
+          <span>{isClinic ? 'Rooms' : 'Tables'}</span>
+        </Link>
+
+        <Link
+          to="/admin/menu"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname.startsWith('/admin/menu')
+              ? 'bg-slate-800 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          <span>Catalog</span>
+        </Link>
+
+        <Link
+          to="/admin/orders"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname.startsWith('/admin/orders')
+              ? 'bg-slate-800 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <ReceiptText className="w-3.5 h-3.5" />
+          <span>Orders</span>
+        </Link>
+
+        <Link
+          to="/admin/reservations"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname.startsWith('/admin/reservations')
+              ? 'bg-purple-600 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <Calendar className="w-3.5 h-3.5" />
+          <span>Bookings</span>
+        </Link>
+
+        <Link
+          to="/admin/staff"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname.startsWith('/admin/staff')
+              ? 'bg-blue-600 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <Users className="w-3.5 h-3.5" />
+          <span>Staff</span>
+        </Link>
+
+        <Link
+          to="/admin/inventory"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname.startsWith('/admin/inventory')
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <Boxes className="w-3.5 h-3.5" />
+          <span>Inventory</span>
+        </Link>
+
+        <Link
+          to="/admin/purchases"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname.startsWith('/admin/purchases')
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <FileSpreadsheet className="w-3.5 h-3.5" />
+          <span>Purchases</span>
+        </Link>
+
+        <Link
+          to="/admin/downloads"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname.startsWith('/admin/downloads')
+              ? 'bg-amber-400 text-slate-950 shadow-xs'
+              : 'text-amber-400 hover:bg-slate-800'
+          }`}
+        >
+          <Laptop className="w-3.5 h-3.5" />
+          <span>Apps</span>
+        </Link>
+
+        <Link
+          to="/admin/settings"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname.startsWith('/admin/settings')
+              ? 'bg-slate-800 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <Settings className="w-3.5 h-3.5" />
+          <span>Settings</span>
+        </Link>
+
+        <Link
+          to="/super-admin"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname === '/super-admin'
+              ? 'bg-purple-600 text-white shadow-xs'
+              : 'text-purple-400 hover:bg-slate-800'
+          }`}
+        >
+          <Building2 className="w-3.5 h-3.5" />
+          <span>Super Admin</span>
+        </Link>
       </div>
     </header>
   );

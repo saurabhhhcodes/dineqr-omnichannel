@@ -281,13 +281,44 @@ DATA_DIR="$HOME/Library/Application Support/DineQR"
 mkdir -p "$DATA_DIR"
 
 echo "Starting DineQR Terminal with local SQLite in $DATA_DIR..."
-# Launch browser pointing to local engine or cloud fallback
-open "https://dineqr-omnichannel.netlify.app"
+# Check if local backend port 3001 is responding
+if curl -s -m 1 http://localhost:3001/api/health >/dev/null 2>&1; then
+  echo "Opening DineQR POS via local SQLite engine..."
+  open "http://localhost:3001"
+else
+  echo "Opening DineQR POS Cloud..."
+  open "https://dineqr-omnichannel.netlify.app"
+fi
 `;
 
 fs.writeFileSync(path.join(contentsDir, 'Info.plist'), plist);
 fs.writeFileSync(path.join(macosBinDir, 'DineQR'), macLauncherScript);
 fs.chmodSync(path.join(macosBinDir, 'DineQR'), '755');
+
+// Automated One-Click Installer & Gatekeeper Bypass script (.command)
+const macCommandInstaller = `#!/bin/bash
+DIR="$( cd "$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
+clear
+echo "=========================================================="
+echo "    DineQR POS Terminal - macOS Automated Installer"
+echo "=========================================================="
+echo ""
+echo "[1/3] Copying DineQR.app to /Applications..."
+cp -R "$DIR/DineQR.app" /Applications/
+echo "[2/3] Whitelisting with macOS Gatekeeper (clearing quarantine)..."
+xattr -cr /Applications/DineQR.app 2>/dev/null
+echo "[3/3] Launching DineQR POS Terminal..."
+open /Applications/DineQR.app
+echo ""
+echo "=========================================================="
+echo "  [SUCCESS] DineQR has been installed and launched!"
+echo "  You can find DineQR in your Launchpad or Applications."
+echo "=========================================================="
+sleep 2
+exit 0
+`;
+fs.writeFileSync(path.join(macDir, 'Install & Open DineQR.command'), macCommandInstaller);
+fs.chmodSync(path.join(macDir, 'Install & Open DineQR.command'), '755');
 
 // Ad-hoc codesign the .app bundle for macOS executable integrity
 try {
@@ -304,23 +335,24 @@ Because DineQR is distributed directly for on-premise restaurant
 and clinic use (outside the Apple Mac App Store), macOS Gatekeeper
 protects against un-notarized apps on the first launch.
 
-TO OPEN DINEQR ON MAC:
-----------------------
-Method 1 (Recommended - 5 Seconds):
-1. Drag "DineQR" into your "Applications" folder.
-2. In Applications, RIGHT-CLICK (or Control + Click) "DineQR".
-3. Select "Open" from the context menu.
-4. When prompted, click "Open".
-(You only need to do this once. Afterwards, click normally).
+HOW TO OPEN DINEQR ON MAC:
+---------------------------
+Method 1 (Fastest - 1 Click):
+Double-click "Install & Open DineQR.command" inside this disk image.
+It will automatically copy DineQR to /Applications, whitelist it
+with macOS Gatekeeper, and open it immediately!
 
-Method 2 (System Settings):
-1. Go to Apple Menu > System Settings > Privacy & Security.
-2. Scroll to "Security".
-3. Under "DineQR was blocked", click "Open Anyway".
+Method 2 (System Settings - 10 Seconds):
+1. Drag "DineQR" into your "Applications" folder.
+2. If you see "Apple could not verify...", open Apple Menu > System Settings.
+3. Click "Privacy & Security" in the left sidebar and scroll to "Security".
+4. Click the "Open Anyway" button next to DineQR.
+5. Enter your Mac password or Touch ID. Done!
 
 Method 3 (Terminal One-Liner):
 Open Terminal and run:
 xattr -cr /Applications/DineQR.app
+Then double-click DineQR.app normally!
 `;
 fs.writeFileSync(path.join(macDir, 'First-Time-Launch-Guide.txt'), macDmgReadme);
 

@@ -153,25 +153,25 @@ export function AdminKitchen() {
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 pb-20">
       {/* Top KDS Control Bar */}
-      <div className="bg-slate-950/80 border-b border-slate-800 px-4 sm:px-6 py-4 sticky top-16 z-30 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-slate-950/95 border-b border-slate-800 px-3 sm:px-6 py-3.5 backdrop-blur-md w-full max-w-full">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-black">
+            <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-black shrink-0">
               <ChefHat className="w-6 h-6" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-black tracking-tight text-white">Live Kitchen Display (KDS)</h1>
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                <h1 className="text-lg sm:text-xl font-black tracking-tight text-white truncate">Live Kitchen Display (KDS)</h1>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping shrink-0"></span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-400 truncate">
                 {orders.length} active tickets queued · Real-time WebSocket/SSE connected
               </p>
             </div>
           </div>
 
           {/* Controls: Audio Toggle, Refresh, Filters */}
-          <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-start sm:justify-end">
             {/* Filter Tabs */}
             <div className="flex items-center bg-slate-800/80 rounded-xl p-1 text-xs font-bold border border-slate-700">
               <button
@@ -215,7 +215,7 @@ export function AdminKitchen() {
                 setAutoPrintEnabled(next);
                 addToast(next ? '🖨️ Auto-print active on new orders' : 'Auto-print paused');
               }}
-              className={`p-2.5 rounded-xl border transition cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
+              className={`p-2.5 rounded-xl border transition cursor-pointer flex items-center gap-1.5 text-xs font-bold shrink-0 ${
                 autoPrintEnabled
                   ? 'bg-slate-800 border-orange-500/40 text-orange-400 hover:bg-slate-700'
                   : 'bg-slate-800 border-slate-700 text-slate-500 hover:text-white'
@@ -232,7 +232,7 @@ export function AdminKitchen() {
                 setSoundEnabled(!soundEnabled);
                 if (!soundEnabled) playOrderChime();
               }}
-              className={`p-2.5 rounded-xl border transition cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
+              className={`p-2.5 rounded-xl border transition cursor-pointer flex items-center gap-1.5 text-xs font-bold shrink-0 ${
                 soundEnabled
                   ? 'bg-slate-800 border-amber-500/40 text-amber-400 hover:bg-slate-700'
                   : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
@@ -245,7 +245,7 @@ export function AdminKitchen() {
 
             <button
               onClick={fetchOrders}
-              className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition cursor-pointer"
+              className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition cursor-pointer shrink-0"
               title="Refresh tickets"
             >
               <RefreshCw className="w-4 h-4" />
@@ -265,7 +265,7 @@ export function AdminKitchen() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 w-full min-w-0 max-w-full">
             {filtered.map((order) => {
               const isUrgent = order.elapsed_minutes >= 15;
               const isReceived = order.status === 'RECEIVED';
@@ -276,7 +276,7 @@ export function AdminKitchen() {
               return (
                 <div
                   key={order.id}
-                  className={`flex flex-col justify-between rounded-2xl border transition-all duration-200 overflow-hidden shadow-xl ${
+                  className={`flex flex-col justify-between rounded-2xl border transition-all duration-200 overflow-hidden shadow-xl min-w-0 max-w-full ${
                     isUrgent
                       ? 'border-rose-500/80 bg-slate-950 ring-2 ring-rose-500/30'
                       : isReceived
