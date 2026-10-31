@@ -20,6 +20,7 @@ import walletRouter from './routes/wallet.js';
 import backupRouter from './routes/backup.js';
 import erpRouter from './routes/erp.js';
 import downloadsRouter from './routes/downloads.js';
+import integrationsRouter from './routes/integrations.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -53,6 +54,7 @@ app.use('/api/wallet', walletRouter);
 app.use('/api/backup', backupRouter);
 app.use('/api/erp', erpRouter);
 app.use('/api/downloads', downloadsRouter);
+app.use('/api/integrations', integrationsRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

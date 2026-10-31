@@ -575,6 +575,101 @@ async function runPostmanTestSuite() {
     assert.ok(platforms.includes('linux'));
   });
 
+  // 29. Food Delivery Aggregator Status & Webhook URLs
+  await step('GET /api/integrations/status -> Returns Zomato, Swiggy, Magicpin & ONDC status', async () => {
+    const res = await fetch(`${BASE_URL}/api/integrations/status?restaurant_id=rest_losteria`);
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.integrations.zomato.webhook_url.includes('/api/integrations/zomato/webhook'));
+    assert.ok(data.integrations.swiggy.webhook_url.includes('/api/integrations/swiggy/webhook'));
+    assert.ok(data.integrations.ondc.webhook_url.includes('/api/integrations/ondc/webhook'));
+  });
+
+  // 30. Partner Credential Validation
+  await step('POST /api/integrations/test-partner -> Validates Zomato ResId and Swiggy Outlet format', async () => {
+    const resZom = await fetch(`${BASE_URL}/api/integrations/test-partner`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ platform: 'zomato', partner_id: '18923412' }),
+    });
+    assert.equal(resZom.status, 200);
+    const dataZom = await resZom.json();
+    assert.equal(dataZom.valid, true);
+
+    const resSwg = await fetch(`${BASE_URL}/api/integrations/test-partner`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ platform: 'swiggy', partner_id: 'SWG-BLR-0419' }),
+    });
+    assert.equal(resSwg.status, 200);
+    const dataSwg = await resSwg.json();
+    assert.equal(dataSwg.valid, true);
+  });
+
+  // 31. Incoming Zomato Webhook Ingestion
+  await step('POST /api/integrations/zomato/webhook -> Ingests Zomato delivery order directly to KDS', async () => {
+    const res = await fetch(`${BASE_URL}/api/integrations/zomato/webhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurant_id: 'rest_losteria',
+        order_id: 'ZOM998877',
+        customer_name: 'Ananya Roy',
+        customer_phone: '9845012345',
+        delivery_rider: 'Zomato Rider (Suresh K.)',
+        rider_phone: '9845099999',
+        total_amount: 580,
+        items: [
+          { name: 'Butter Chicken Masala', unit_price: 380, quantity: 1, notes: 'Medium spice' },
+          { name: 'Garlic Butter Naan', unit_price: 100, quantity: 2 },
+        ],
+      }),
+    });
+    assert.equal(res.status, 201);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.order_code.startsWith('ZOM-'));
+  });
+
+  // 32. Incoming Swiggy Webhook Ingestion
+  await step('POST /api/integrations/swiggy/webhook -> Ingests Swiggy delivery order directly to KDS', async () => {
+    const res = await fetch(`${BASE_URL}/api/integrations/swiggy/webhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurant_id: 'rest_losteria',
+        order_id: 'SWG445566',
+        customer_name: 'Karan Mehra',
+        customer_phone: '9845077777',
+        delivery_rider: 'Swiggy Executive (Manoj D.)',
+        rider_phone: '9845088888',
+        total_amount: 640,
+        items: [
+          { name: 'Artisan Wood-Fired Margherita Pizza', unit_price: 450, quantity: 1 },
+          { name: 'Iced Vanilla Cold Brew', unit_price: 190, quantity: 1 },
+        ],
+      }),
+    });
+    assert.equal(res.status, 201);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.order_code.startsWith('SWG-'));
+  });
+
+  // 33. Live Delivery Order Simulator
+  await step('POST /api/integrations/simulate -> Dispatches simulated aggregator order to KDS', async () => {
+    const res = await fetch(`${BASE_URL}/api/integrations/simulate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ platform: 'zomato', restaurant_id: 'rest_losteria' }),
+    });
+    assert.equal(res.status, 201);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.order.order_source, 'ZOMATO');
+  });
+
   console.log(`\n🏁 Postman Test Suite Summary: ${passed}/${total} assertions passed!`);
   if (passed === total) {
     console.log('🎉 ALL POSTMAN COLLECTION ENDPOINTS VERIFIED AND PASSING 100%!\n');

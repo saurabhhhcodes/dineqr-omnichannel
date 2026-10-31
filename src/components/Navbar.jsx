@@ -185,7 +185,7 @@ export function Navbar({ onOpenCart }) {
   // ============================================================
   if (isCustomerView) {
     return (
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs transition-all w-full max-w-full overflow-x-hidden">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs transition-all w-full max-w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
           {/* Business Brand on Digital Menu */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 sm:flex-initial">
@@ -269,7 +269,7 @@ export function Navbar({ onOpenCart }) {
   // 3. BUSINESS MANAGEMENT & ADMIN OPERATIONS VIEW
   // ============================================================
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs transition-all w-full max-w-full overflow-x-hidden">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs transition-all w-full max-w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         {/* Brand & Organization Switcher */}
         <div className="flex items-center gap-2.5 shrink-0">

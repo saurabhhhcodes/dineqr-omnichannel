@@ -525,6 +525,15 @@ router.put('/:id', (req, res) => {
       paper_width,
       auto_print_bills,
       cash_drawer_kick,
+      zomato_res_id,
+      zomato_api_key,
+      zomato_auto_accept,
+      swiggy_outlet_id,
+      swiggy_api_key,
+      swiggy_auto_accept,
+      magicpin_merchant_id,
+      ondc_provider_id,
+      aggregator_webhook_secret,
     } = req.body;
 
     execute(
@@ -553,6 +562,15 @@ router.put('/:id', (req, res) => {
         paper_width = COALESCE(?, paper_width),
         auto_print_bills = COALESCE(?, auto_print_bills),
         cash_drawer_kick = COALESCE(?, cash_drawer_kick),
+        zomato_res_id = COALESCE(?, zomato_res_id),
+        zomato_api_key = COALESCE(?, zomato_api_key),
+        zomato_auto_accept = COALESCE(?, zomato_auto_accept),
+        swiggy_outlet_id = COALESCE(?, swiggy_outlet_id),
+        swiggy_api_key = COALESCE(?, swiggy_api_key),
+        swiggy_auto_accept = COALESCE(?, swiggy_auto_accept),
+        magicpin_merchant_id = COALESCE(?, magicpin_merchant_id),
+        ondc_provider_id = COALESCE(?, ondc_provider_id),
+        aggregator_webhook_secret = COALESCE(?, aggregator_webhook_secret),
         updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
       [
@@ -580,6 +598,15 @@ router.put('/:id', (req, res) => {
         paper_width !== undefined ? paper_width : null,
         auto_print_bills !== undefined ? (auto_print_bills ? 1 : 0) : null,
         cash_drawer_kick !== undefined ? (cash_drawer_kick ? 1 : 0) : null,
+        zomato_res_id !== undefined ? zomato_res_id.trim() : null,
+        zomato_api_key !== undefined ? zomato_api_key.trim() : null,
+        zomato_auto_accept !== undefined ? (zomato_auto_accept ? 1 : 0) : null,
+        swiggy_outlet_id !== undefined ? swiggy_outlet_id.trim() : null,
+        swiggy_api_key !== undefined ? swiggy_api_key.trim() : null,
+        swiggy_auto_accept !== undefined ? (swiggy_auto_accept ? 1 : 0) : null,
+        magicpin_merchant_id !== undefined ? magicpin_merchant_id.trim() : null,
+        ondc_provider_id !== undefined ? ondc_provider_id.trim() : null,
+        aggregator_webhook_secret !== undefined ? aggregator_webhook_secret.trim() : null,
         req.params.id,
       ]
     );

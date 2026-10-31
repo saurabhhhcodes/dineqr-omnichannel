@@ -325,6 +325,19 @@ export function initDb() {
   ensureColumn('restaurants', 'paper_width', "TEXT DEFAULT '80mm'");
   ensureColumn('restaurants', 'auto_print_bills', "INTEGER DEFAULT 1");
   ensureColumn('restaurants', 'cash_drawer_kick', "INTEGER DEFAULT 1");
+  ensureColumn('restaurants', 'zomato_res_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'zomato_api_key', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'zomato_auto_accept', "INTEGER DEFAULT 1");
+  ensureColumn('restaurants', 'swiggy_outlet_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'swiggy_api_key', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'swiggy_auto_accept', "INTEGER DEFAULT 1");
+  ensureColumn('restaurants', 'magicpin_merchant_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'ondc_provider_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'aggregator_webhook_secret', "TEXT DEFAULT ''");
+  ensureColumn('orders', 'order_source', "TEXT DEFAULT 'DIRECT'");
+  ensureColumn('orders', 'aggregator_order_id', "TEXT DEFAULT ''");
+  ensureColumn('orders', 'aggregator_rider_name', "TEXT DEFAULT ''");
+  ensureColumn('orders', 'aggregator_rider_phone', "TEXT DEFAULT ''");
   ensureColumn('orders', 'split_type', "TEXT DEFAULT 'SINGLE'");
   ensureColumn('orders', 'split_shares', "INTEGER DEFAULT 1");
   ensureColumn('restaurants', 'razorpay_key_id', "TEXT DEFAULT ''");
@@ -368,6 +381,19 @@ export function initDb() {
   ensureColumn('restaurants', 'paper_width', "TEXT DEFAULT '80mm'");
   ensureColumn('restaurants', 'auto_print_bills', "INTEGER DEFAULT 1");
   ensureColumn('restaurants', 'cash_drawer_kick', "INTEGER DEFAULT 1");
+  ensureColumn('restaurants', 'zomato_res_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'zomato_api_key', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'zomato_auto_accept', "INTEGER DEFAULT 1");
+  ensureColumn('restaurants', 'swiggy_outlet_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'swiggy_api_key', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'swiggy_auto_accept', "INTEGER DEFAULT 1");
+  ensureColumn('restaurants', 'magicpin_merchant_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'ondc_provider_id', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'aggregator_webhook_secret', "TEXT DEFAULT ''");
+  ensureColumn('orders', 'order_source', "TEXT DEFAULT 'DIRECT'");
+  ensureColumn('orders', 'aggregator_order_id', "TEXT DEFAULT ''");
+  ensureColumn('orders', 'aggregator_rider_name', "TEXT DEFAULT ''");
+  ensureColumn('orders', 'aggregator_rider_phone', "TEXT DEFAULT ''");
 
   // Seed default restaurants
   for (const r of defaultRestaurants) {

@@ -272,12 +272,19 @@ export function AdminKitchen() {
               const isPreparing = order.status === 'PREPARING';
               const isReady = order.status === 'READY';
               const isServed = order.status === 'SERVED';
+              const isZomato = order.order_source === 'ZOMATO';
+              const isSwiggy = order.order_source === 'SWIGGY';
+              const isOndc = order.order_source === 'ONDC';
 
               return (
                 <div
                   key={order.id}
                   className={`flex flex-col justify-between rounded-2xl border transition-all duration-200 overflow-hidden shadow-xl min-w-0 max-w-full ${
-                    isUrgent
+                    isZomato
+                      ? 'border-rose-500/80 bg-slate-950 ring-1 ring-rose-500/30'
+                      : isSwiggy
+                      ? 'border-orange-500/80 bg-slate-950 ring-1 ring-orange-500/30'
+                      : isUrgent
                       ? 'border-rose-500/80 bg-slate-950 ring-2 ring-rose-500/30'
                       : isReceived
                       ? 'border-amber-500/50 bg-slate-950'
@@ -291,7 +298,11 @@ export function AdminKitchen() {
                   {/* Ticket Header */}
                   <div
                     className={`p-4 flex items-center justify-between border-b ${
-                      isReceived
+                      isZomato
+                        ? 'bg-rose-500/15 border-rose-500/30'
+                        : isSwiggy
+                        ? 'bg-orange-500/15 border-orange-500/30'
+                        : isReceived
                         ? 'bg-amber-500/15 border-amber-500/20'
                         : isPreparing
                         ? 'bg-sky-500/15 border-sky-500/20'
@@ -301,13 +312,28 @@ export function AdminKitchen() {
                     }`}
                   >
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-base font-black text-white tracking-wide">
                           {order.table_number}
                         </span>
                         <span className="text-xs font-mono font-bold text-slate-400">
                           ({order.order_code})
                         </span>
+                        {isZomato && (
+                          <span className="px-2 py-0.5 rounded-md bg-rose-600 text-white font-black text-[9px] uppercase tracking-wider">
+                            Zomato
+                          </span>
+                        )}
+                        {isSwiggy && (
+                          <span className="px-2 py-0.5 rounded-md bg-orange-600 text-white font-black text-[9px] uppercase tracking-wider">
+                            Swiggy
+                          </span>
+                        )}
+                        {isOndc && (
+                          <span className="px-2 py-0.5 rounded-md bg-purple-600 text-white font-black text-[9px] uppercase tracking-wider">
+                            ONDC
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
                         <Clock className="w-3.5 h-3.5" />
@@ -320,6 +346,11 @@ export function AdminKitchen() {
                           </span>
                         )}
                       </div>
+                      {order.aggregator_rider_name && (
+                        <div className="text-[11px] text-amber-300 font-semibold mt-1">
+                          🛵 {order.aggregator_rider_name}
+                        </div>
+                      )}
                     </div>
 
                     {/* Status Badge */}

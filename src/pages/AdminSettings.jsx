@@ -13,7 +13,11 @@ import {
   HelpCircle,
   ExternalLink,
   Printer,
-  Cpu
+  Cpu,
+  Copy,
+  Zap,
+  Flame,
+  Share2
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -46,6 +50,14 @@ export function AdminSettings() {
     paper_width: '80mm',
     auto_print_bills: 1,
     cash_drawer_kick: 1,
+    zomato_res_id: '',
+    zomato_api_key: '',
+    zomato_auto_accept: 1,
+    swiggy_outlet_id: '',
+    swiggy_api_key: '',
+    swiggy_auto_accept: 1,
+    magicpin_merchant_id: '',
+    ondc_provider_id: '',
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +66,8 @@ export function AdminSettings() {
   const [keyValidationStatus, setKeyValidationStatus] = useState(null);
   const [isTestingPrinter, setIsTestingPrinter] = useState(false);
   const [printerStatusMsg, setPrinterStatusMsg] = useState(null);
+  const [testingPartner, setTestingPartner] = useState('');
+  const [simulatingPartner, setSimulatingPartner] = useState('');
 
   useEffect(() => {
     if (!activeRestaurant) return;
@@ -88,12 +102,67 @@ export function AdminSettings() {
             paper_width: r.paper_width || '80mm',
             auto_print_bills: r.auto_print_bills !== undefined ? r.auto_print_bills : 1,
             cash_drawer_kick: r.cash_drawer_kick !== undefined ? r.cash_drawer_kick : 1,
+            zomato_res_id: r.zomato_res_id || '',
+            zomato_api_key: '',
+            zomato_auto_accept: r.zomato_auto_accept !== undefined ? r.zomato_auto_accept : 1,
+            swiggy_outlet_id: r.swiggy_outlet_id || '',
+            swiggy_api_key: '',
+            swiggy_auto_accept: r.swiggy_auto_accept !== undefined ? r.swiggy_auto_accept : 1,
+            magicpin_merchant_id: r.magicpin_merchant_id || '',
+            ondc_provider_id: r.ondc_provider_id || '',
           });
         }
       })
       .catch((err) => console.error('Failed to load settings:', err))
       .finally(() => setIsLoading(false));
   }, [activeRestaurant]);
+
+  const handleTestPartner = async (platform) => {
+    const partnerId = platform === 'zomato' ? formData.zomato_res_id : formData.swiggy_outlet_id;
+    if (!partnerId || !partnerId.trim()) {
+      addToast(`Please enter ${platform === 'zomato' ? 'Zomato ResID' : 'Swiggy Outlet ID'} first`, 'error');
+      return;
+    }
+    setTestingPartner(platform);
+    try {
+      const res = await fetch('/api/integrations/test-partner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform, partner_id: partnerId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`✅ ${data.message}`);
+      } else {
+        addToast(data.error || 'Partner validation failed', 'error');
+      }
+    } catch (err) {
+      addToast(err.message, 'error');
+    } finally {
+      setTestingPartner('');
+    }
+  };
+
+  const handleSimulateAggregatorOrder = async (platform) => {
+    setSimulatingPartner(platform);
+    try {
+      const res = await fetch('/api/integrations/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform, restaurant_id: activeRestaurant?.id || 'rest_losteria' }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(`🛵 ${data.message}`);
+      } else {
+        addToast(data.error || 'Simulation failed', 'error');
+      }
+    } catch (err) {
+      addToast(err.message, 'error');
+    } finally {
+      setSimulatingPartner('');
+    }
+  };
 
   const handleTestPrinter = async () => {
     setIsTestingPrinter(true);
@@ -345,6 +414,298 @@ export function AdminSettings() {
                     value={formData.bank_ifsc}
                     onChange={(e) => setFormData({ ...formData, bank_ifsc: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono uppercase focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* FOOD DELIVERY AGGREGATORS & OMNICHANNEL HUB (ZOMATO · SWIGGY · MAGICPIN · ONDC) */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-rose-200/90 shadow-md shadow-rose-500/5 space-y-6">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-rose-600 to-orange-500 text-white flex items-center justify-center font-black shadow-md shadow-rose-600/20">
+                  <Flame className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-black text-slate-900">
+                      Food Delivery Aggregators & Omnichannel Hub
+                    </h2>
+                    <span className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[10px] font-bold uppercase">
+                      Zomato · Swiggy · ONDC
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Connect your external business partner IDs to stream live online delivery orders straight into your DineQR Kitchen Display (KDS).
+                  </p>
+                </div>
+              </div>
+
+              <span className="text-xs px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Unified KDS Dispatch</span>
+              </span>
+            </div>
+
+            {/* Explanatory callout */}
+            <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 flex items-start gap-3 text-xs text-amber-950">
+              <Zap className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold">Zero Platform Switching: </span>
+                When customers order via Zomato, Swiggy, Magicpin, or ONDC, the order payload arrives via webhook, drops directly into your KDS ticket queue with audio chimes, and triggers silent thermal printing without staff needing multiple tablets!
+              </div>
+            </div>
+
+            {/* 1. ZOMATO PARTNER INTEGRATION */}
+            <div className="p-5 rounded-2xl bg-rose-50/40 border border-rose-200/80 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-rose-600 text-white flex items-center justify-center font-black text-xs shadow-xs">
+                    Z
+                  </div>
+                  <div>
+                    <h3 className="font-black text-sm text-slate-900">Zomato for Business</h3>
+                    <p className="text-[11px] text-slate-500">Live order sync via Zomato Merchant API</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleTestPartner('zomato')}
+                    disabled={testingPartner === 'zomato'}
+                    className="px-3 py-1.5 rounded-xl bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-bold transition cursor-pointer"
+                  >
+                    {testingPartner === 'zomato' ? 'Validating...' : 'Verify ResID'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSimulateAggregatorOrder('zomato')}
+                    disabled={simulatingPartner === 'zomato'}
+                    className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1"
+                    title="Simulate incoming Zomato delivery order"
+                  >
+                    <Flame className="w-3.5 h-3.5" />
+                    <span>{simulatingPartner === 'zomato' ? 'Sending...' : 'Simulate Zomato Order'}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    Zomato Restaurant ID (ResId)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 18923412"
+                    value={formData.zomato_res_id}
+                    onChange={(e) => setFormData({ ...formData, zomato_res_id: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none bg-white"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-1 block">
+                    Found in your Zomato Merchant Dashboard &rarr; Profile
+                  </span>
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    Zomato API Secret / Webhook Key
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••••••••••••••••••"
+                    value={formData.zomato_api_key}
+                    onChange={(e) => setFormData({ ...formData, zomato_api_key: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none bg-white"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-1 block">
+                    Used to authenticate incoming Zomato webhook payloads
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs border-t border-rose-200/60">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="zomato_auto_accept"
+                    checked={!!formData.zomato_auto_accept}
+                    onChange={(e) => setFormData({ ...formData, zomato_auto_accept: e.target.checked ? 1 : 0 })}
+                    className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-slate-300 cursor-pointer"
+                  />
+                  <label htmlFor="zomato_auto_accept" className="font-bold text-slate-800 cursor-pointer">
+                    Auto-Accept Zomato orders into Kitchen Display System
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-500 bg-white px-2.5 py-1 rounded-xl border border-rose-200">
+                  <span className="font-mono text-slate-700">Webhook: /api/integrations/zomato/webhook</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/api/integrations/zomato/webhook`);
+                      addToast('Zomato webhook URL copied!');
+                    }}
+                    className="text-rose-600 hover:text-rose-800 cursor-pointer p-0.5"
+                    title="Copy full Webhook URL"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. SWIGGY PARTNER INTEGRATION */}
+            <div className="p-5 rounded-2xl bg-orange-50/40 border border-orange-200/80 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-orange-500 text-white flex items-center justify-center font-black text-xs shadow-xs">
+                    S
+                  </div>
+                  <div>
+                    <h3 className="font-black text-sm text-slate-900">Swiggy Partner Integration</h3>
+                    <p className="text-[11px] text-slate-500">Live order sync via Swiggy Outlet API</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleTestPartner('swiggy')}
+                    disabled={testingPartner === 'swiggy'}
+                    className="px-3 py-1.5 rounded-xl bg-white border border-orange-200 hover:bg-orange-50 text-orange-700 text-xs font-bold transition cursor-pointer"
+                  >
+                    {testingPartner === 'swiggy' ? 'Validating...' : 'Verify Outlet ID'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSimulateAggregatorOrder('swiggy')}
+                    disabled={simulatingPartner === 'swiggy'}
+                    className="px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1"
+                    title="Simulate incoming Swiggy delivery order"
+                  >
+                    <Zap className="w-3.5 h-3.5" />
+                    <span>{simulatingPartner === 'swiggy' ? 'Sending...' : 'Simulate Swiggy Order'}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    Swiggy Outlet ID / Store ID
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. SWG-BLR-0419 or 481923"
+                    value={formData.swiggy_outlet_id}
+                    onChange={(e) => setFormData({ ...formData, swiggy_outlet_id: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none bg-white"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-1 block">
+                    Found in your Swiggy Partner App &rarr; Outlet Settings
+                  </span>
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    Swiggy Webhook API Token
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••••••••••••••••••"
+                    value={formData.swiggy_api_key}
+                    onChange={(e) => setFormData({ ...formData, swiggy_api_key: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none bg-white"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-1 block">
+                    Used to authenticate orders dispatched from Swiggy dispatch
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs border-t border-orange-200/60">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="swiggy_auto_accept"
+                    checked={!!formData.swiggy_auto_accept}
+                    onChange={(e) => setFormData({ ...formData, swiggy_auto_accept: e.target.checked ? 1 : 0 })}
+                    className="w-4 h-4 rounded text-orange-600 focus:ring-orange-500 border-slate-300 cursor-pointer"
+                  />
+                  <label htmlFor="swiggy_auto_accept" className="font-bold text-slate-800 cursor-pointer">
+                    Auto-Accept Swiggy orders into Kitchen Display System
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-500 bg-white px-2.5 py-1 rounded-xl border border-orange-200">
+                  <span className="font-mono text-slate-700">Webhook: /api/integrations/swiggy/webhook</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/api/integrations/swiggy/webhook`);
+                      addToast('Swiggy webhook URL copied!');
+                    }}
+                    className="text-orange-600 hover:text-orange-800 cursor-pointer p-0.5"
+                    title="Copy full Webhook URL"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. MAGICPIN & ONDC INTEGRATION */}
+            <div className="p-5 rounded-2xl bg-purple-50/40 border border-purple-200/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black text-xs shadow-xs">
+                    O
+                  </div>
+                  <div>
+                    <h3 className="font-black text-sm text-slate-900">ONDC Network & Magicpin</h3>
+                    <p className="text-[11px] text-slate-500">Government Open Network for Digital Commerce & Local Discovery</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleSimulateAggregatorOrder('ondc')}
+                  className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center gap-1"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>Simulate ONDC Order</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    Magicpin Merchant ID
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. MP-DELHI-88192"
+                    value={formData.magicpin_merchant_id}
+                    onChange={(e) => setFormData({ ...formData, magicpin_merchant_id: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    ONDC BAP / BPP Provider ID
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. ondc.seller.losteria.in"
+                    value={formData.ondc_provider_id}
+                    onChange={(e) => setFormData({ ...formData, ondc_provider_id: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none bg-white"
                   />
                 </div>
               </div>

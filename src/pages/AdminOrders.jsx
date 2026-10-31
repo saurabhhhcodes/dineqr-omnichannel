@@ -225,7 +225,20 @@ export function AdminOrders() {
                       </td>
 
                       <td className="py-3.5 px-4 font-bold text-slate-800">
-                        {order.table_number}
+                        <div>{order.table_number}</div>
+                        {order.order_source && order.order_source !== 'DIRECT' ? (
+                          <span
+                            className={`inline-block px-1.5 py-0.2 rounded text-[9px] font-black uppercase tracking-wider mt-0.5 ${
+                              order.order_source === 'ZOMATO'
+                                ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                                : order.order_source === 'SWIGGY'
+                                ? 'bg-orange-100 text-orange-800 border border-orange-200'
+                                : 'bg-purple-100 text-purple-800 border border-purple-200'
+                            }`}
+                          >
+                            {order.order_source}
+                          </span>
+                        ) : null}
                       </td>
 
                       <td className="py-3.5 px-4 text-slate-600">
