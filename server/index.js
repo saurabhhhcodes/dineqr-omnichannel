@@ -89,8 +89,8 @@ app.get('{*path}', (req, res) => {
 // Start listening if not running in a serverless environment (e.g. Vercel)
 if (process.env.VERCEL !== '1') {
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 DineQR Platform Server running on http://localhost:${PORT}`);
-    console.log(`📡 Real-time Kitchen SSE ready at http://localhost:${PORT}/api/events`);
+    console.log(`[Server] DineQR Platform Server running on http://localhost:${PORT}`);
+    console.log(`[SSE] Real-time Kitchen SSE ready at http://localhost:${PORT}/api/events`);
   });
 }
 

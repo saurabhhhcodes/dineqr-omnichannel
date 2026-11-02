@@ -415,7 +415,10 @@ export function AdminDashboard() {
                 <div className="text-xs font-mono font-bold text-sky-600 truncate mt-1">
                   {storageStatus.remote_access_url}
                 </div>
-                <span className="text-[10px] text-emerald-600 font-bold">● Live Encrypted Tunnel</span>
+                <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1 mt-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Encrypted Tunnel
+                </span>
               </div>
             </div>
           </div>

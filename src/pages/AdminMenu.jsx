@@ -13,7 +13,8 @@ import {
   Image,
   Utensils,
   FolderPlus,
-  RefreshCw
+  RefreshCw,
+  X,
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -391,7 +392,7 @@ export function AdminMenu() {
                       }`}
                       title="Click to toggle In Stock / Sold Out"
                     >
-                      {item.is_available ? '● In Stock' : '✕ Sold Out'}
+                      {item.is_available ? 'In Stock' : 'Sold Out'}
                     </button>
                   </div>
                 </div>
@@ -482,7 +483,7 @@ export function AdminMenu() {
                 onClick={() => setShowItemModal(false)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-700 transition cursor-pointer"
               >
-                ✕
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -546,8 +547,8 @@ export function AdminMenu() {
                     onChange={(e) => setFormData({ ...formData, is_veg: parseInt(e.target.value, 10) })}
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none bg-white"
                   >
-                    <option value="1">Pure Veg 🟢</option>
-                    <option value="0">Non-Veg 🔴</option>
+                    <option value="1">Pure Veg</option>
+                    <option value="0">Non-Veg</option>
                   </select>
                 </div>
 
@@ -561,9 +562,9 @@ export function AdminMenu() {
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none bg-white"
                   >
                     <option value="None">None</option>
-                    <option value="Mild">Mild 🌶️</option>
-                    <option value="Medium">Medium 🌶️🌶️</option>
-                    <option value="Spicy">Spicy 🌶️🌶️🌶️</option>
+                    <option value="Mild">Mild</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Spicy">Spicy</option>
                   </select>
                 </div>
               </div>
@@ -667,7 +668,7 @@ export function AdminMenu() {
                 onClick={() => setShowCatModal(false)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-700 transition cursor-pointer"
               >
-                ✕
+                <X className="w-5 h-5" />
               </button>
             </div>
 

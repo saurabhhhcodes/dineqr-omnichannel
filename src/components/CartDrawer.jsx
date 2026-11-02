@@ -13,7 +13,10 @@ import {
   ShoppingBag,
   ShieldCheck,
   ChevronRight,
-  MessageSquare
+  MessageSquare,
+  Zap,
+  Smartphone,
+  Building2,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
@@ -282,7 +285,8 @@ export function CartDrawer({ isOpen, onClose }) {
                     <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2.5">
                       <div className="text-xs font-bold text-amber-900 flex items-center justify-between">
                         <span className="flex items-center gap-1.5">
-                          <span>⚡ Counter Pickup & Token Slip</span>
+                          <Zap className="w-3.5 h-3.5 text-amber-600" />
+                          <span>Counter Pickup & Token Slip</span>
                         </span>
                         <span className="text-[10px] bg-amber-200 text-amber-900 font-black px-1.5 py-0.5 rounded uppercase">
                           Live Daily Token
@@ -398,27 +402,32 @@ export function CartDrawer({ isOpen, onClose }) {
                       {paymentChoice === 'RAZORPAY' && (
                         <div className="mt-3 pt-2.5 border-t border-sky-100/70 grid grid-cols-3 gap-1.5">
                           {[
-                            { id: 'Google Pay', name: 'GPay', icon: '⚡', color: 'hover:border-blue-400' },
-                            { id: 'PhonePe', name: 'PhonePe', icon: '🟣', color: 'hover:border-purple-400' },
-                            { id: 'Paytm', name: 'Paytm', icon: '🔵', color: 'hover:border-sky-400' },
-                            { id: 'BHIM / Cred UPI', name: 'BHIM / UPI', icon: '🇮🇳', color: 'hover:border-emerald-400' },
-                            { id: 'Debit & Credit Cards', name: 'Cards', icon: '💳', color: 'hover:border-amber-400' },
-                            { id: 'NetBanking', name: 'NetBanking', icon: '🏦', color: 'hover:border-slate-400' },
-                          ].map((m) => (
-                            <button
-                              key={m.id}
-                              type="button"
-                              onClick={() => setSpecificMethod(m.id)}
-                              className={`p-2 rounded-xl text-left border text-xs font-medium transition cursor-pointer flex flex-col justify-between ${
-                                specificMethod === m.id
-                                  ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
-                                  : 'bg-white text-slate-700 border-slate-200 ' + m.color
-                              }`}
-                            >
-                              <div className="text-base">{m.icon}</div>
-                              <div className="text-[10px] font-bold mt-1 truncate">{m.name}</div>
-                            </button>
-                          ))}
+                            { id: 'Google Pay', name: 'GPay', icon: Smartphone, color: 'hover:border-sky-400' },
+                            { id: 'PhonePe', name: 'PhonePe', icon: Smartphone, color: 'hover:border-purple-400' },
+                            { id: 'Paytm', name: 'Paytm', icon: Smartphone, color: 'hover:border-sky-400' },
+                            { id: 'BHIM / Cred UPI', name: 'BHIM / UPI', icon: Zap, color: 'hover:border-emerald-400' },
+                            { id: 'Debit & Credit Cards', name: 'Cards', icon: CreditCard, color: 'hover:border-amber-400' },
+                            { id: 'NetBanking', name: 'NetBanking', icon: Building2, color: 'hover:border-slate-400' },
+                          ].map((m) => {
+                            const IconComponent = m.icon;
+                            return (
+                              <button
+                                key={m.id}
+                                type="button"
+                                onClick={() => setSpecificMethod(m.id)}
+                                className={`p-2 rounded-xl text-left border text-xs font-medium transition cursor-pointer flex flex-col justify-between ${
+                                  specificMethod === m.id
+                                    ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
+                                    : 'bg-white text-slate-700 border-slate-200 ' + m.color
+                                }`}
+                              >
+                                <div>
+                                  <IconComponent className={`w-4 h-4 ${specificMethod === m.id ? 'text-white' : 'text-slate-600'}`} />
+                                </div>
+                                <div className="text-[10px] font-bold mt-1 truncate">{m.name}</div>
+                              </button>
+                            );
+                          })}
                         </div>
                       )}
                     </div>

@@ -192,7 +192,7 @@ router.post('/verify', (req, res) => {
 
     res.json({
       success: true,
-      message: `🎉 Subscription activated! Your restaurant is subscribed to ${plan.name} at ₹${plan.amount}/month.`,
+      message: `Subscription activated! Your restaurant is subscribed to ${plan.name} at ₹${plan.amount}/month.`,
       plan: plan.name,
       status: 'active',
       expires_at: nextExpiryIso,

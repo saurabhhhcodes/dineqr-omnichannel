@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Search,
   Filter,
+  X,
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -329,9 +330,9 @@ export function AdminPurchases() {
               <h3 className="font-extrabold text-slate-900 text-base">New Request for Quotation (RfQ)</h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 cursor-pointer p-1 rounded-lg"
               >
-                ✕
+                <X className="w-5 h-5" />
               </button>
             </div>
 

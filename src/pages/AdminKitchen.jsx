@@ -13,7 +13,8 @@ import {
   UtensilsCrossed,
   Receipt,
   CheckCheck,
-  Printer
+  Printer,
+  Bike,
 } from 'lucide-react';
 import { playOrderChime } from '../utils/audioAlert.js';
 import { useToast } from '../context/ToastContext.jsx';
@@ -63,7 +64,7 @@ export function AdminKitchen() {
       });
       const data = await res.json();
       if (data.success) {
-        addToast(`🖨️ ${data.message || `Thermal KOT printed for ${orderCode}`}`);
+        addToast(data.message || `Thermal KOT printed for ${orderCode}`);
       } else {
         addToast(data.error || 'Failed to print KOT', 'error');
       }
@@ -83,7 +84,7 @@ export function AdminKitchen() {
         if (soundEnabled) {
           playOrderChime();
         }
-        addToast('🔔 New table order placed!', 'info');
+        addToast('New table order placed!', 'info');
 
         try {
           const payload = JSON.parse(e.data);
@@ -91,7 +92,7 @@ export function AdminKitchen() {
             fetch(`/api/invoice/${payload.order.id}/print`, { method: 'POST' })
               .then((r) => r.json())
               .then((d) => {
-                if (d.success) addToast(`🖨️ Auto-printed ticket: ${payload.order.order_code}`);
+                if (d.success) addToast(`Auto-printed ticket: ${payload.order.order_code}`);
               })
               .catch(() => {});
           }
@@ -104,7 +105,7 @@ export function AdminKitchen() {
         if (soundEnabled) {
           playOrderChime();
         }
-        addToast('💳 Order payment verified online!', 'success');
+        addToast('Order payment verified online!', 'success');
         fetchOrders();
       });
 
@@ -213,7 +214,7 @@ export function AdminKitchen() {
               onClick={() => {
                 const next = !autoPrintEnabled;
                 setAutoPrintEnabled(next);
-                addToast(next ? '🖨️ Auto-print active on new orders' : 'Auto-print paused');
+                addToast(next ? 'Auto-print active on new orders' : 'Auto-print paused');
               }}
               className={`p-2.5 rounded-xl border transition cursor-pointer flex items-center gap-1.5 text-xs font-bold shrink-0 ${
                 autoPrintEnabled
@@ -347,8 +348,9 @@ export function AdminKitchen() {
                         )}
                       </div>
                       {order.aggregator_rider_name && (
-                        <div className="text-[11px] text-amber-300 font-semibold mt-1">
-                          🛵 {order.aggregator_rider_name}
+                        <div className="text-[11px] text-amber-300 font-semibold mt-1 flex items-center gap-1">
+                          <Bike className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Rider: {order.aggregator_rider_name}</span>
                         </div>
                       )}
                     </div>

@@ -106,7 +106,7 @@ export function ItemCard({ item, onSelect }) {
           )}
         </div>
 
-        {/* Media Switcher: [ 🎥 Video ] / [ 🖼️ Photo ] Pill */}
+        {/* Media Switcher: Video / Photo Pill */}
         {hasVideo && (
           <div
             onClick={(e) => e.stopPropagation()}

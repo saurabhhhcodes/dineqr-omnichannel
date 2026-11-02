@@ -643,5 +643,5 @@ export function initDb() {
     }
   }
 
-  console.log('✅ SQLite Database successfully initialized and synced at:', DB_PATH);
+  console.log('[SQLite DB] Successfully initialized and synced at:', DB_PATH);
 }

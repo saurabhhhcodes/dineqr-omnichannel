@@ -143,7 +143,7 @@ export function OrderConfirmation() {
         {(order.token_number || order.is_counter_order) && (
           <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white rounded-3xl p-6 shadow-xl text-center space-y-2 border border-white/20 animate-in zoom-in-95">
             <div className="text-[10px] font-black uppercase tracking-widest bg-black/25 rounded-full px-3 py-1 inline-block">
-              🎯 Counter Pickup Token
+              Counter Pickup Token
             </div>
             <div className="text-4xl sm:text-5xl font-black tracking-tight">
               TOKEN #{order.token_number || '1'}

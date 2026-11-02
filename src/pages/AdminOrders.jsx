@@ -75,7 +75,7 @@ export function AdminOrders() {
       });
       const data = await res.json();
       if (data.success) {
-        addToast(`🖨️ ${data.message || `Thermal bill printed for ${orderCode}`}`);
+        addToast(data.message || `Thermal bill printed for ${orderCode}`);
       } else {
         addToast(data.error || 'Failed to print bill', 'error');
       }

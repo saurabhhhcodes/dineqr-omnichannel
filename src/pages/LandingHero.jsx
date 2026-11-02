@@ -40,17 +40,17 @@ const VIDEO_SUITE = [
     title: 'Restaurant Operations & Kitchen KDS',
     subtitle: 'Table QR Ordering to Live Chef Ticket Chimes',
     badge: 'Restaurant & Cafe',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    videoUrl: '/videos/item_4.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80',
     tags: ['Table QR Codes', 'Kitchen KDS', 'ESC/POS Printer', 'Razorpay UPI'],
-    description: 'Customers scan table QR codes, view 4K looping food dishes, and pay via UPI. Orders stream to kitchen KDS screens with audio bells and auto-cutting thermal bills.',
+    description: 'Customers scan table QR codes, view high-definition looping dishes, and pay via UPI. Orders stream to kitchen KDS screens with audio alerts and auto-cutting thermal bills.',
   },
   {
     id: 'hotel_floor_plan',
     title: 'Hotel Management & Floor Plans',
     subtitle: 'Visual Drag & Drop Tables, Room Service & Split Bills',
     badge: 'Hotels & Fine Dining',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    videoUrl: '/videos/item_6.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80',
     tags: ['Interactive Floor Plan', 'Room Service QR', 'Split Invoicing', 'Table Bookings'],
     description: 'Design custom floor layouts matching your physical premises. Rearrange tables with drag-and-drop, manage room service dispatch, and split guest checks.',
@@ -60,17 +60,17 @@ const VIDEO_SUITE = [
     title: 'High-Velocity Bar & Pub Concessions',
     subtitle: 'Zero Bar Line-Ups with Cashless Speed-Ordering',
     badge: 'Bars & Pubs',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4',
+    videoUrl: '/videos/item_7.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=1200&q=80',
     tags: ['Cashless Bar', 'Drink Queue Tokens', 'Instant Settlements', 'Zero Waiter Delay'],
-    description: 'Patrons scan counter codes at busy bars to order craft beers and cocktails without waiting for bartenders to bring cards or change.',
+    description: 'Patrons scan counter codes at busy bars to order craft beverages and cocktails without waiting for bartenders to bring card terminals or change.',
   },
   {
     id: 'fast_food_tokens',
     title: 'Fast Food, Bakery & Counter Pickups',
     subtitle: 'Daily Token Call Screens & Instant Takeaway Bills',
     badge: 'QSR & Food Courts',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
+    videoUrl: '/videos/item_8.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=1200&q=80',
     tags: ['Token Call Screen', 'Takeaway QR', 'GST Invoices', 'Local SQLite Backup'],
     description: 'Display live daily pickup tokens (#01, #02) on overhead screens. Complete order processing in seconds with zero paper waste.',
@@ -275,10 +275,19 @@ export function LandingHero() {
               muted
               loop
               playsInline
+              preload="auto"
+              ref={(el) => {
+                if (el) {
+                  el.muted = true;
+                  el.defaultMuted = true;
+                  el.play().catch(() => {});
+                }
+              }}
               className="w-full h-full object-cover"
             />
-            <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-amber-300 border border-amber-400/30">
-              🔴 Live Demonstration: {selectedVideo.badge}
+            <div className="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-amber-300 border border-amber-400/30 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+              <span>Live Demonstration: {selectedVideo.badge}</span>
             </div>
           </div>
 

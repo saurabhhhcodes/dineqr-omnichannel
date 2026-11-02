@@ -132,7 +132,7 @@ export function AdminSettings() {
       });
       const data = await res.json();
       if (data.success) {
-        addToast(`✅ ${data.message}`);
+        addToast(data.message, 'success');
       } else {
         addToast(data.error || 'Partner validation failed', 'error');
       }
@@ -153,7 +153,7 @@ export function AdminSettings() {
       });
       const data = await res.json();
       if (data.success) {
-        addToast(`🛵 ${data.message}`);
+        addToast(data.message, 'info');
       } else {
         addToast(data.error || 'Simulation failed', 'error');
       }
@@ -179,7 +179,7 @@ export function AdminSettings() {
       const data = await res.json();
       if (data.success) {
         setPrinterStatusMsg({ success: true, message: data.message });
-        addToast(`✅ ${data.message}`);
+        addToast(data.message, 'success');
       } else {
         setPrinterStatusMsg({ success: false, message: data.error || 'Printer test failed' });
         addToast(data.error || 'Failed to print', 'error');
@@ -211,7 +211,7 @@ export function AdminSettings() {
       const data = await res.json();
       if (data.success && data.valid) {
         setKeyValidationStatus({ valid: true, message: data.message });
-        addToast(`✅ Razorpay Verified: ${data.message}`);
+        addToast(`Razorpay Verified: ${data.message}`, 'success');
       } else {
         setKeyValidationStatus({ valid: false, error: data.error || 'Validation failed' });
         addToast(data.error || 'Invalid credentials', 'error');

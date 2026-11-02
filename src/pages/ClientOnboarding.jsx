@@ -152,7 +152,7 @@ export function ClientOnboarding() {
           mode: data.mode,
           message: data.message,
         });
-        addToast(`✅ Razorpay Verified! Connected in ${data.mode}`);
+        addToast(`Razorpay Verified! Connected in ${data.mode}`, 'success');
       } else {
         setKeyValidationStatus({
           valid: false,
@@ -224,7 +224,7 @@ export function ClientOnboarding() {
         if (data.restaurant) {
           setActiveRestaurant(data.restaurant);
         }
-        addToast(`🎉 ${data.restaurant?.name || name} registered successfully!`);
+        addToast(`${data.restaurant?.name || name} registered successfully!`, 'success');
         setStep(4);
       } else {
         addToast(data.error || 'Failed to onboard business', 'error');
@@ -757,7 +757,7 @@ export function ClientOnboarding() {
 
             <div>
               <h2 className="text-2xl sm:text-3xl font-black text-white">
-                🎉 Welcome to DineQR, {createdResult.restaurant?.name}!
+                Welcome to DineQR, {createdResult.restaurant?.name}!
               </h2>
               <p className="text-slate-400 text-sm mt-1 max-w-lg mx-auto">
                 Your restaurant is registered on our platform. Your tables, QR menus, floor plan, and local SQLite database have been provisioned.

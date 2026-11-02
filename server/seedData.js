@@ -199,7 +199,7 @@ export const defaultCategories = [
 ];
 
 export const defaultMenuItems = [
-  // 🍽️ L'Osteria Items
+  // L'Osteria Items
   {
     id: 'item_1',
     restaurant_id: 'rest_losteria',
@@ -281,7 +281,7 @@ export const defaultMenuItems = [
     tags: 'Handmade,Gourmet,Chef Signature',
   },
 
-  // 🏥 Apex Clinic Services & Tests
+  // Apex Clinic Services & Tests
   {
     id: 'item_c1',
     restaurant_id: 'rest_apex_clinic',
@@ -347,7 +347,7 @@ export const defaultMenuItems = [
     tags: 'Rehab,Pain Relief,Certified Physio',
   },
 
-  // 🏋️ IronPulse Gym Passes & Shakes
+  // IronPulse Gym Passes & Shakes
   {
     id: 'item_g1',
     restaurant_id: 'rest_ironpulse_gym',
@@ -413,7 +413,7 @@ export const defaultMenuItems = [
     tags: 'Trainer,1-on-1,Strength & Form',
   },
 
-  // 🎪 NeonWave Festival Concessions & Passes
+  // NeonWave Festival Concessions & Passes
   {
     id: 'item_e1',
     restaurant_id: 'rest_neonwave_event',

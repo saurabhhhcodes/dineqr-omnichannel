@@ -204,7 +204,7 @@ export function AdminFloorPlan() {
 
       const data = await res.json();
       if (data.success) {
-        addToast(`✅ Table ${formTableNumber} added to floor plan!`);
+        addToast(`Table ${formTableNumber} added to floor plan!`, 'success');
         setShowAddModal(false);
         fetchFloorPlan();
       } else {
@@ -251,7 +251,7 @@ export function AdminFloorPlan() {
 
       const data = await res.json();
       if (data.success) {
-        addToast(`✅ Table ${formTableNumber} updated!`);
+        addToast(`Table ${formTableNumber} updated!`, 'success');
         setShowEditModal(false);
         fetchFloorPlan();
       } else {
@@ -276,7 +276,7 @@ export function AdminFloorPlan() {
       });
       const data = await res.json();
       if (data.success) {
-        addToast(`🗑️ Table ${table.table_number} removed.`);
+        addToast(`Table ${table.table_number} removed.`);
         setSelectedTable(null);
         fetchFloorPlan();
       } else {
@@ -317,8 +317,9 @@ export function AdminFloorPlan() {
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
           {hasUnsavedChanges && (
-            <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 animate-pulse">
-              ● Unsaved drag edits
+            <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              Unsaved drag edits
             </span>
           )}
 

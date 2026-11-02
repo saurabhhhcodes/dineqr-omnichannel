@@ -126,7 +126,7 @@ export function AdminStaff() {
 
       const data = await res.json();
       if (data.success) {
-        addToast(`✅ ${clockInName} clocked in for "${clockInActivity}"`);
+        addToast(`${clockInName} clocked in for "${clockInActivity}"`, 'success');
         setShowClockInModal(false);
         setClockInName('');
         setClockInNotes('');
@@ -159,7 +159,7 @@ export function AdminStaff() {
 
       const data = await res.json();
       if (data.success) {
-        addToast(`✅ ${selectedAttendance.employee_name}'s activity updated to "${newActivity}"`);
+        addToast(`${selectedAttendance.employee_name}'s activity updated to "${newActivity}"`, 'success');
         setShowUpdateActivityModal(false);
         fetchStaffData();
       } else {
@@ -188,7 +188,7 @@ export function AdminStaff() {
 
       const data = await res.json();
       if (data.success) {
-        addToast(`👋 ${att.employee_name} clocked out successfully`);
+        addToast(`${att.employee_name} clocked out successfully`);
         fetchStaffData();
       } else {
         addToast(data.error || 'Failed to clock out', 'error');

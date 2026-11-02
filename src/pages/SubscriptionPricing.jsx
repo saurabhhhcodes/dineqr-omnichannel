@@ -144,7 +144,7 @@ export function SubscriptionPricing() {
 
       const data = await res.json();
       if (data.success) {
-        addToast(`🎉 Subscription renewed! ${data.plan} is now active.`);
+        addToast(`Subscription renewed! ${data.plan} is now active.`, 'success');
         await refreshRestaurants();
         fetchSubscription();
       } else {

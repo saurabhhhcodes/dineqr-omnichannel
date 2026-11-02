@@ -11,7 +11,8 @@ import {
   Utensils,
   Eye,
   CheckCircle2,
-  RefreshCw
+  RefreshCw,
+  X,
 } from 'lucide-react';
 import { TablePlacard } from '../components/TablePlacard.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -318,7 +319,7 @@ export function AdminTables() {
                 onClick={() => setShowAddModal(false)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-600 transition cursor-pointer"
               >
-                ✕
+                <X className="w-5 h-5" />
               </button>
             </div>
 

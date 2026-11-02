@@ -9,7 +9,10 @@ import {
   Utensils,
   ChevronDown,
   Info,
-  Flame
+  Flame,
+  Star,
+  MapPin,
+  Zap,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
@@ -119,19 +122,19 @@ export function CustomerMenu() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-black tracking-widest uppercase">
                 {currentRestaurant?.business_type === 'clinic'
-                  ? '🏥 Certified Medical OPD & Lab'
+                  ? 'Certified Medical OPD & Diagnostics'
                   : currentRestaurant?.business_type === 'gym'
-                  ? '🏋️ Premium Strength & Nutrition Bar'
+                  ? 'Premium Strength & Nutrition Bar'
                   : currentRestaurant?.business_type === 'event'
-                  ? '🎪 Official Festival VIP Service'
-                  : '🍽️ Artisanal Kitchen & Video Menu'}
+                  ? 'Official Festival VIP Service'
+                  : 'Artisanal Kitchen & Digital Menu'}
               </span>
               <span className="text-emerald-400 text-xs font-semibold flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span>Open Now</span>
               </span>
-              <span className="text-slate-400 text-xs font-medium hidden sm:inline">
-                · ★ 4.9 (450+ verified ratings)
+              <span className="text-slate-400 text-xs font-medium hidden sm:inline-flex items-center gap-1">
+                · <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> 4.9 (450+ verified reviews)
               </span>
             </div>
 
@@ -142,13 +145,13 @@ export function CustomerMenu() {
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl font-normal leading-relaxed">
               {currentRestaurant?.tagline || "Authentic culinary selections and quick self-ordering."}
               <span className="hidden sm:inline text-slate-400 ml-1">
-                Tap items to toggle between live video loops and high-res photos!
+                Tap items to toggle between live video loops and high-res photos.
               </span>
             </p>
 
             <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 pt-0.5">
-              <span>📍 {currentRestaurant?.address || 'Indiranagar, Bengaluru'}</span>
-              <span>· ⚡ Instant Razorpay & UPI Settlement</span>
+              <span className="flex items-center gap-1"><MapPin className="w-3 h-3 text-slate-400" /> {currentRestaurant?.address || 'Indiranagar, Bengaluru'}</span>
+              <span className="flex items-center gap-1">· <Zap className="w-3 h-3 text-amber-400" /> Instant Razorpay & UPI Settlement</span>
             </div>
           </div>
 
@@ -191,7 +194,7 @@ export function CustomerMenu() {
               }}
               className="bg-slate-900/90 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer shadow-inner shrink-0"
             >
-              <option value="counter">🚶 Counter / Token Mode</option>
+              <option value="counter">Counter Pickup / Daily Token</option>
               {availableTables.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.table_number} ({t.section})
