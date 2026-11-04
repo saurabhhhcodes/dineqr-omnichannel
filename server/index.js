@@ -22,12 +22,15 @@ import erpRouter from './routes/erp.js';
 import downloadsRouter from './routes/downloads.js';
 import integrationsRouter from './routes/integrations.js';
 import subscriptionRouter from './routes/subscription.js';
+import marketplaceRouter from './routes/marketplace.js';
+import porterRouter from './routes/porter.js';
+import webhookRouter from './routes/webhook.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3005;
 
 // Trust reverse proxies (Cloudflare, Vercel, Nginx) for accurate HTTPS detection
 app.set('trust proxy', true);
@@ -57,6 +60,9 @@ app.use('/api/erp', erpRouter);
 app.use('/api/downloads', downloadsRouter);
 app.use('/api/integrations', integrationsRouter);
 app.use('/api/subscription', subscriptionRouter);
+app.use('/api/marketplace', marketplaceRouter);
+app.use('/api/porter', porterRouter);
+app.use('/api/erp/webhook', webhookRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

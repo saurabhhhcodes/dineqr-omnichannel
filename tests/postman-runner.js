@@ -1,7 +1,7 @@
 // tests/postman-runner.js - Automated test runner for Postman API Collection
 import assert from 'node:assert/strict';
 
-const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3001';
+const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3005';
 
 async function runPostmanTestSuite() {
   console.log(`\n📮 Running DineQR Postman Collection Automated Test Suite against ${BASE_URL}...\n`);
@@ -826,6 +826,137 @@ async function runPostmanTestSuite() {
     assert.ok(disp.includes('restaurant-local-store.db'));
     const buf = await res.arrayBuffer();
     assert.ok(buf.byteLength > 1000, 'Expected valid SQLite database binary file');
+  });
+
+  // 44. Hyperlocal On-Demand Services Marketplace (Apronto Competitor)
+  await step('GET /api/marketplace/pros -> List nearby pros (Chefs, Carpenters, Electricians, Materials)', async () => {
+    const res = await fetch(`${BASE_URL}/api/marketplace/pros`);
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(Array.isArray(data.pros));
+    assert.ok(data.pros.length >= 4);
+  });
+
+  // 45. Mobile Pro Onboarding
+  await step('POST /api/marketplace/onboard -> Instant 60s pro self-registration', async () => {
+    const res = await fetch(`${BASE_URL}/api/marketplace/onboard`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        provider_name: 'Vikram Singh Carpentry',
+        provider_phone: '+91 99112 33445',
+        category: 'carpenter',
+        headline: 'Door fittings, plywood partition & modular wardrobes',
+        hourly_rate: 350,
+        fixed_price: 299,
+        skills: ['Door Locks', 'Plywood Cutting', 'Wardrobe Hinges'],
+        location_area: 'Indiranagar, Bengaluru',
+      }),
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.pro.id.startsWith('srv_carpenter_'));
+  });
+
+  // 46. Service Booking
+  let testBookingId = null;
+  await step('POST /api/marketplace/book -> Book verified pro with address & slot', async () => {
+    const res = await fetch(`${BASE_URL}/api/marketplace/book`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service_id: 'srv_chef_1',
+        customer_name: 'Priya Narayanan',
+        customer_phone: '+91 98860 12345',
+        customer_address: 'Flat 402, Sunshine Heights, Indiranagar',
+        scheduled_at: 'Tomorrow 1:00 PM',
+        instructions: 'Vegetarian Awadhi lunch for 5 guests',
+        total_amount: 1499,
+      }),
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.booking.booking_code.startsWith('SRV-'));
+    testBookingId = data.booking.id;
+  });
+
+  // 47. Porter Logistics Fare Estimation
+  await step('POST /api/porter/estimate -> Calculate Porter fare for Tata Ace / Bike', async () => {
+    const res = await fetch(`${BASE_URL}/api/porter/estimate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pickup_address: 'Gupta Cement Depot, Bellandur',
+        drop_address: 'Plot 42, Galleria Boulevard, Indiranagar',
+        vehicle_type: 'tata_ace',
+        cargo_weight_kg: 500,
+        distance_km: 5.2,
+      }),
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.pricing.total_estimated_fare > 300);
+    assert.equal(data.vehicle.type, 'tata_ace');
+  });
+
+  // 48. Porter Logistics Dispatch
+  let testTrackingCode = null;
+  await step('POST /api/porter/dispatch -> Dispatch Porter driver with live tracking', async () => {
+    const res = await fetch(`${BASE_URL}/api/porter/dispatch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        booking_id: testBookingId,
+        item_description: '10 Bags UltraTech Cement & Sand',
+        cargo_weight_kg: 500,
+        vehicle_type: 'tata_ace',
+        pickup_address: 'Gupta Building Materials Depot, Bellandur',
+        drop_address: 'Indiranagar 100ft Road, Bengaluru',
+        distance_km: 4.8,
+      }),
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.shipment.tracking_code.startsWith('PRTR-BLR-'));
+    testTrackingCode = data.shipment.tracking_code;
+  });
+
+  // 49. Porter Live Tracking
+  await step('GET /api/porter/track/:trackingCode -> Fetch live telemetry & driver info', async () => {
+    const res = await fetch(`${BASE_URL}/api/porter/track/${testTrackingCode}`);
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.shipment.tracking_code, testTrackingCode);
+    assert.ok(data.live_telemetry.eta_minutes > 0);
+  });
+
+  // 50. Cryptographic Local SQLite Webhook Verification
+  await step('POST /api/erp/webhook/sync-verify -> Cryptographic SQLite sha256 checksum & integrity', async () => {
+    const res = await fetch(`${BASE_URL}/api/erp/webhook/sync-verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.verification_status, 'VERIFIED_HEALTHY');
+    assert.ok(data.database.sha256_checksum.length === 64);
+    assert.ok(data.total_records > 0);
+  });
+
+  // 51. Webhook Status Endpoint
+  await step('GET /api/erp/webhook/status -> Return sync state and webhook health', async () => {
+    const res = await fetch(`${BASE_URL}/api/erp/webhook/status`);
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.equal(data.local_storage_active, true);
   });
 
   console.log(`\n🏁 Postman Test Suite Summary: ${passed}/${total} assertions passed!`);

@@ -30,6 +30,10 @@ import {
   Zap,
   Check,
   X as XIcon,
+  BookOpen,
+  Scissors,
+  Truck,
+  Hammer,
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -103,6 +107,30 @@ const VERTICAL_DEMOS = [
     stats: '40% Faster Table Turns · 100% Order Accuracy',
   },
   {
+    id: 'rest_alexandria_library',
+    title: 'Study Library & Desks',
+    tagline: 'Alexandria Study Lounge & Digital Library',
+    badge: 'Study Lounge & Desks',
+    icon: BookOpen,
+    gradient: 'from-amber-600 to-yellow-600',
+    stationLabel: 'Desk 01 - Silent AC Pod',
+    description: 'Desk QR pass recharges, 6h/12h daily study slots, monthly reserved cabins with lockers, high-speed Wi-Fi, and silent coffee delivery.',
+    targetUrl: '/menu?restaurant=alexandria-library&table=tbl_lib_1',
+    stats: '100% Desk Self-Recharge · Zero Reception Disturbance',
+  },
+  {
+    id: 'rest_glamour_salon',
+    title: 'Salon, Barber & Spa',
+    tagline: 'Glamour & Groom Salon & Spa',
+    badge: 'Styling & Spa Chairs',
+    icon: Scissors,
+    gradient: 'from-rose-500 to-pink-600',
+    stationLabel: 'Chair 01 - Styling Deck',
+    description: 'Chair QR styling menus, executive haircuts, beard sculpting, head massage spa bookings, and instant UPI checkout.',
+    targetUrl: '/menu?restaurant=glamour-salon&table=tbl_sal_1',
+    stats: 'Zero Waiting Idle Time · Cashless Direct Settlement',
+  },
+  {
     id: 'rest_ironpulse_gym',
     title: 'Gym & Performance Bar',
     tagline: 'IronPulse Fitness Club',
@@ -167,37 +195,45 @@ export function LandingHero() {
 
         {/* Subtitle */}
         <p className="mt-6 text-base sm:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed font-normal">
-          The all-in-one operations suite for <span className="text-white font-semibold">Clinics</span>,{' '}
+          The all-in-one operations suite for <span className="text-white font-semibold">Study Libraries</span>,{' '}
           <span className="text-white font-semibold">Restaurants</span>,{' '}
-          <span className="text-white font-semibold">Gyms</span>, and{' '}
-          <span className="text-white font-semibold">Events</span>. Features 4K looping video catalogs, direct Razorpay UPI settlements, visual floor plans, inventory reorder alerts, and native desktop installers.
+          <span className="text-white font-semibold">Salons & Spas</span>,{' '}
+          <span className="text-white font-semibold">Clinics</span>, and{' '}
+          <span className="text-white font-semibold">Gyms</span>. Features desk & table QR self-recharge, live kitchen KDS, phone-friendly profit estimators, on-demand trades dispatch, and local SQLite data ownership.
         </p>
 
         {/* CTA Buttons */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <Link
             to="/onboard"
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-amber-500/25 transition active:scale-98 cursor-pointer"
+            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-xl shadow-amber-500/25 transition active:scale-98 cursor-pointer"
           >
             <span>Subscribe for ₹1,000 / month</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
 
-          <button
-            onClick={() => handleLaunchDemo(selectedDemo)}
-            className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm border border-slate-700 flex items-center justify-center gap-2.5 transition active:scale-98 cursor-pointer"
+          <Link
+            to="/walkthrough"
+            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-sm border border-amber-500/30 flex items-center justify-center gap-2 transition"
           >
             <Play className="w-4 h-4 text-amber-400 fill-amber-400" />
-            <span>Launch Live Interactive Demo</span>
-          </button>
+            <span>Watch Walkthrough (Subtitles)</span>
+          </Link>
 
           <Link
-            to="/admin/downloads"
-            className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800 text-sky-300 font-bold text-sm border border-sky-500/30 flex items-center justify-center gap-2 transition"
+            to="/services"
+            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-sky-300 font-bold text-sm border border-sky-500/30 flex items-center justify-center gap-2 transition"
           >
-            <Download className="w-4 h-4 text-sky-400" />
-            <span>Download EXE / APK / DMG</span>
+            <Truck className="w-4 h-4 text-sky-400" />
+            <span>Apronto Trades & Porter</span>
           </Link>
+
+          <button
+            onClick={() => handleLaunchDemo(selectedDemo)}
+            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 font-bold text-sm border border-slate-700 flex items-center justify-center gap-2 transition cursor-pointer"
+          >
+            <span>Launch Live Demo</span>
+          </button>
 
           <Link
             to="/super-admin"

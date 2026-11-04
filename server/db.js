@@ -325,6 +325,91 @@ export function initDb() {
     );
   `);
 
+  // 15. On-Demand Services Marketplace (Apronto Competitor)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS services_marketplace (
+      id TEXT PRIMARY KEY,
+      provider_name TEXT NOT NULL,
+      provider_phone TEXT,
+      category TEXT NOT NULL, -- chef, carpenter, electrician, plumber, materials, etc.
+      headline TEXT,
+      description TEXT,
+      hourly_rate REAL DEFAULT 0,
+      fixed_price REAL DEFAULT 0,
+      pricing_unit TEXT DEFAULT 'visit',
+      rating REAL DEFAULT 4.9,
+      reviews_count INTEGER DEFAULT 24,
+      distance_km REAL DEFAULT 1.2,
+      availability_status TEXT DEFAULT 'AVAILABLE',
+      skills_json TEXT DEFAULT '[]',
+      location_area TEXT DEFAULT 'Koramangala, Bengaluru',
+      porter_eligible INTEGER DEFAULT 1,
+      image_url TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // 16. Service Bookings & Job Orders
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS service_bookings (
+      id TEXT PRIMARY KEY,
+      booking_code TEXT NOT NULL,
+      service_id TEXT NOT NULL,
+      provider_name TEXT,
+      customer_name TEXT NOT NULL,
+      customer_phone TEXT NOT NULL,
+      customer_address TEXT NOT NULL,
+      category TEXT,
+      scheduled_at TEXT,
+      instructions TEXT,
+      status TEXT DEFAULT 'CONFIRMED', -- REQUESTED, CONFIRMED, EN_ROUTE, IN_PROGRESS, COMPLETED
+      total_amount REAL NOT NULL,
+      payment_status TEXT DEFAULT 'PAID',
+      payment_method TEXT DEFAULT 'UPI / Razorpay',
+      porter_shipment_id TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // 17. Porter Cargo & Tempo Dispatch Shipments
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS porter_shipments (
+      id TEXT PRIMARY KEY,
+      tracking_code TEXT NOT NULL,
+      booking_id TEXT,
+      item_description TEXT,
+      cargo_weight_kg REAL DEFAULT 50,
+      vehicle_type TEXT DEFAULT 'tata_ace', -- two_wheeler, three_wheeler, tata_ace, pickup_8ft
+      pickup_address TEXT NOT NULL,
+      drop_address TEXT NOT NULL,
+      distance_km REAL DEFAULT 4.5,
+      estimated_cost REAL NOT NULL,
+      driver_name TEXT DEFAULT 'Ramesh Yadav',
+      driver_phone TEXT DEFAULT '+91 98451 22334',
+      vehicle_number TEXT DEFAULT 'KA 01 AB 4590',
+      eta_minutes INTEGER DEFAULT 25,
+      status TEXT DEFAULT 'ASSIGNED', -- BOOKED, ASSIGNED, PICKED_UP, IN_TRANSIT, DELIVERED
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // 18. Local SQLite Sync & Webhook Verifications
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS sync_webhooks (
+      id TEXT PRIMARY KEY,
+      restaurant_id TEXT DEFAULT 'rest_losteria',
+      webhook_url TEXT NOT NULL,
+      secret_token TEXT NOT NULL,
+      event_types TEXT DEFAULT 'order.created,order.paid,inventory.low,attendance.clock_in',
+      last_ping_at DATETIME,
+      last_status_code INTEGER DEFAULT 200,
+      db_hash TEXT,
+      record_count INTEGER DEFAULT 0,
+      is_active INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
   // Apply migrations for columns in case of existing database
   ensureColumn('tables', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
   ensureColumn('categories', 'restaurant_id', "TEXT DEFAULT 'rest_losteria'");
@@ -641,6 +726,170 @@ export function initDb() {
         [po.id, po.restaurant_id, po.rfq_number, po.vendor_name, po.vendor_email, po.items_json, po.subtotal, po.tax_amount, po.total_amount, po.status, po.payment_terms, po.received_date]
       );
     }
+  }
+
+  // Seed sample on-demand services (Apronto Competitor) if empty
+  const srvCount = queryOne(`SELECT COUNT(*) as c FROM services_marketplace`)?.c || 0;
+  if (srvCount === 0) {
+    const sampleServices = [
+      {
+        id: 'srv_chef_1',
+        provider_name: 'Chef Vikramaditya Roy',
+        provider_phone: '+91 98450 11223',
+        category: 'chef',
+        headline: 'Executive Private Chef · Live Barbecue & Gourmet North/South Indian Feast',
+        description: '12 years luxury hotel experience. Custom multi-course meals prepared fresh in your kitchen with full hygiene & ingredient preparation.',
+        hourly_rate: 450,
+        fixed_price: 1499,
+        pricing_unit: '3-course feast (up to 6 guests)',
+        rating: 4.96,
+        reviews_count: 84,
+        distance_km: 1.4,
+        availability_status: 'AVAILABLE',
+        skills_json: JSON.stringify(['Live Barbecue Grill', 'North Indian Awadhi', 'Italian Pastas & Woodfire', 'Keto & Vegan Diets']),
+        location_area: 'Indiranagar / Koramangala, Bengaluru',
+        porter_eligible: 1,
+        image_url: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=600&q=80',
+      },
+      {
+        id: 'srv_carpenter_1',
+        provider_name: 'Rajesh Sharma Wooden Crafts',
+        provider_phone: '+91 97412 33445',
+        category: 'carpenter',
+        headline: 'Master Carpenter · Furniture Assembly, Door Lock Fitting & Modular Kitchens',
+        description: 'Specialist in custom plywood wardrobes, hinge replacements, laminate repairs, bed frame assembly, and precision wood cutting.',
+        hourly_rate: 300,
+        fixed_price: 299,
+        pricing_unit: 'service visit & inspection',
+        rating: 4.92,
+        reviews_count: 112,
+        distance_km: 2.1,
+        availability_status: 'AVAILABLE',
+        skills_json: JSON.stringify(['Modular Wardrobes', 'Door & Lock Repairs', 'Bed Frame Assembly', 'Laminate & Hinge Fixing']),
+        location_area: 'HSR Layout, Bengaluru',
+        porter_eligible: 1,
+        image_url: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80',
+      },
+      {
+        id: 'srv_electrician_1',
+        provider_name: 'Anand Verma (Licensed Wireman)',
+        provider_phone: '+91 98110 55667',
+        category: 'electrician',
+        headline: 'Govt Certified Electrician · Short Circuit Repair, Inverters & MCB Wiring',
+        description: 'High-voltage safety certified. Emergency power outage troubleshooting, ceiling fan installations, modular switchboards, and heavy appliance earthing.',
+        hourly_rate: 250,
+        fixed_price: 199,
+        pricing_unit: 'inspection & minor fix',
+        rating: 4.95,
+        reviews_count: 146,
+        distance_km: 0.9,
+        availability_status: 'AVAILABLE',
+        skills_json: JSON.stringify(['MCB & Short Circuit Repair', 'Ceiling Fan Installation', 'Home Inverter Setup', 'Appliance Earthing']),
+        location_area: 'BTM Layout / Koramangala, Bengaluru',
+        porter_eligible: 0,
+        image_url: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=600&q=80',
+      },
+      {
+        id: 'srv_plumber_1',
+        provider_name: 'Tariq HydroTech Plumbers',
+        provider_phone: '+91 99012 77889',
+        category: 'plumber',
+        headline: 'Plumbing Specialist · Water Leakage, Submersible Pump & RO Filter Service',
+        description: 'Concealed pipe leak detection, bathroom sanitary fittings, overhead water tank float valve, submersible pump motor servicing, and RO membrane replacement.',
+        hourly_rate: 280,
+        fixed_price: 249,
+        pricing_unit: 'visit & leak detection',
+        rating: 4.89,
+        reviews_count: 98,
+        distance_km: 1.8,
+        availability_status: 'AVAILABLE',
+        skills_json: JSON.stringify(['Leakage Detection', 'Submersible Pump Motor', 'RO Purifier Servicing', 'Sanitary Tap Fitting']),
+        location_area: 'Jayanagar, Bengaluru',
+        porter_eligible: 1,
+        image_url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&q=80',
+      },
+      {
+        id: 'srv_materials_1',
+        provider_name: 'Gupta Building Materials Depot',
+        provider_phone: '+91 98220 99001',
+        category: 'materials',
+        headline: 'UltraTech Cement, River Sand, Red Bricks & Hardware · Same-Hour Porter Delivery',
+        description: 'Wholesale & retail supplier of UltraTech Super Cement (50kg bags), washed river sand, gravel aggregate, AAC blocks, and construction binding wire. Instant loading onto Porter Tata Ace mini-trucks.',
+        hourly_rate: 0,
+        fixed_price: 385,
+        pricing_unit: 'per 50kg UltraTech bag',
+        rating: 4.94,
+        reviews_count: 230,
+        distance_km: 3.2,
+        availability_status: 'AVAILABLE',
+        skills_json: JSON.stringify(['UltraTech Cement (50kg)', 'Washed River Sand', 'Red Clay Bricks', 'Binding Wire & Nails']),
+        location_area: 'Outer Ring Road / Bellandur, Bengaluru',
+        porter_eligible: 1,
+        image_url: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=600&q=80',
+      },
+    ];
+
+    for (const s of sampleServices) {
+      execute(
+        `INSERT INTO services_marketplace (
+          id, provider_name, provider_phone, category, headline, description,
+          hourly_rate, fixed_price, pricing_unit, rating, reviews_count, distance_km,
+          availability_status, skills_json, location_area, porter_eligible, image_url
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          s.id, s.provider_name, s.provider_phone, s.category, s.headline, s.description,
+          s.hourly_rate, s.fixed_price, s.pricing_unit, s.rating, s.reviews_count, s.distance_km,
+          s.availability_status, s.skills_json, s.location_area, s.porter_eligible, s.image_url
+        ]
+      );
+    }
+  }
+
+  // Seed sample Porter shipment if empty
+  const portCount = queryOne(`SELECT COUNT(*) as c FROM porter_shipments`)?.c || 0;
+  if (portCount === 0) {
+    execute(
+      `INSERT INTO porter_shipments (
+        id, tracking_code, booking_id, item_description, cargo_weight_kg, vehicle_type,
+        pickup_address, drop_address, distance_km, estimated_cost, driver_name,
+        driver_phone, vehicle_number, eta_minutes, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        'port_ship_1',
+        'PRTR-BLR-8921',
+        'bkg_sample_1',
+        '10 Bags UltraTech Super Cement (500kg total)',
+        500,
+        'tata_ace',
+        'Gupta Building Materials Depot, Outer Ring Road, Bengaluru',
+        'Plot 42, Galleria Boulevard, Indiranagar, Bengaluru',
+        4.8,
+        420,
+        'Ramesh Yadav',
+        '+91 98451 22334',
+        'KA 01 AB 4590',
+        22,
+        'IN_TRANSIT',
+      ]
+    );
+  }
+
+  // Seed default webhook record if empty
+  const whCount = queryOne(`SELECT COUNT(*) as c FROM sync_webhooks`)?.c || 0;
+  if (whCount === 0) {
+    execute(
+      `INSERT INTO sync_webhooks (
+        id, restaurant_id, webhook_url, secret_token, event_types, last_ping_at,
+        last_status_code, db_hash, record_count, is_active
+      ) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, 200, 'sha256_verified_local_engine', 55, 1)`,
+      [
+        'wh_default',
+        'rest_losteria',
+        'https://api.dineqr.local/webhook/sqlite-sync',
+        'sec_live_token_2026',
+        'order.created,order.paid,inventory.low,attendance.clock_in',
+      ]
+    );
   }
 
   console.log('[SQLite DB] Successfully initialized and synced at:', DB_PATH);

@@ -29,7 +29,10 @@ import {
   Calendar,
   Layers,
   FileSpreadsheet,
-  CreditCard
+  CreditCard,
+  Truck,
+  PlayCircle,
+  Wrench
 } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
@@ -76,7 +79,12 @@ export function Navbar({ onOpenCart }) {
     return () => clearInterval(interval);
   }, [activeRestaurant]);
 
-  const isLandingView = location.pathname === '/' || location.pathname === '/home';
+  const isLandingView =
+    location.pathname === '/' ||
+    location.pathname === '/home' ||
+    location.pathname === '/walkthrough' ||
+    location.pathname === '/services' ||
+    location.pathname === '/demo';
   const isCustomerView =
     location.pathname.startsWith('/menu') ||
     location.pathname.startsWith('/order/') ||
@@ -134,23 +142,49 @@ export function Navbar({ onOpenCart }) {
           </Link>
 
           {/* Quick Marketing Nav Links */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300">
+          <nav className="hidden lg:flex items-center gap-5 text-xs font-bold text-slate-300">
+            <Link
+              to="/walkthrough"
+              className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
+                location.pathname === '/walkthrough' ? 'text-amber-400' : ''
+              }`}
+            >
+              <PlayCircle className="w-3.5 h-3.5 text-amber-400" />
+              <span>Walkthrough Video</span>
+            </Link>
+            <Link
+              to="/services"
+              className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
+                location.pathname === '/services' ? 'text-amber-400' : ''
+              }`}
+            >
+              <Truck className="w-3.5 h-3.5 text-amber-400" />
+              <span>Trades & Porter Hub</span>
+            </Link>
             <Link to="/menu?restaurant=losteria&table=counter" className="hover:text-amber-400 transition flex items-center gap-1.5">
               <QrCode className="w-3.5 h-3.5 text-amber-400" />
-              <span>Live Scanner Demo</span>
+              <span>Live Scanner</span>
             </Link>
             <Link to="/onboard" className="hover:text-amber-400 transition flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-amber-400" />
-              <span>₹1,000/mo Flat Pricing</span>
+              <span>₹1,000/mo Plan</span>
             </Link>
             <Link to="/downloads" className="hover:text-sky-300 transition flex items-center gap-1.5">
               <Laptop className="w-3.5 h-3.5 text-sky-400" />
-              <span>Terminal Installers (.exe/.apk/.dmg)</span>
+              <span>Installers (.exe/.apk)</span>
             </Link>
           </nav>
 
           {/* Right Action CTA Buttons */}
           <div className="flex items-center gap-2.5 shrink-0">
+            <Link
+              to="/walkthrough"
+              className="hidden sm:inline-flex md:hidden items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold transition"
+            >
+              <PlayCircle className="w-3.5 h-3.5 text-amber-400" />
+              <span>Video</span>
+            </Link>
+
             <Link
               to="/downloads"
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-sky-300 hover:text-white hover:border-sky-500 text-xs font-bold transition"
@@ -176,6 +210,46 @@ export function Navbar({ onOpenCart }) {
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
+        </div>
+
+        {/* Mobile quick-nav pill strip for marketing / portal views */}
+        <div className="lg:hidden bg-slate-900/90 border-t border-white/5 px-3 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap text-xs font-bold">
+          <Link
+            to="/walkthrough"
+            className={`px-3 py-1 rounded-lg transition flex items-center gap-1.5 shrink-0 ${
+              location.pathname === '/walkthrough'
+                ? 'bg-amber-500 text-slate-950 shadow-xs'
+                : 'text-slate-300 bg-slate-800/80 hover:text-white'
+            }`}
+          >
+            <PlayCircle className="w-3 h-3 text-amber-400" />
+            <span>Walkthrough Video</span>
+          </Link>
+          <Link
+            to="/services"
+            className={`px-3 py-1 rounded-lg transition flex items-center gap-1.5 shrink-0 ${
+              location.pathname === '/services'
+                ? 'bg-amber-500 text-slate-950 shadow-xs'
+                : 'text-slate-300 bg-slate-800/80 hover:text-white'
+            }`}
+          >
+            <Truck className="w-3 h-3 text-amber-400" />
+            <span>Trades & Porter</span>
+          </Link>
+          <Link
+            to="/menu?restaurant=alexandria-library&table=tbl_lib_1"
+            className="px-3 py-1 rounded-lg text-slate-300 bg-slate-800/80 hover:text-white transition flex items-center gap-1.5 shrink-0"
+          >
+            <BookOpen className="w-3 h-3 text-amber-400" />
+            <span>Library Desk QR</span>
+          </Link>
+          <Link
+            to="/downloads"
+            className="px-3 py-1 rounded-lg text-sky-300 bg-slate-800/80 hover:text-white transition flex items-center gap-1.5 shrink-0"
+          >
+            <Download className="w-3 h-3 text-sky-400" />
+            <span>Installer Apps</span>
+          </Link>
         </div>
       </header>
     );
@@ -427,6 +501,22 @@ export function Navbar({ onOpenCart }) {
                   <Laptop className="w-4 h-4 text-amber-600" />
                   <span>Standalone POS Apps (EXE/APK)</span>
                 </Link>
+                <Link
+                  to="/services"
+                  onClick={() => setIsOperationsDropdownOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                >
+                  <Truck className="w-4 h-4 text-amber-600" />
+                  <span>On-Demand Trades & Porter</span>
+                </Link>
+                <Link
+                  to="/walkthrough"
+                  onClick={() => setIsOperationsDropdownOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                >
+                  <PlayCircle className="w-4 h-4 text-sky-600" />
+                  <span>Product Video Walkthrough</span>
+                </Link>
               </div>
             )}
           </div>
@@ -618,6 +708,30 @@ export function Navbar({ onOpenCart }) {
         >
           <Laptop className="w-3.5 h-3.5" />
           <span>Apps</span>
+        </Link>
+
+        <Link
+          to="/services"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname === '/services'
+              ? 'bg-amber-500 text-slate-950 shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <Truck className="w-3.5 h-3.5 text-amber-400" />
+          <span>Trades</span>
+        </Link>
+
+        <Link
+          to="/walkthrough"
+          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
+            location.pathname === '/walkthrough'
+              ? 'bg-sky-500 text-white shadow-xs'
+              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+          }`}
+        >
+          <PlayCircle className="w-3.5 h-3.5 text-sky-400" />
+          <span>Walkthrough</span>
         </Link>
 
         <Link

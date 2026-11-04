@@ -26,6 +26,8 @@ import { AdminInventory } from './pages/AdminInventory.jsx';
 import { AdminPurchases } from './pages/AdminPurchases.jsx';
 import { AdminDownloads } from './pages/AdminDownloads.jsx';
 import { SubscriptionPricing } from './pages/SubscriptionPricing.jsx';
+import { MarketplaceServices } from './pages/MarketplaceServices.jsx';
+import { ProductWalkthrough } from './pages/ProductWalkthrough.jsx';
 import { AdminAuthGate } from './components/AdminAuthGate.jsx';
 
 function AppContent() {
@@ -33,8 +35,13 @@ function AppContent() {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const isPrintOnly = location.pathname.startsWith('/invoice') && location.search.includes('print=true');
-  const isLandingPage = location.pathname === '/' || location.pathname === '/home';
-  const pageBg = isLandingPage ? 'bg-slate-950' : 'bg-slate-50';
+  const isDarkPage =
+    location.pathname === '/' ||
+    location.pathname === '/home' ||
+    location.pathname === '/walkthrough' ||
+    location.pathname === '/services' ||
+    location.pathname === '/demo';
+  const pageBg = isDarkPage ? 'bg-slate-950' : 'bg-slate-50';
 
   return (
     <div className={`min-h-screen ${pageBg} flex flex-col font-sans w-full max-w-full`}>
@@ -52,6 +59,13 @@ function AppContent() {
           <Route path="/menu" element={<CustomerMenu />} />
           <Route path="/order/:orderId" element={<OrderConfirmation />} />
           <Route path="/invoice/:orderId" element={<InvoiceView />} />
+
+          {/* Standalone Hyperlocal Services Marketplace (Apronto Competitor + Porter Logistics) */}
+          <Route path="/services" element={<MarketplaceServices />} />
+
+          {/* Interactive Multi-Vertical Product Walkthrough with Subtitles */}
+          <Route path="/walkthrough" element={<ProductWalkthrough />} />
+          <Route path="/demo" element={<ProductWalkthrough />} />
 
           {/* Client Self-Onboarding & Join */}
           <Route path="/onboard" element={<ClientOnboarding />} />
