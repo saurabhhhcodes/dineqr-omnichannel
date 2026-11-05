@@ -19,6 +19,8 @@ import {
   Maximize2,
   RotateCcw,
   Sparkles,
+  ChefHat,
+  Layers,
 } from 'lucide-react';
 
 const CHAPTERS = [
@@ -28,14 +30,14 @@ const CHAPTERS = [
     title: 'Study Library Desk QR Recharge',
     badge: 'Education & Co-Working',
     icon: BookOpen,
-    videoUrl: '/videos/item_4.mp4',
+    videoUrl: '/videos/walkthrough_library.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1200&q=80',
-    duration: 18,
+    duration: 10,
     actionLabel: 'Launch Alexandria Library Demo',
     actionRoute: '/menu?restaurant=alexandria-library&table=tbl_lib_1',
     subtitles: {
-      en: '[Chapter 1: Study Library Desk QR] Readers scan the physical QR placard on their quiet study desk or cabin. They can select 6-hour, full-day, or monthly passes, pay instantly via UPI, and receive a digital seat pass without disturbing anyone.',
-      hi: '[अध्याय 1: स्टडी लाइब्रेरी डेस्क क्यूआर] विद्यार्थी अपनी स्टडी टेबल या एसी केबिन पर लगा क्यूआर कोड स्कैन करते हैं। वे 6-घंटे, पूरे दिन या मासिक पास चुनकर सीधे यूपीआई से भुगतान करते हैं और बिना किसी रुकावट के डिजिटल रसीद पाते हैं।',
+      en: '[Chapter 1: Study Library Desk QR] Live recording of physical desk QR scan on Desk 01 (Silent AC Pod). The reader selects 6-Hour Deep Work Pass (₹49), enters their student name, and receives a digital seat token without disturbing anyone in the quiet room.',
+      hi: '[अध्याय 1: स्टडी लाइब्रेरी डेस्क क्यूआर] डेस्क 01 (साइलेंट एसी पॉड) पर लगे असली क्यूआर कोड स्कैनिंग का लाइव वॉकथ्रू। छात्र 6-घंटे का पास (₹49) चुनते हैं, अपना नाम दर्ज करते हैं और बिना किसी रुकावट के डिजिटल सीट पास तुरंत प्राप्त करते हैं।',
     },
     keyPoints: [
       'Desk & Silent Cabin Specific QR Placards',
@@ -47,133 +49,155 @@ const CHAPTERS = [
   {
     id: 'restaurant',
     number: '02',
-    title: 'Restaurant & Cafe Table POS',
+    title: 'Restaurant Table QR & Invoicing',
     badge: 'Dining & Kitchen',
     icon: UtensilsCrossed,
-    videoUrl: '/videos/item_6.mp4',
+    videoUrl: '/videos/walkthrough_restaurant.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80',
-    duration: 20,
+    duration: 10,
     actionLabel: 'Launch Bistro Table POS Demo',
     actionRoute: '/menu?restaurant=losteria&table=tbl_1',
     subtitles: {
-      en: '[Chapter 2: Restaurant & Cafe Table POS] Diners view high-definition looping dishes on their smartphones. Orders stream directly into the kitchen display system (KDS) with sound chimes while ESC/POS printers cut tickets automatically.',
-      hi: '[अध्याय 2: रेस्टोरेंट और कैफे टेबल पीओएस] ग्राहक फोन पर हर डिश का एचडी वीडियो लूप देखते हैं। ऑर्डर सीधे किचन केडीएस स्क्रीन पर घंटी की आवाज के साथ पहुंचते हैं और थर्मल प्रिंटर से बिल कट जाता है।',
+      en: '[Chapter 2: Restaurant & Table POS] Live screen capture of guest table self-ordering. Diners browse the digital menu, add items to cart, view CGST + SGST tax breakdown, and submit their order for Dining Table 01.',
+      hi: '[अध्याय 2: रेस्टोरेंट टेबल पीओएस व बिलिंग] डाइनिंग टेबल 01 से असली कस्टमर सेल्फ-ऑर्डर का लाइव वीडियो। ग्राहक डिजिटल मेनू देखकर कार्ट में आइटम जोड़ते हैं, जीएसटी टैक्स देखते हैं और टेबल के लिए ऑर्डर सबमिट करते हैं।',
     },
     keyPoints: [
-      'Dual Media Video Looping Food Dishes',
-      'Live Kitchen Display System (KDS) & Audio Bells',
-      'ESC/POS Thermal Auto-Cut Receipts & 3-Way Split Bills',
-      'Visual Drag-and-Drop Floor Plan Matching Premises',
+      'Interactive Digital Table Menu with Search & Category Filters',
+      'Instant Cart Drawer with Real-Time CGST/SGST Tax Breakdown',
+      'Direct Table Token Allocation & Official GST Invoice',
+      'Zero Waiter Delay for Cashless Table Turnarounds',
+    ],
+  },
+  {
+    id: 'kds',
+    number: '03',
+    title: 'Kitchen KDS & Order Chimes',
+    badge: 'Kitchen Operations',
+    icon: ChefHat,
+    videoUrl: '/videos/walkthrough_kds.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200&q=80',
+    duration: 8,
+    actionLabel: 'Open Live Kitchen Display (KDS)',
+    actionRoute: '/admin/kitchen',
+    subtitles: {
+      en: '[Chapter 3: Kitchen Display System] Live recording of kitchen staff KDS screen. Incoming table orders appear instantly. Chefs click "Accept & Start Prep" to update status to Preparing, followed by Ready and Complete with audio alerts.',
+      hi: '[अध्याय 3: किचन केडीएस व लाइव टिकट] किचन शेफ स्क्रीन का लाइव वीडियो। जैसे ही ग्राहक ऑर्डर करता है, स्क्रीन पर तुरंत टिकट आ जाता है। शेफ "Accept & Start Prep" पर क्लिक करके स्टेटस अपडेट करते हैं और अलर्ट घंटी बजती है।',
+    },
+    keyPoints: [
+      'Real-Time Webhook & Server-Sent Ticket Streams',
+      'Status Pipeline: Received -> Preparing -> Ready -> Served',
+      'Urgent Order Timers & Color-Coded Alert Borders',
+      'Single-Click ESC/POS 80mm Thermal KOT Slip Printing',
+    ],
+  },
+  {
+    id: 'floorplan',
+    number: '04',
+    title: 'Premises Floor Plan Management',
+    badge: 'Floor Layout',
+    icon: Layers,
+    videoUrl: '/videos/walkthrough_floorplan.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80',
+    duration: 8,
+    actionLabel: 'Open Floor Plan Designer',
+    actionRoute: '/admin/floor-plan',
+    subtitles: {
+      en: '[Chapter 4: Visual Floor Plan Management] Real video demonstrating premises table layouts. Managers drag-and-drop dining tables to match their room architecture, inspect live seated tabs, and add new tables dynamically.',
+      hi: '[अध्याय 4: विजुअल फ्लोर प्लान व टेबल सेटिंग] रेस्टोरेंट व कैफे फ्लोर प्लान का लाइव वीडियो। मैनेजर अपनी जगह के अनुसार टेबलों को ड्रैग करके सेट करते हैं, खाली व बैठी टेबलों का स्टेटस देखते हैं और नई टेबल जोड़ते हैं।',
+    },
+    keyPoints: [
+      'Visual Coordinate Drag-and-Drop Canvas',
+      'Live Table Occupancy & Seated Guest Billing Tabs',
+      'Custom Table Capacities & Shape Configuration (Round/Rect)',
+      'Instant Synchronized Persistence to Local SQLite',
     ],
   },
   {
     id: 'trades',
-    number: '03',
-    title: 'Apronto Hyperlocal Trades & Chefs',
-    badge: 'On-Demand Services',
-    icon: Hammer,
-    videoUrl: '/videos/item_7.mp4',
-    posterUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=80',
-    duration: 22,
-    actionLabel: 'Open Apronto Services Directory',
-    actionRoute: '/services',
-    subtitles: {
-      en: '[Chapter 3: Apronto Hyperlocal Trades] Local customers hire verified private chefs, licensed electricians, master carpenters, and plumbers with transparent hourly or fixed pricing.',
-      hi: '[अध्याय 3: ऑन-डिमांड कारीगर व शेफ] ग्राहक अपने घर के लिए प्राइवेट शेफ, इलेक्ट्रीशियन, कारपेंटर और प्लंबर को तय दाम पर सीधे मोबाइल से बुक कर सकते हैं।',
-    },
-    keyPoints: [
-      'Private Chefs for Live Barbecue & Banquets',
-      'Master Carpenters for Door Locks & Wardrobes',
-      'Certified Electricians for Inverter & MCB Outages',
-      '60-Second Mobile Self-Onboarding for Local Pros',
-    ],
-  },
-  {
-    id: 'porter',
-    number: '04',
-    title: 'Porter Logistics & Materials Dispatch',
-    badge: 'Logistics & Cargo',
+    number: '05',
+    title: 'Apronto Trades & Porter Logistics',
+    badge: 'On-Demand & Cargo',
     icon: Truck,
-    videoUrl: '/videos/item_8.mp4',
-    posterUrl: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=1200&q=80',
-    duration: 19,
-    actionLabel: 'Launch Porter Delivery Calculator',
+    videoUrl: '/videos/walkthrough_trades.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=80',
+    duration: 9,
+    actionLabel: 'Launch Trades & Porter Hub',
     actionRoute: '/services',
     subtitles: {
-      en: '[Chapter 4: Porter Logistics Dispatch] Order building materials like UltraTech cement and river sand, or move heavy furniture with immediate Porter Tata Ace and pickup tempo dispatches.',
-      hi: '[अध्याय 4: पोर्टर टेम्पो व भारी सामान डिलीवरी] अल्ट्राटेक सीमेंट, बालू या भारी फर्नीचर मंगाने के लिए पोर्टर टाटा एस और पिकअप तुरंत बुक करके लाइव ट्रैक करें।',
+      en: '[Chapter 5: Apronto Trades & Porter Dispatch] Live demonstration of the standalone services hub. Customers browse verified carpenters, electricians, private chefs, select 50kg UltraTech cement, calculate Porter Tata Ace truck fare, and dispatch drivers.',
+      hi: '[अध्याय 5: ऑन-डिमांड कारीगर व पोर्टर डिलीवरी] सेपरेट सर्विसेज हब का लाइव वीडियो। कारपेंटर, इलेक्ट्रीशियन व शेफ को बुक करें, 50 किलो अल्ट्राटेक सीमेंट ऑर्डर करें और पोर्टर टाटा एस का किराया देखकर ड्राइवर डिस्पैच करें।',
     },
     keyPoints: [
-      'Direct UltraTech Cement & River Sand Ordering',
-      'Instant Vehicle Selection (Tata Ace, 8ft Pickup, 2-Wheeler)',
-      'Real-Time Porter Driver Assignment & Live Telemetry',
-      'Transparent Per-KM Fare Estimation',
+      'Private Chefs, Carpenters, Electricians & Submersible Pump Techs',
+      'Building Materials Depot (UltraTech Cement & River Sand)',
+      'Porter Logistics Rate Engine (Tata Ace, Pickup, 2-Wheeler)',
+      'Live Driver Telemetry Tracking & 60s Mobile Pro Onboarding',
     ],
   },
   {
     id: 'profit',
-    number: '05',
-    title: 'Mobile Profit & Loss Margin Estimator',
+    number: '06',
+    title: 'Mobile Profit & Loss Estimator',
     badge: 'Financial Analytics',
     icon: TrendingUp,
-    videoUrl: '/videos/item_4.mp4',
-    posterUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80',
-    duration: 21,
-    actionLabel: 'View Mobile Analytics Dashboard',
+    videoUrl: '/videos/walkthrough_pnl.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
+    duration: 10,
+    actionLabel: 'Open Mobile Profit Dashboard',
     actionRoute: '/admin',
     subtitles: {
-      en: '[Chapter 5: Mobile Profit & Margin Estimator] Business owners view daily and monthly revenue on their phone. An interactive simulator calculates Cost of Goods (COGS), rent, staff wages, and net profit margins in real time.',
-      hi: '[अध्याय 5: फोन पर मुनाफा और खर्च कैलकुलेटर] लाइब्रेरी व दुकान मालिक अपने फोन पर रोज की कमाई देखते हैं। इसमें किराया, बिजली और स्टाफ वेतन घटाकर नेट प्रॉफिट तुरंत कैलकुलेट हो जाता है।',
+      en: '[Chapter 6: Mobile Phone P&L Estimator] Real capture on mobile viewport. Owners adjust touch sliders for monthly rent, electricity & AC, and staff payroll to see real-time net take-home profit and margin percentages calculate dynamically.',
+      hi: '[अध्याय 6: मोबाइल फोन पर नेट प्रॉफिट कैलकुलेटर] मोबाइल स्क्रीन का लाइव वीडियो। दुकान व लाइब्रेरी मालिक अपनी दुकान का किराया, बिजली बिल और स्टाफ की सैलरी वाले स्लाइडर घुमाकर रोज और महीने का नेट प्रॉफिट लाइव देखते हैं।',
     },
     keyPoints: [
-      'Phone-Friendly Responsive Dashboard for Low-End Devices',
-      'Gross Profit & Cost of Goods Sold (COGS) Breakdown',
-      'Interactive Sliders for Rent, Electricity & Staff Wages',
-      'Live Net Profit Margin % and Monthly Projections',
+      'Phone-Friendly Touch Sliders for Rent, Electricity & Staff Wages',
+      'Dynamic Industry COGS (8% Library, 16% Salon, 32% Restaurant, 12% Gym)',
+      'Real-Time Net Profit (₹) & Take-Home Margin % Calculations',
+      'Zero Cloud Fees with Instant On-Device Computation',
     ],
   },
   {
     id: 'sqlite',
-    number: '06',
-    title: 'Local SQLite & Webhook Sync Engine',
+    number: '07',
+    title: 'Local SQLite Engine & Webhook Sync',
     badge: 'Offline-First Engine',
     icon: Database,
-    videoUrl: '/videos/item_6.mp4',
+    videoUrl: '/videos/walkthrough_sqlite.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80',
-    duration: 17,
-    actionLabel: 'Inspect Local SQLite Engine',
+    duration: 10,
+    actionLabel: 'Verify SQLite Webhook Now',
     actionRoute: '/admin',
     subtitles: {
-      en: '[Chapter 6: Local SQLite Database & Webhooks] All data resides on your physical local machine in SQLite. Even if the internet drops, offline operations continue and sync via cryptographic webhooks with zero cloud database fees.',
-      hi: '[अध्याय 6: लोकल डेटाबेस व वेबहुक] सारा डेटा आपके अपने कंप्यूटर में सुरक्षित रहता है। इंटरनेट न होने पर भी काम नहीं रुकता और वेबहुक से पूरा डेटा वेरीफाई रहता है।',
+      en: '[Chapter 7: Local SQLite DB & Webhook] Live recording of the cryptographic integrity check. Clicking "Verify Database Webhook" generates a real SHA-256 checksum of restaurant.db and audits all 18 tables with 395 verified records.',
+      hi: '[अध्याय 7: लोकल SQLite डेटाबेस व क्रिप्टोग्राफिक वेबहुक] डेटा वेरिफिकेशन का लाइव वीडियो। "Verify Database Webhook" पर क्लिक करने पर लोकल फाइल का SHA-256 हैश बनता है और सभी 18 टेबलों के 395 रिकॉर्ड्स का ऑडिट हो जाता है।',
     },
     keyPoints: [
       'Embedded SQLite Engine with Zero Cloud DB Monthly Costs',
-      'Cryptographic SHA-256 Database Integrity Webhook',
-      'Perpetual Data Ownership (Download .db File Anytime)',
-      'Cross-Platform Native Binaries (EXE, APK, DMG, DEB)',
+      'Cryptographic SHA-256 Database Integrity Webhook Check',
+      'Permanent Local Data Ownership (restaurant.db file on disk)',
+      'Cross-Platform Native Standalone Apps (EXE, APK, DMG, DEB)',
     ],
   },
   {
-    id: 'razorpay',
-    number: '07',
+    id: 'subscription',
+    number: '08',
     title: 'Razorpay ₹1,000/mo SaaS Activation',
     badge: 'Merchant Billing',
     icon: CreditCard,
-    videoUrl: '/videos/item_7.mp4',
+    videoUrl: '/videos/walkthrough_subscription.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1556742049-0a67e557224f?w=1200&q=80',
-    duration: 18,
+    duration: 8,
     actionLabel: 'Subscribe for ₹1,000 / month',
     actionRoute: '/pricing',
     subtitles: {
-      en: '[Chapter 7: ₹1,000/Month SaaS Subscription] Businesses get started in 60 seconds. Subscribe via official Razorpay checkout, receive your merchant User ID, and run your entire business for flat ₹1,000/month.',
-      hi: '[अध्याय 7: मात्र ₹1,000 प्रति माह सब्सक्रिप्शन] कोई भी नया व्यापारी मात्र 60 सेकंड में ऑनबोर्ड हो सकता है। रेजरपे से सुरक्षित पेमेंट करें और बिना किसी कमीशन के अपना काम शुरू करें।',
+      en: '[Chapter 8: Flat ₹1,000/Month SaaS Plan] Live recording of the subscription checkout flow. Businesses choose monthly or annual flat pricing with zero per-order commissions and activate their license via Razorpay UPI.',
+      hi: '[अध्याय 8: फ्लैट ₹1,000 प्रति माह लाइसेंस] सब्सक्रिप्शन पेमेंट का लाइव वीडियो। व्यापारी बिना किसी कमीशन के मात्र ₹1,000/माह में पूरा सॉफ्टवेयर रेजरपे यूपीआई से एक्टिवेट करके तुरंत काम शुरू करते हैं।',
     },
     keyPoints: [
-      'Flat ₹1,000 / Month (Zero Hidden User or Table Fees)',
+      'Flat ₹1,000 / Month (Zero Hidden User, Seat or Table Commission)',
       'Official Razorpay Checkout SDK Integration',
       'Instant Merchant User ID & Admin PIN Issuance',
-      'Automatic GST Invoice Generation & Business License',
+      'Perpetual License with Local Database Backup Left on Machine',
     ],
   },
 ];
@@ -187,6 +211,7 @@ export function ProductWalkthrough() {
   const [subtitleLang, setSubtitleLang] = useState('hi'); // 'en', 'hi', 'off'
   const [currentTime, setCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState(20);
+  const [viewMode, setViewMode] = useState('video'); // 'video' | 'interactive'
 
   const activeChapter = CHAPTERS[activeChapterIndex];
 
@@ -296,79 +321,130 @@ export function ProductWalkthrough() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
         {/* Main Video Showcase Frame */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left: Video Player with Real-Time Subtitles Overlay */}
+          {/* Left: Video Player with Real-Time Subtitles Overlay or Live Interactive Sandbox */}
           <div className="lg:col-span-8 space-y-4">
-            <div className="relative rounded-3xl overflow-hidden border border-slate-800 bg-black aspect-video shadow-2xl group">
-              <video
-                ref={(el) => {
-                  videoRef.current = el;
-                  if (el) {
-                    el.muted = isMuted;
-                    el.defaultMuted = isMuted;
-                  }
-                }}
-                src={activeChapter.videoUrl}
-                poster={activeChapter.posterUrl}
-                autoPlay
-                playsInline
-                loop
-                onTimeUpdate={handleTimeUpdate}
-                className="w-full h-full object-cover"
-              />
-
-              {/* Top Chapter Badge */}
-              <div className="absolute top-4 left-4 bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-700/80 flex items-center gap-2 text-xs font-bold text-white shadow-xl">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Chapter {activeChapter.number}: {activeChapter.badge}</span>
-              </div>
-
-              {/* Subtitle Overlay Box */}
-              {subtitleLang !== 'off' && (
-                <div className="absolute bottom-16 left-4 right-4 text-center pointer-events-none">
-                  <div className="inline-block px-4 py-2 rounded-2xl bg-slate-950/90 backdrop-blur-md border border-amber-400/40 text-amber-200 text-xs sm:text-sm font-semibold shadow-2xl max-w-xl mx-auto leading-relaxed animate-in fade-in">
-                    {activeChapter.subtitles[subtitleLang] || activeChapter.subtitles.en}
-                  </div>
-                </div>
-              )}
-
-              {/* Custom Scrub Bar & Controls Bar */}
-              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col gap-2">
-                {/* Scrub Progress Bar */}
-                <div
-                  onClick={handleSeek}
-                  className="w-full h-1.5 bg-slate-700/80 hover:h-2.5 rounded-full cursor-pointer transition-all relative overflow-hidden"
+            {/* View Mode Toggle */}
+            <div className="flex items-center justify-between pb-1">
+              <div className="flex items-center gap-2 p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold">
+                <button
+                  onClick={() => setViewMode('video')}
+                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
+                    viewMode === 'video'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
                 >
-                  <div
-                    className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
-                    style={{ width: `${(currentTime / (videoDuration || 1)) * 100}%` }}
-                  />
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Real Screen Recording</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('interactive')}
+                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 ${
+                    viewMode === 'interactive'
+                      ? 'bg-sky-500 text-white font-black shadow-xs'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Maximize2 className="w-3.5 h-3.5" />
+                  <span>Interactive Live Sandbox</span>
+                </button>
+              </div>
+
+              <Link
+                to={activeChapter.actionRoute}
+                target="_blank"
+                className="text-xs font-bold text-sky-400 hover:text-sky-300 flex items-center gap-1"
+              >
+                <span>Open Full Page</span>
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+
+            {viewMode === 'interactive' ? (
+              <div className="relative rounded-3xl overflow-hidden border border-slate-700 bg-slate-900 aspect-video shadow-2xl">
+                <iframe
+                  src={activeChapter.actionRoute}
+                  title={activeChapter.title}
+                  className="w-full h-full border-0 bg-white"
+                />
+                <div className="absolute top-3 left-3 bg-slate-950/90 backdrop-blur-md px-3 py-1 rounded-full border border-sky-400/40 text-[10px] font-black uppercase tracking-wider text-sky-300 flex items-center gap-1.5 shadow-lg pointer-events-none">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Live Interactive Sandbox · Real Data & Actions</span>
+                </div>
+              </div>
+            ) : (
+              <div className="relative rounded-3xl overflow-hidden border border-slate-800 bg-black aspect-video shadow-2xl group">
+                <video
+                  ref={(el) => {
+                    videoRef.current = el;
+                    if (el) {
+                      el.muted = isMuted;
+                      el.defaultMuted = isMuted;
+                    }
+                  }}
+                  src={activeChapter.videoUrl}
+                  poster={activeChapter.posterUrl}
+                  autoPlay
+                  playsInline
+                  loop
+                  onTimeUpdate={handleTimeUpdate}
+                  className="w-full h-full object-cover"
+                />
+
+                {/* Top Chapter Badge */}
+                <div className="absolute top-4 left-4 bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-700/80 flex items-center gap-2 text-xs font-bold text-white shadow-xl">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Chapter {activeChapter.number}: {activeChapter.badge}</span>
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-slate-300">
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={handleTogglePlay}
-                      className="p-1 rounded-lg hover:text-white transition cursor-pointer"
-                    >
-                      {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                    </button>
-                    <button
-                      onClick={handleToggleMute}
-                      className="p-1 rounded-lg hover:text-white transition cursor-pointer"
-                    >
-                      {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
-                    </button>
-                    <span className="font-mono text-[11px] text-slate-400">
-                      {Math.floor(currentTime)}s / {Math.floor(videoDuration)}s
-                    </span>
+                {/* Subtitle Overlay Box */}
+                {subtitleLang !== 'off' && (
+                  <div className="absolute bottom-16 left-4 right-4 text-center pointer-events-none">
+                    <div className="inline-block px-4 py-2 rounded-2xl bg-slate-950/90 backdrop-blur-md border border-amber-400/40 text-amber-200 text-xs sm:text-sm font-semibold shadow-2xl max-w-xl mx-auto leading-relaxed animate-in fade-in">
+                      {activeChapter.subtitles[subtitleLang] || activeChapter.subtitles.en}
+                    </div>
+                  </div>
+                )}
+
+                {/* Custom Scrub Bar & Controls Bar */}
+                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col gap-2">
+                  {/* Scrub Progress Bar */}
+                  <div
+                    onClick={handleSeek}
+                    className="w-full h-1.5 bg-slate-700/80 hover:h-2.5 rounded-full cursor-pointer transition-all relative overflow-hidden"
+                  >
+                    <div
+                      className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
+                      style={{ width: `${(currentTime / (videoDuration || 1)) * 100}%` }}
+                    />
                   </div>
 
-                  <div className="text-[11px] font-bold text-amber-300 truncate max-w-xs sm:max-w-none">
-                    {activeChapter.title}
+                  <div className="flex items-center justify-between text-xs text-slate-300">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={handleTogglePlay}
+                        className="p-1 rounded-lg hover:text-white transition cursor-pointer"
+                      >
+                        {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={handleToggleMute}
+                        className="p-1 rounded-lg hover:text-white transition cursor-pointer"
+                      >
+                        {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
+                      </button>
+                      <span className="font-mono text-[11px] text-slate-400">
+                        {Math.floor(currentTime)}s / {Math.floor(videoDuration)}s
+                      </span>
+                    </div>
+
+                    <div className="text-[11px] font-bold text-amber-300 truncate max-w-xs sm:max-w-none">
+                      {activeChapter.title}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Chapter Action Bar */}
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

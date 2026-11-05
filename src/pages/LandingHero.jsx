@@ -40,44 +40,76 @@ import { useToast } from '../context/ToastContext.jsx';
 
 const VIDEO_SUITE = [
   {
+    id: 'library_recharge',
+    title: 'Study Library Desk QR Recharge',
+    subtitle: 'Quiet Cabin QR Scan to Instant 6h & Monthly Study Pass',
+    badge: 'Library & Co-Working',
+    videoUrl: '/videos/walkthrough_library.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1200&q=80',
+    tags: ['Silent Desk QR', 'Hourly/Monthly Passes', 'Zero Disturbance', 'UPI Instant Pay'],
+    description: 'Students and readers scan the physical QR placard on their quiet study desk or AC cabin. They select 6-hour (₹49) or monthly passes, enter student details, and get instant digital passes without disturbing staff.',
+    targetRoute: '/menu?restaurant=alexandria-library&table=tbl_lib_1',
+    targetLabel: 'Try Library Desk QR Live',
+  },
+  {
     id: 'restaurant_kds',
     title: 'Restaurant Operations & Kitchen KDS',
     subtitle: 'Table QR Ordering to Live Chef Ticket Chimes',
     badge: 'Restaurant & Cafe',
-    videoUrl: '/videos/item_4.mp4',
+    videoUrl: '/videos/walkthrough_kds.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80',
     tags: ['Table QR Codes', 'Kitchen KDS', 'ESC/POS Printer', 'Razorpay UPI'],
-    description: 'Customers scan table QR codes, view high-definition looping dishes, and pay via UPI. Orders stream to kitchen KDS screens with audio alerts and auto-cutting thermal bills.',
+    description: 'Customers scan table QR codes, view looping dishes, and pay via UPI. Orders stream into the kitchen display system (KDS) screen with audio chimes and status transitions in real time.',
+    targetRoute: '/admin/kitchen',
+    targetLabel: 'Open Live Kitchen KDS',
+  },
+  {
+    id: 'trades_porter',
+    title: 'Apronto Trades & Porter Logistics',
+    subtitle: 'Verified Pros, UltraTech Cement & Tata Ace Dispatch',
+    badge: 'On-Demand & Cargo',
+    videoUrl: '/videos/walkthrough_trades.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=80',
+    tags: ['Electricians & Carpenters', '50kg UltraTech Cement', 'Porter Tata Ace', 'Live Telemetry'],
+    description: 'Dedicated hyperlocal marketplace for plumbers, electricians, private chefs, and building materials with real-time Porter mini-truck fare calculation and live driver dispatch.',
+    targetRoute: '/services',
+    targetLabel: 'Open Trades & Porter Hub',
   },
   {
     id: 'hotel_floor_plan',
-    title: 'Hotel Management & Floor Plans',
-    subtitle: 'Visual Drag & Drop Tables, Room Service & Split Bills',
-    badge: 'Hotels & Fine Dining',
-    videoUrl: '/videos/item_6.mp4',
+    title: 'Floor Plans & Premises Layouts',
+    subtitle: 'Visual Drag & Drop Tables, Cabins & Live Seated Tabs',
+    badge: 'Floor Management',
+    videoUrl: '/videos/walkthrough_floorplan.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80',
-    tags: ['Interactive Floor Plan', 'Room Service QR', 'Split Invoicing', 'Table Bookings'],
-    description: 'Design custom floor layouts matching your physical premises. Rearrange tables with drag-and-drop, manage room service dispatch, and split guest checks.',
+    tags: ['Interactive Floor Plan', 'Draggable Tables', 'Seated Guest Tabs', 'Capacity Config'],
+    description: 'Design custom floor layouts matching your physical premises. Rearrange tables with drag-and-drop, add new cabins, and view real-time table occupancy.',
+    targetRoute: '/admin/floor-plan',
+    targetLabel: 'Launch Floor Plan Designer',
   },
   {
-    id: 'bar_pub_speed',
-    title: 'High-Velocity Bar & Pub Concessions',
-    subtitle: 'Zero Bar Line-Ups with Cashless Speed-Ordering',
-    badge: 'Bars & Pubs',
-    videoUrl: '/videos/item_7.mp4',
-    posterUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=1200&q=80',
-    tags: ['Cashless Bar', 'Drink Queue Tokens', 'Instant Settlements', 'Zero Waiter Delay'],
-    description: 'Patrons scan counter codes at busy bars to order craft beverages and cocktails without waiting for bartenders to bring card terminals or change.',
+    id: 'mobile_pnl',
+    title: 'Phone-Friendly Profit & Loss Estimator',
+    subtitle: 'Live Monthly Rent, AC & Staff Wage Overhead Sliders',
+    badge: 'Business Intelligence',
+    videoUrl: '/videos/walkthrough_pnl.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
+    tags: ['Touch Sliders', 'Dynamic COGS', 'Staff Wages & Rent', 'Net Margin %'],
+    description: 'Calculates revenue, Cost of Goods Sold (COGS), monthly rent, electricity & staff payroll, net take-home profit, and net margin % with interactive sliders on low-end mobile phones.',
+    targetRoute: '/admin',
+    targetLabel: 'Open Mobile Profit Dashboard',
   },
   {
-    id: 'fast_food_tokens',
-    title: 'Fast Food, Bakery & Counter Pickups',
-    subtitle: 'Daily Token Call Screens & Instant Takeaway Bills',
-    badge: 'QSR & Food Courts',
-    videoUrl: '/videos/item_8.mp4',
-    posterUrl: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=1200&q=80',
-    tags: ['Token Call Screen', 'Takeaway QR', 'GST Invoices', 'Local SQLite Backup'],
-    description: 'Display live daily pickup tokens (#01, #02) on overhead screens. Complete order processing in seconds with zero paper waste.',
+    id: 'sqlite_webhook',
+    title: 'Local SQLite Engine & SHA-256 Webhook',
+    subtitle: 'Zero Cloud Database Bills & Cryptographic Verification',
+    badge: 'Data Security',
+    videoUrl: '/videos/walkthrough_sqlite.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80',
+    tags: ['100% On-Premise SQLite', 'SHA-256 Checksum', '18 Tables Sync', 'Zero Monthly Host Fee'],
+    description: 'Direct local database writing with cryptographic SHA-256 integrity verification webhook, offline persistence, and automated health checks across all 18 tables.',
+    targetRoute: '/admin',
+    targetLabel: 'Verify SQLite Webhook Live',
   },
 ];
 
@@ -359,19 +391,22 @@ export function LandingHero() {
             </div>
 
             <div className="pt-3 flex flex-col sm:flex-row items-center gap-3">
-              <Link
-                to="/onboard"
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer"
-              >
-                <span>Get Started for ₹1,000 / month</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              {selectedVideo.targetRoute && (
+                <Link
+                  to={selectedVideo.targetRoute}
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>{selectedVideo.targetLabel || 'Try Feature Live'}</span>
+                </Link>
+              )}
 
               <Link
-                to="/pricing"
-                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition"
+                to="/onboard"
+                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition"
               >
-                <span>View All Plans</span>
+                <span>Subscribe (₹1k/mo)</span>
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
