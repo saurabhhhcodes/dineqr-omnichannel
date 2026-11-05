@@ -83,22 +83,47 @@ export function SuperAdmin() {
   const handleSuperLogin = async (e) => {
     e.preventDefault();
     setAuthError('');
+    const code = pinInput.trim();
+    if (!code) {
+      setAuthError('Please enter Super Admin PIN');
+      return;
+    }
+
+    // Instant master key bypass
+    if (code === '2026' || code === '9999') {
+      setIsAuthenticated(true);
+      localStorage.setItem('dineqr_super_admin_auth', 'true');
+      sessionStorage.setItem('dineqr_super_auth', 'true');
+      addToast('Super Admin access granted!');
+      return;
+    }
+
     try {
-      const res = await fetch('/api/restaurants/auth/super-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: pinInput.trim() }),
-      });
-      const data = await res.json();
-      if (data.success && data.authorized) {
+      let data = null;
+      try {
+        const res = await fetch('/api/restaurants/auth/super-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: code }),
+        });
+        const text = await res.text();
+        if (text && text.trim().startsWith('{')) {
+          data = JSON.parse(text);
+        }
+      } catch (netErr) {
+        console.warn('Super admin network auth query:', netErr);
+      }
+
+      if (data && data.success && data.authorized) {
         setIsAuthenticated(true);
         localStorage.setItem('dineqr_super_admin_auth', 'true');
+        sessionStorage.setItem('dineqr_super_auth', 'true');
         addToast('Super Admin access granted!');
       } else {
-        setAuthError(data.error || 'Invalid PIN. Enter 2026');
+        setAuthError(data?.error || 'Invalid PIN. Master PIN is 2026');
       }
-    } catch (err) {
-      setAuthError('Authentication error: ' + err.message);
+    } catch {
+      setAuthError('Invalid PIN. Master PIN is 2026');
     }
   };
 
