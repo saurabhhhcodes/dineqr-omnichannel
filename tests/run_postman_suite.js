@@ -187,6 +187,97 @@ async function runPostmanSuite() {
     }
   }
 
+  // Bonus 21: Token TV Display Active Orders
+  totalTests++;
+  process.stdout.write(`[TEST ${totalTests}] 21. TV Display - Fetch Active Tokens (Preparing vs Ready) ... `);
+  try {
+    const tRes = await fetch(`${BASE_URL}/api/tokens/active`);
+    const tData = await tRes.json();
+    if (tRes.status === 200 && tData.success === true && tData.counts !== undefined) {
+      passedTests++;
+      console.log(`PASSED (Preparing: ${tData.counts.preparing}, Ready: ${tData.counts.ready})`);
+    } else {
+      failedTests++;
+      console.log(`FAILED: ${JSON.stringify(tData)}`);
+      failureDetails.push({ name: 'TV Display Tokens', details: tData });
+    }
+  } catch (err) {
+    failedTests++;
+    console.log(`ERROR: ${err.message}`);
+  }
+
+  // Bonus 22: Book a 10-Minute Demo (Petpooja Parity)
+  totalTests++;
+  process.stdout.write(`[TEST ${totalTests}] 22. Lead Ingestion - Book A 10-Minute Demo ... `);
+  try {
+    const dRes = await fetch(`${BASE_URL}/api/demo/book`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Saurabh Bajpai',
+        phone: '+919876543210',
+        email: 'saurabhbajpai03@gmail.com',
+        outlet_name: 'Saurabh Bistro',
+        outlet_type: 'finedine',
+        city: 'Bengaluru',
+      }),
+    });
+    const dData = await dRes.json();
+    if (dRes.status === 201 && dData.success === true && dData.demo_id) {
+      passedTests++;
+      console.log(`PASSED (Demo ID: ${dData.demo_id})`);
+    } else {
+      failedTests++;
+      console.log(`FAILED: ${JSON.stringify(dData)}`);
+      failureDetails.push({ name: 'Book Demo', details: dData });
+    }
+  } catch (err) {
+    failedTests++;
+    console.log(`ERROR: ${err.message}`);
+  }
+
+  // Bonus 23: Cloud Sync Status (Local DB ₹1500 vs Cloud ₹5000)
+  totalTests++;
+  process.stdout.write(`[TEST ${totalTests}] 23. Cloud Engine - Status (Dual SQLite & MongoDB Atlas) ... `);
+  try {
+    const cRes = await fetch(`${BASE_URL}/api/cloud/status?restaurant_id=rest_losteria`);
+    const cData = await cRes.json();
+    if (cRes.status === 200 && cData.success === true && cData.pricing) {
+      passedTests++;
+      console.log(`PASSED (Architecture: ${cData.architecture})`);
+    } else {
+      failedTests++;
+      console.log(`FAILED: ${JSON.stringify(cData)}`);
+      failureDetails.push({ name: 'Cloud Status', details: cData });
+    }
+  } catch (err) {
+    failedTests++;
+    console.log(`ERROR: ${err.message}`);
+  }
+
+  // Bonus 24: Cloud Sync Snapshot Trigger
+  totalTests++;
+  process.stdout.write(`[TEST ${totalTests}] 24. Cloud Engine - Sync Snapshot to MongoDB Atlas Buffer ... `);
+  try {
+    const sRes = await fetch(`${BASE_URL}/api/cloud/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurant_id: 'rest_losteria' }),
+    });
+    const sData = await sRes.json();
+    if (sRes.status === 200 && sData.success === true && sData.counts) {
+      passedTests++;
+      console.log(`PASSED (Mode: ${sData.mode}, Synced Tables: ${sData.counts.tables_count})`);
+    } else {
+      failedTests++;
+      console.log(`FAILED: ${JSON.stringify(sData)}`);
+      failureDetails.push({ name: 'Cloud Sync', details: sData });
+    }
+  } catch (err) {
+    failedTests++;
+    console.log(`ERROR: ${err.message}`);
+  }
+
   console.log(`\n=============================================================`);
   console.log(` POSTMAN RUN SUMMARY:`);
   console.log(` Total Tests Executed: ${totalTests}`);

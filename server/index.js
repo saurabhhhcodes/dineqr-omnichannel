@@ -6,7 +6,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { initDb } from './db.js';
+import { initDb, execute, queryAll, queryOne } from './db.js';
 import { registerSSE } from './sse.js';
 
 import tablesRouter from './routes/tables.js';
@@ -26,6 +26,8 @@ import marketplaceRouter from './routes/marketplace.js';
 import porterRouter from './routes/porter.js';
 import webhookRouter from './routes/webhook.js';
 import razorpayStandardRouter from './routes/razorpayStandard.js';
+import cloudRouter from './routes/cloud.js';
+import { initMongo } from './cloudMongo.js';
 import { getFolderOverview, initLocalFileSystem } from './localFileSystem.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,6 +42,7 @@ app.set('trust proxy', true);
 // Initialize database & tables
 initDb();
 initLocalFileSystem();
+initMongo().catch((err) => console.warn('Mongo init deferred:', err.message));
 
 // Middlewares
 app.use(cors());
@@ -66,9 +69,88 @@ app.use('/api/subscription', subscriptionRouter);
 app.use('/api/marketplace', marketplaceRouter);
 app.use('/api/porter', porterRouter);
 app.use('/api/erp/webhook', webhookRouter);
+app.use('/api/cloud', cloudRouter);
 
 // Razorpay Standard Web Checkout routes: /api/create-order & /api/verify-payment
 app.use('/api', razorpayStandardRouter);
+
+// Token Display API (Food Court & QSR Display)
+app.get('/api/tokens/active', (req, res) => {
+  try {
+    const { restaurant_id } = req.query;
+    let sql = `SELECT * FROM orders WHERE status IN ('RECEIVED', 'PREPARING', 'READY', 'SERVED')`;
+    const params = [];
+
+    if (restaurant_id) {
+      sql += ` AND restaurant_id = ?`;
+      params.push(restaurant_id);
+    }
+    sql += ` ORDER BY updated_at DESC, created_at DESC LIMIT 50`;
+
+    const allOrders = queryAll(sql, params);
+    const preparing = [];
+    const ready = [];
+    const served = [];
+
+    allOrders.forEach((o) => {
+      const token = {
+        id: o.id,
+        order_code: o.order_code,
+        token_number: o.order_code ? o.order_code.replace(/^[A-Za-z]+-/, '') : o.id.slice(-4),
+        table_number: o.table_number,
+        customer_name: o.customer_name || 'Guest',
+        status: o.status,
+        created_at: o.created_at,
+        updated_at: o.updated_at,
+      };
+
+      if (o.status === 'READY') {
+        ready.push(token);
+      } else if (o.status === 'RECEIVED' || o.status === 'PREPARING') {
+        preparing.push(token);
+      } else if (o.status === 'SERVED') {
+        if (served.length < 5) served.push(token);
+      }
+    });
+
+    res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      preparing,
+      ready,
+      served,
+      counts: { preparing: preparing.length, ready: ready.length },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Book a 10-Minute Demo (Petpooja Parity)
+app.post('/api/demo/book', (req, res) => {
+  try {
+    const { name, email, phone, outlet_name, outlet_type, city, preferred_time } = req.body;
+    if (!name || !phone) {
+      return res.status(400).json({ success: false, error: 'Name and Phone number are required' });
+    }
+
+    const demoId = `DEMO-${Date.now().toString().slice(-6)}`;
+    execute(
+      `INSERT INTO demo_requests (id, name, email, phone, outlet_name, outlet_type, city, preferred_time)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [demoId, name, email || '', phone, outlet_name || '', outlet_type || 'restaurant', city || 'India', preferred_time || 'ASAP']
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Demo request registered! Our restaurant specialist will connect with you in 10 minutes.',
+      demo_id: demoId,
+      sandbox_url: '/walkthrough',
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // Local System Folders & On-Premise Data Directory API
 app.get('/api/system/folders', (req, res) => {

@@ -28,6 +28,9 @@ import { AdminDownloads } from './pages/AdminDownloads.jsx';
 import { SubscriptionPricing } from './pages/SubscriptionPricing.jsx';
 import { MarketplaceServices } from './pages/MarketplaceServices.jsx';
 import { ProductWalkthrough } from './pages/ProductWalkthrough.jsx';
+import { CaptainApp } from './pages/CaptainApp.jsx';
+import { TokenDisplay } from './pages/TokenDisplay.jsx';
+import { PetpoojaComparison } from './pages/PetpoojaComparison.jsx';
 import { AdminAuthGate } from './components/AdminAuthGate.jsx';
 
 function AppContent() {
@@ -40,7 +43,12 @@ function AppContent() {
     location.pathname === '/home' ||
     location.pathname === '/walkthrough' ||
     location.pathname === '/services' ||
-    location.pathname === '/demo';
+    location.pathname === '/demo' ||
+    location.pathname === '/poss' ||
+    location.pathname === '/compare/petpooja' ||
+    location.pathname === '/captain' ||
+    location.pathname === '/tokens' ||
+    location.pathname === '/display/tokens';
   const pageBg = isDarkPage ? 'bg-slate-950' : 'bg-slate-50';
 
   return (

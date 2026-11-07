@@ -407,6 +407,22 @@ export function initDb() {
     );
   `);
 
+  // 17b. Demo Booking Leads (Petpooja Parity)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS demo_requests (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      outlet_name TEXT,
+      outlet_type TEXT DEFAULT 'restaurant',
+      city TEXT,
+      preferred_time TEXT,
+      status TEXT DEFAULT 'CONFIRMED',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
   // 18. Local SQLite Sync & Webhook Verifications
   db.exec(`
     CREATE TABLE IF NOT EXISTS sync_webhooks (
@@ -457,6 +473,8 @@ export function initDb() {
   ensureColumn('orders', 'aggregator_order_id', "TEXT DEFAULT ''");
   ensureColumn('orders', 'aggregator_rider_name', "TEXT DEFAULT ''");
   ensureColumn('orders', 'aggregator_rider_phone', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'last_cloud_sync_at', "TEXT");
+  ensureColumn('restaurants', 'cloud_sync_enabled', "INTEGER DEFAULT 0");
   ensureColumn('orders', 'split_type', "TEXT DEFAULT 'SINGLE'");
   ensureColumn('orders', 'split_shares', "INTEGER DEFAULT 1");
   ensureColumn('restaurants', 'razorpay_key_id', "TEXT DEFAULT ''");
@@ -513,6 +531,8 @@ export function initDb() {
   ensureColumn('orders', 'aggregator_order_id', "TEXT DEFAULT ''");
   ensureColumn('orders', 'aggregator_rider_name', "TEXT DEFAULT ''");
   ensureColumn('orders', 'aggregator_rider_phone', "TEXT DEFAULT ''");
+  ensureColumn('restaurants', 'last_cloud_sync_at', "TEXT");
+  ensureColumn('restaurants', 'cloud_sync_enabled', "INTEGER DEFAULT 0");
 
   // Seed default restaurants
   for (const r of defaultRestaurants) {

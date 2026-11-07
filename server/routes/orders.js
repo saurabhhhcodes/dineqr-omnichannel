@@ -11,6 +11,61 @@ function generateOrderCode() {
   return `ORD-${num}`;
 }
 
+// GET /api/orders/tokens/active - Token status for TV Display / Food Court Screens
+router.get('/tokens/active', (req, res) => {
+  try {
+    const { restaurant_id } = req.query;
+    let sql = `SELECT * FROM orders WHERE status IN ('RECEIVED', 'PREPARING', 'READY', 'SERVED')`;
+    const params = [];
+
+    if (restaurant_id) {
+      sql += ` AND restaurant_id = ?`;
+      params.push(restaurant_id);
+    }
+    sql += ` ORDER BY updated_at DESC, created_at DESC LIMIT 50`;
+
+    const allOrders = queryAll(sql, params);
+    const preparing = [];
+    const ready = [];
+    const served = [];
+
+    allOrders.forEach((o) => {
+      const token = {
+        id: o.id,
+        order_code: o.order_code,
+        token_number: o.order_code ? o.order_code.replace(/^[A-Za-z]+-/, '') : o.id.slice(-4),
+        table_number: o.table_number,
+        customer_name: o.customer_name || 'Guest',
+        status: o.status,
+        created_at: o.created_at,
+        updated_at: o.updated_at,
+      };
+
+      if (o.status === 'READY') {
+        ready.push(token);
+      } else if (o.status === 'RECEIVED' || o.status === 'PREPARING') {
+        preparing.push(token);
+      } else if (o.status === 'SERVED') {
+        if (served.length < 5) served.push(token);
+      }
+    });
+
+    res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      preparing,
+      ready,
+      served,
+      counts: {
+        preparing: preparing.length,
+        ready: ready.length,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // GET /api/orders/export - Download orders spreadsheet (CSV formatted for Microsoft Excel)
 router.get('/export', (req, res) => {
   try {

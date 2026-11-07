@@ -94,7 +94,11 @@ export function Navbar({ onOpenCart }) {
     location.pathname === '/services' ||
     location.pathname === '/demo' ||
     location.pathname === '/pricing' ||
-    location.pathname === '/downloads';
+    location.pathname === '/downloads' ||
+    location.pathname === '/poss' ||
+    location.pathname === '/compare/petpooja' ||
+    location.pathname === '/captain' ||
+    location.pathname === '/tokens';
 
   const isCustomerView =
     location.pathname.startsWith('/menu') ||
@@ -129,6 +133,16 @@ export function Navbar({ onOpenCart }) {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-300">
+            <Link
+              to="/poss"
+              className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
+                location.pathname === '/poss' ? 'text-amber-400 font-bold' : ''
+              }`}
+            >
+              <Store className="w-3.5 h-3.5 text-amber-400" />
+              <span>POS Solutions</span>
+            </Link>
+
             <Link
               to="/walkthrough"
               className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
@@ -214,6 +228,17 @@ export function Navbar({ onOpenCart }) {
         {isMobileMenuOpen && (
           <div className="lg:hidden bg-slate-950 border-b border-slate-800 px-4 py-4 space-y-3 animate-in slide-in-from-top-2 duration-150">
             <div className="grid grid-cols-1 gap-1 text-sm font-semibold">
+              <Link
+                to="/poss"
+                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-amber-400 transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Store className="w-4 h-4 text-amber-400" />
+                  <span>Petpooja POS Alternative & Demo</span>
+                </div>
+                <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
+              </Link>
+
               <Link
                 to="/walkthrough"
                 className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-amber-400 transition"
@@ -492,6 +517,23 @@ export function Navbar({ onOpenCart }) {
 
             {isOperationsDropdownOpen && (
               <div className="absolute top-full right-0 mt-2 w-56 bg-slate-900 rounded-xl shadow-2xl border border-slate-800 py-1.5 z-50 animate-in fade-in zoom-in-95">
+                <Link
+                  to="/captain"
+                  onClick={() => setIsOperationsDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
+                >
+                  <Store className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Captain Waiter App</span>
+                </Link>
+                <Link
+                  to="/tokens"
+                  onClick={() => setIsOperationsDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
+                >
+                  <Laptop className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Token TV Display</span>
+                </Link>
+                <div className="my-1 border-t border-slate-800" />
                 <Link
                   to="/admin/reservations"
                   onClick={() => setIsOperationsDropdownOpen(false)}

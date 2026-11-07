@@ -133,3 +133,6 @@ export async function triggerRazorpayCheckout({
     if (onFailure) onFailure(err);
   }
 }
+
+export const openRazorpayCheckout = triggerRazorpayCheckout;
+export default triggerRazorpayCheckout;
