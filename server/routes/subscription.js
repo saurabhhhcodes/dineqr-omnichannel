@@ -32,6 +32,7 @@ const PLANS = {
     amount_paise: 150000,
     billing_period: 'monthly',
     badge: 'Enterprise',
+    staff_limit: 12,
     description: 'Everything in Essential plus real-time Zomato, Swiggy & ONDC webhook aggregator order streaming.',
     features: [
       'Everything in Essential Restaurant Suite',
@@ -40,7 +41,28 @@ const PLANS = {
       'ONDC Network & Magicpin Delivery Hub',
       'Unified Single-Screen KDS for Dine-In & Delivery',
       'Multi-Terminal Standalone Apps (EXE, APK, DMG, DEB)',
+      'Up to 12 Staff User Accounts with Role Permissions',
       'Priority 24/7 Phone & WhatsApp Support',
+    ],
+  },
+  enterprise_5000: {
+    id: 'enterprise_5000',
+    name: 'Enterprise Scale & Unlimited Staff Hub',
+    amount: 5000,
+    amount_paise: 500000,
+    billing_period: 'monthly',
+    badge: 'Scale & Chains',
+    staff_limit: 30,
+    description: 'High-volume dining chains, multi-counter food courts, and franchises needing advanced staff limits, timeclock tracking, and dedicated folder archives.',
+    features: [
+      'Up to 30 Staff Accounts with Unique User IDs and Passwords',
+      'Live Staff Arrival & Departure Timeclock Attendance Log',
+      'Multi-Screen Kitchen KDS with Expediter Stations',
+      'Dedicated On-Premise Folders (/bills, /inventory, /staff)',
+      'Pay-on-Counter Cash & UPI Split Tender Verification',
+      'Real-Time Food Cost, Margin & Daily P&L Engine',
+      'Multi-Branch Consolidated Reporting & Analytics',
+      'Direct Razorpay Merchant Settlement with 0% Cut',
     ],
   },
 };
@@ -55,7 +77,12 @@ router.get('/status', (req, res) => {
       return res.status(404).json({ success: false, error: 'Restaurant not found' });
     }
 
-    const currentPlanId = rest.subscription_plan?.includes('1500') ? 'pro_1500' : 'starter_1000';
+    const planStr = (rest.subscription_plan || '').toLowerCase();
+    const currentPlanId = planStr.includes('5000') || planStr.includes('enterprise')
+      ? 'enterprise_5000'
+      : planStr.includes('1500') || planStr.includes('pro')
+      ? 'pro_1500'
+      : 'starter_1000';
     const plan = PLANS[currentPlanId] || PLANS.starter_1000;
 
     // Calculate expiry (default 30 days from now if not explicitly set)

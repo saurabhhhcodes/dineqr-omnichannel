@@ -1,53 +1,23 @@
 // src/context/RestaurantContext.jsx - Multi-restaurant state & active cafe switcher
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import {
+  FALLBACK_RESTAURANTS,
+  getAllAvailableRestaurants,
+  resolveRestaurant,
+} from '../data/fallbackMenu.js';
 
 const RestaurantContext = createContext(null);
 
-const FALLBACK_RESTAURANTS = [
-  {
-    id: 'rest_losteria',
-    name: "L'Osteria Gourmet Bistro",
-    slug: 'losteria',
-    tagline: 'Artisanal Kitchen & Wood-Fired Oven',
-    business_type: 'restaurant',
-    station_type: 'table',
-    staff_pin: '1234',
-  },
-  {
-    id: 'rest_glamour_salon',
-    name: 'Glamour & Groom Salon & Spa',
-    slug: 'glamour-salon',
-    tagline: 'Styling & Spa Chairs',
-    business_type: 'salon',
-    station_type: 'chair',
-    staff_pin: '1234',
-  },
-  {
-    id: 'rest_ironpulse_gym',
-    name: 'IronPulse Fitness Club & Protein Bar',
-    slug: 'ironpulse-gym',
-    tagline: 'Performance Fitness',
-    business_type: 'gym',
-    station_type: 'bay',
-    staff_pin: '1234',
-  },
-  {
-    id: 'rest_apex_clinic',
-    name: 'Apex Healthcare & Multi-Specialty Clinic',
-    slug: 'apex-clinic',
-    tagline: 'Outpatient & Diagnostic Care',
-    business_type: 'clinic',
-    station_type: 'room',
-    staff_pin: '1234',
-  },
-];
-
 export function RestaurantProvider({ children }) {
-  const [restaurants, setRestaurants] = useState(FALLBACK_RESTAURANTS);
+  const [restaurants, setRestaurants] = useState(() => getAllAvailableRestaurants());
   const [activeRestaurant, setActiveRestaurant] = useState(() => {
     try {
       const saved = localStorage.getItem('dineqr_active_restaurant');
-      return saved ? JSON.parse(saved) : FALLBACK_RESTAURANTS[0];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return resolveRestaurant(parsed?.id || parsed?.slug);
+      }
+      return FALLBACK_RESTAURANTS[0];
     } catch {
       return FALLBACK_RESTAURANTS[0];
     }
@@ -55,6 +25,9 @@ export function RestaurantProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchRestaurants = async () => {
+    const localAll = getAllAvailableRestaurants();
+    setRestaurants(localAll);
+
     try {
       const res = await fetch('/api/restaurants');
       let data = null;
@@ -63,21 +36,24 @@ export function RestaurantProvider({ children }) {
         data = JSON.parse(text);
       }
       if (data && data.success && data.restaurants && data.restaurants.length > 0) {
-        setRestaurants(data.restaurants);
+        // Merge server restaurants with local custom restaurants
+        const map = new Map();
+        localAll.forEach((r) => map.set(r.id, r));
+        data.restaurants.forEach((r) => map.set(r.id, { ...map.get(r.id), ...r }));
+        const merged = Array.from(map.values());
+        setRestaurants(merged);
 
-        // If no active restaurant or current one not in list, default to first
-        if (!activeRestaurant || !data.restaurants.some((r) => r.id === activeRestaurant.id)) {
-          const defaultRest = data.restaurants[0] || FALLBACK_RESTAURANTS[0];
+        // If active restaurant is not set or missing, update
+        if (!activeRestaurant || !merged.some((r) => r.id === activeRestaurant.id)) {
+          const defaultRest = merged[0] || FALLBACK_RESTAURANTS[0];
           setActiveRestaurant(defaultRest);
-          if (defaultRest) {
-            localStorage.setItem('dineqr_active_restaurant', JSON.stringify(defaultRest));
-          }
+          localStorage.setItem('dineqr_active_restaurant', JSON.stringify(defaultRest));
         }
       }
     } catch (err) {
       console.warn('API unavailable, keeping active local tenant defaults:', err.message);
       if (!activeRestaurant) {
-        setActiveRestaurant(FALLBACK_RESTAURANTS[0]);
+        setActiveRestaurant(localAll[0] || FALLBACK_RESTAURANTS[0]);
       }
     } finally {
       setIsLoading(false);
@@ -90,10 +66,16 @@ export function RestaurantProvider({ children }) {
 
   const switchRestaurant = (restOrId) => {
     let target = null;
+    const currentList = restaurants.length > 0 ? restaurants : getAllAvailableRestaurants();
     if (typeof restOrId === 'string') {
-      target = restaurants.find((r) => r.id === restOrId || r.slug === restOrId);
+      target = currentList.find(
+        (r) => r.id === restOrId || r.slug === restOrId || r.name.toLowerCase() === restOrId.toLowerCase()
+      );
     } else {
       target = restOrId;
+    }
+    if (!target && restOrId) {
+      target = resolveRestaurant(restOrId);
     }
     if (target) {
       setActiveRestaurant(target);

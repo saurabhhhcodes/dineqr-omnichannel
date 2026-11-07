@@ -25,6 +25,8 @@ import subscriptionRouter from './routes/subscription.js';
 import marketplaceRouter from './routes/marketplace.js';
 import porterRouter from './routes/porter.js';
 import webhookRouter from './routes/webhook.js';
+import razorpayStandardRouter from './routes/razorpayStandard.js';
+import { getFolderOverview, initLocalFileSystem } from './localFileSystem.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +39,7 @@ app.set('trust proxy', true);
 
 // Initialize database & tables
 initDb();
+initLocalFileSystem();
 
 // Middlewares
 app.use(cors());
@@ -63,6 +66,19 @@ app.use('/api/subscription', subscriptionRouter);
 app.use('/api/marketplace', marketplaceRouter);
 app.use('/api/porter', porterRouter);
 app.use('/api/erp/webhook', webhookRouter);
+
+// Razorpay Standard Web Checkout routes: /api/create-order & /api/verify-payment
+app.use('/api', razorpayStandardRouter);
+
+// Local System Folders & On-Premise Data Directory API
+app.get('/api/system/folders', (req, res) => {
+  try {
+    const overview = getFolderOverview();
+    res.json({ success: true, folders: overview });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

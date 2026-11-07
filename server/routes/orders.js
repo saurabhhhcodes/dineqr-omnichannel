@@ -2,6 +2,7 @@
 import express from 'express';
 import { queryAll, queryOne, execute } from '../db.js';
 import { broadcastEvent } from '../sse.js';
+import { saveBillReceipt } from '../localFileSystem.js';
 
 const router = express.Router();
 
@@ -378,6 +379,50 @@ router.post('/', (req, res) => {
   } catch (error) {
     console.error('Error creating order:', error);
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// PATCH /api/orders/:id/mark-counter-paid - Mark a Pay-on-Counter order as paid & generate local bill
+router.patch('/:id/mark-counter-paid', (req, res) => {
+  try {
+    const order = queryOne(`SELECT * FROM orders WHERE id = ? OR order_code = ?`, [req.params.id, req.params.id]);
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+
+    const { payment_method = 'Cash at Counter' } = req.body;
+
+    execute(
+      `UPDATE orders SET
+        payment_status = 'PAID',
+        payment_method = ?,
+        status = CASE WHEN status = 'RECEIVED' THEN 'PREPARING' ELSE status END,
+        updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [payment_method, order.id]
+    );
+
+    const updated = queryOne(`SELECT * FROM orders WHERE id = ?`, [order.id]);
+    const items = queryAll(`SELECT * FROM order_items WHERE order_id = ?`, [order.id]);
+    const rest = queryOne(`SELECT * FROM restaurants WHERE id = ?`, [order.restaurant_id]) || {};
+
+    // Save official bill receipt into DineQR-Data/bills/
+    const billFiles = saveBillReceipt(updated, items, rest);
+
+    broadcastEvent('ORDER_PAID', {
+      order: { ...updated, items },
+      restaurant_id: order.restaurant_id,
+      timestamp: new Date().toISOString(),
+    });
+
+    res.json({
+      success: true,
+      message: `Counter payment recorded for order ${order.order_code}. Bill saved to DineQR-Data/bills/.`,
+      order: { ...updated, items },
+      bill_files: billFiles,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 

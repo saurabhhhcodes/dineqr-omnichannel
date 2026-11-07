@@ -98,7 +98,7 @@ router.post('/onboard', (req, res) => {
         cgst_pct, sgst_pct, service_charge_pct, razorpay_key_id, razorpay_key_secret, upi_id, bank_account, bank_ifsc,
         admin_pin, staff_pin, admin_password, commission_pct, settlement_type, onboarding_status, is_active,
         merchant_user_id, subscription_plan, subscription_status, subscription_expires_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', 1, ?, ?, 'active', ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', 1, ?, ?, 'active', ?)`,
       [
         id,
         safeName,

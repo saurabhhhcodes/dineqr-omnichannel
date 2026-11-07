@@ -4,11 +4,24 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { queryAll, queryOne, execute, db, initDb } from '../db.js';
+import { saveStaffAttendanceLog, saveInventorySnapshot } from '../localFileSystem.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const router = express.Router();
+
+// Helper to determine staff limits based on subscription plan
+function getPlanStaffLimit(planStr = '') {
+  const normalized = (planStr || '').toLowerCase();
+  if (normalized.includes('5000') || normalized.includes('enterprise')) {
+    return { limit: 30, planName: 'Enterprise Scale & Staff Hub (₹5,000/mo)' };
+  }
+  if (normalized.includes('1500') || normalized.includes('pro')) {
+    return { limit: 12, planName: 'Omnichannel Pro Delivery Suite (₹1,500/mo)' };
+  }
+  return { limit: 5, planName: 'Essential Restaurant Suite (₹1,000/mo)' };
+}
 
 // ==========================================
 // 1. VISUAL FLOOR PLAN (Odoo Restaurant Parity)
@@ -81,14 +94,20 @@ router.post('/floor-plan/table', (req, res) => {
       return res.status(400).json({ success: false, error: 'Table number/label is required' });
     }
 
+    let finalTableNumber = table_number;
+    const existingTable = queryOne(`SELECT id FROM tables WHERE restaurant_id = ? AND table_number = ?`, [restaurant_id, table_number]);
+    if (existingTable) {
+      finalTableNumber = `${table_number} (${Math.floor(10 + Math.random() * 90)})`;
+    }
+
     const tableId = 'tbl_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
     const fpId = 'fp_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
-    const tableName = name || `Table ${table_number}`;
+    const tableName = name || `Table ${finalTableNumber}`;
 
     // 1. Insert into tables master registry
     execute(
       `INSERT INTO tables (id, restaurant_id, table_number, name, section, capacity) VALUES (?, ?, ?, ?, ?, ?)`,
-      [tableId, restaurant_id, table_number, tableName, section, parseInt(capacity) || 4]
+      [tableId, restaurant_id, finalTableNumber, tableName, section, parseInt(capacity) || 4]
     );
 
     // 2. Insert into floor_plan_tables layout registry
@@ -379,7 +398,221 @@ router.delete('/staff-shifts/:id', (req, res) => {
 });
 
 // ==========================================
-// 3B. STAFF LIVE CLOCK-IN & ACTIVITY LEDGER
+// 3B. STAFF MEMBER PROFILES & PLAN LIMIT ENFORCEMENT
+// ==========================================
+
+// GET /api/erp/staff-members - List all registered staff accounts & check plan limits
+router.get('/staff-members', (req, res) => {
+  try {
+    const restId = req.query.restaurant_id || 'rest_losteria';
+    const rest = queryOne(`SELECT * FROM restaurants WHERE id = ?`, [restId]) || {};
+    const { limit, planName } = getPlanStaffLimit(rest.subscription_plan);
+
+    const staff = queryAll(
+      `SELECT id, restaurant_id, user_id, name, role, pin, phone, status, created_at
+       FROM staff_members WHERE restaurant_id = ? ORDER BY created_at ASC`,
+      [restId]
+    );
+
+    res.json({
+      success: true,
+      restaurant_id: restId,
+      plan_name: planName,
+      staff_limit: limit,
+      total_count: staff.length,
+      remaining_slots: Math.max(0, limit - staff.length),
+      staff,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/erp/staff-members - Add staff member (enforces plan limit)
+router.post('/staff-members', (req, res) => {
+  try {
+    const {
+      restaurant_id = 'rest_losteria',
+      name,
+      user_id,
+      role = 'Waiter / Server',
+      pin = '1234',
+      password = 'staff123',
+      phone = '',
+    } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ success: false, error: 'Staff member name is required' });
+    }
+
+    if (!user_id || !user_id.trim()) {
+      return res.status(400).json({ success: false, error: 'Unique Staff User ID is required' });
+    }
+
+    const rest = queryOne(`SELECT * FROM restaurants WHERE id = ?`, [restaurant_id]) || {};
+    const { limit, planName } = getPlanStaffLimit(rest.subscription_plan);
+
+    const currentCount = queryOne(
+      `SELECT COUNT(*) as c FROM staff_members WHERE restaurant_id = ?`,
+      [restaurant_id]
+    )?.c || 0;
+
+    if (currentCount >= limit) {
+      return res.status(400).json({
+        success: false,
+        error: `Staff limit reached: Your current ${planName} allows a maximum of ${limit} staff members. Please upgrade to the ₹5,000/mo Enterprise Plan to add more staff.`,
+        current_count: currentCount,
+        staff_limit: limit,
+      });
+    }
+
+    // Check duplicate user_id
+    const existing = queryOne(`SELECT id FROM staff_members WHERE user_id = ?`, [user_id.trim()]);
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        error: `Staff User ID "${user_id.trim()}" is already taken. Please choose a different ID.`,
+      });
+    }
+
+    const id = 'stf_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+
+    execute(
+      `INSERT INTO staff_members (id, restaurant_id, user_id, name, role, pin, password, phone, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE')`,
+      [id, restaurant_id, user_id.trim(), name.trim(), role, pin.trim() || '1234', password.trim() || 'staff123', phone.trim()]
+    );
+
+    const created = queryOne(`SELECT id, restaurant_id, user_id, name, role, pin, phone, status, created_at FROM staff_members WHERE id = ?`, [id]);
+    res.status(201).json({
+      success: true,
+      message: `Staff member ${name} created successfully!`,
+      staff: created,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// DELETE /api/erp/staff-members/:id - Remove staff member
+router.delete('/staff-members/:id', (req, res) => {
+  try {
+    execute(`DELETE FROM staff_members WHERE id = ?`, [req.params.id]);
+    res.json({ success: true, message: 'Staff member removed successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/erp/staff/login - Staff Member Login & Clock-In (Records Arrival Time)
+router.post('/staff/login', (req, res) => {
+  try {
+    const { user_id, pin, password, current_activity = 'Floor Duty', notes = '' } = req.body;
+
+    if (!user_id) {
+      return res.status(400).json({ success: false, error: 'Staff User ID is required' });
+    }
+
+    const staff = queryOne(
+      `SELECT * FROM staff_members WHERE user_id = ? AND (pin = ? OR password = ?)`,
+      [user_id.trim(), (pin || '').trim(), (password || pin || '').trim()]
+    );
+
+    if (!staff) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid Staff User ID or PIN/Password credentials.',
+      });
+    }
+
+    // Record Arrival Time in staff_attendance
+    const attId = 'att_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+    const arrivalTime = new Date().toISOString();
+
+    execute(
+      `INSERT INTO staff_attendance (
+        id, restaurant_id, employee_name, staff_pin, role, current_activity, notes, status, clock_in_time
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'ON_DUTY', CURRENT_TIMESTAMP)`,
+      [attId, staff.restaurant_id, staff.name, staff.pin, staff.role, current_activity, notes || `Clocked in via User ID: ${staff.user_id}`]
+    );
+
+    const record = queryOne(`SELECT * FROM staff_attendance WHERE id = ?`, [attId]);
+
+    // Save snapshot to local filesystem DineQR-Data/staff/
+    const allAttendance = queryAll(`SELECT * FROM staff_attendance WHERE restaurant_id = ? ORDER BY clock_in_time DESC LIMIT 50`, [staff.restaurant_id]);
+    saveStaffAttendanceLog(allAttendance);
+
+    res.status(200).json({
+      success: true,
+      message: `Welcome, ${staff.name}! Your arrival time (${new Date().toLocaleTimeString('en-IN')}) has been recorded.`,
+      attendance_id: attId,
+      arrival_time: arrivalTime,
+      staff: {
+        id: staff.id,
+        user_id: staff.user_id,
+        name: staff.name,
+        role: staff.role,
+        restaurant_id: staff.restaurant_id,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/erp/staff/logout - Staff Member Clock-Out (Records Departure Time)
+router.post('/staff/logout', (req, res) => {
+  try {
+    const { user_id, attendance_id, notes } = req.body;
+    let targetId = attendance_id;
+
+    if (!targetId && user_id) {
+      const staff = queryOne(`SELECT name, restaurant_id FROM staff_members WHERE user_id = ?`, [user_id.trim()]);
+      if (staff) {
+        const active = queryOne(
+          `SELECT id FROM staff_attendance WHERE employee_name = ? AND status = 'ON_DUTY' ORDER BY clock_in_time DESC`,
+          [staff.name]
+        );
+        if (active) targetId = active.id;
+      }
+    }
+
+    if (!targetId) {
+      return res.status(400).json({
+        success: false,
+        error: 'No active clock-in session found for this staff member.',
+      });
+    }
+
+    execute(
+      `UPDATE staff_attendance SET
+        clock_out_time = CURRENT_TIMESTAMP,
+        status = 'CLOCKED_OUT',
+        notes = CASE WHEN ? IS NOT NULL AND ? != '' THEN notes || ' | ' || ? ELSE notes END
+       WHERE id = ?`,
+      [notes, notes, notes, targetId]
+    );
+
+    const updated = queryOne(`SELECT * FROM staff_attendance WHERE id = ?`, [targetId]);
+
+    // Save snapshot to local filesystem DineQR-Data/staff/
+    if (updated?.restaurant_id) {
+      const allAttendance = queryAll(`SELECT * FROM staff_attendance WHERE restaurant_id = ? ORDER BY clock_in_time DESC LIMIT 50`, [updated.restaurant_id]);
+      saveStaffAttendanceLog(allAttendance);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `${updated?.employee_name || 'Staff member'} clocked out successfully. Departure time logged.`,
+      attendance: updated,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// 3C. STAFF LIVE CLOCK-IN & ACTIVITY LEDGER
 // ==========================================
 
 // GET /api/erp/staff-attendance - List staff clock-ins and live duty status

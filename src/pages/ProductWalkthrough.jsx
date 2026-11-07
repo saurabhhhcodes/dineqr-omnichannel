@@ -187,20 +187,57 @@ export function ProductWalkthrough() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [subtitleLang, setSubtitleLang] = useState('hi'); // 'en', 'hi', 'off'
+  const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState(20);
   const [viewMode, setViewMode] = useState('video'); // 'video' | 'interactive'
 
   const activeChapter = CHAPTERS[activeChapterIndex];
 
-  // When chapter changes, reset playback
+  // Voice narration speech synthesis helper
+  const speakNarration = (chapterIdx, lang) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    if (!isVoiceActive) return;
+
+    const chap = CHAPTERS[chapterIdx];
+    if (!chap) return;
+
+    const speechText = lang === 'en' ? chap.subtitles.en : chap.subtitles.hi;
+    const utterance = new SpeechSynthesisUtterance(speechText);
+    utterance.lang = lang === 'en' ? 'en-IN' : 'hi-IN';
+    utterance.rate = 0.95;
+    utterance.pitch = 1.0;
+
+    const voices = window.speechSynthesis.getVoices();
+    const voice = voices.find((v) => (lang === 'en' ? v.lang.includes('en') : v.lang.includes('hi')));
+    if (voice) utterance.voice = voice;
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // When chapter changes or voice is toggled, reset playback and trigger audio
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
       videoRef.current.play().catch(() => {});
       setIsPlaying(true);
     }
-  }, [activeChapterIndex]);
+    if (isVoiceActive) {
+      speakNarration(activeChapterIndex, subtitleLang);
+    } else if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  }, [activeChapterIndex, isVoiceActive, subtitleLang]);
+
+  // Clean up speech on unmount
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
@@ -214,10 +251,28 @@ export function ProductWalkthrough() {
       if (isPlaying) {
         videoRef.current.pause();
         setIsPlaying(false);
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+          window.speechSynthesis.pause();
+        }
       } else {
         videoRef.current.play().catch(() => {});
         setIsPlaying(true);
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          } else if (isVoiceActive) {
+            speakNarration(activeChapterIndex, subtitleLang);
+          }
+        }
       }
+    }
+  };
+
+  const handleToggleVoice = () => {
+    const nextState = !isVoiceActive;
+    setIsVoiceActive(nextState);
+    if (!nextState && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
   };
 
@@ -255,42 +310,69 @@ export function ProductWalkthrough() {
               </p>
             </div>
 
-            {/* Subtitle Language Switcher */}
-            <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold">
-              <div className="flex items-center gap-1.5 px-2 text-slate-400">
-                <Languages className="w-4 h-4 text-amber-400" />
-                <span className="hidden sm:inline">Subtitles:</span>
+            {/* Controls: Audio Voiceover + Subtitle Language Switcher */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Spoken Voiceover Narration Button */}
+              <button
+                type="button"
+                onClick={handleToggleVoice}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-bold border transition cursor-pointer ${
+                  isVoiceActive
+                    ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 ring-2 ring-emerald-500/30'
+                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                }`}
+                title="Enable spoken voice narration explaining the system"
+              >
+                {isVoiceActive ? (
+                  <>
+                    <Volume2 className="w-4 h-4 text-emerald-400 animate-pulse" />
+                    <span>Voice Narration: ON</span>
+                  </>
+                ) : (
+                  <>
+                    <VolumeX className="w-4 h-4 text-slate-500" />
+                    <span>Listen to Voiceover</span>
+                  </>
+                )}
+              </button>
+
+              {/* Subtitle Language Switcher */}
+              <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-900 border border-slate-800 text-xs font-bold">
+                <div className="flex items-center gap-1.5 px-2 text-slate-400">
+                  <Languages className="w-4 h-4 text-amber-400" />
+                  <span className="hidden sm:inline">Language:</span>
+                </div>
+                <button
+                  onClick={() => setSubtitleLang('hi')}
+                  className={`px-3 py-1.5 rounded-xl transition cursor-pointer ${
+                    subtitleLang === 'hi'
+                      ? 'bg-amber-500 text-slate-950 font-black'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  हिंदी (Hindi)
+                </button>
+                <button
+                  onClick={() => setSubtitleLang('en')}
+                  className={`px-3 py-1.5 rounded-xl transition cursor-pointer ${
+                    subtitleLang === 'en'
+                      ? 'bg-amber-500 text-slate-950 font-black'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setSubtitleLang('off')}
+                  className={`px-2.5 py-1.5 rounded-xl transition cursor-pointer ${
+                    subtitleLang === 'off'
+                      ? 'bg-slate-700 text-white'
+                      : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  Off
+                </button>
               </div>
-              <button
-                onClick={() => setSubtitleLang('hi')}
-                className={`px-3 py-1.5 rounded-xl transition cursor-pointer ${
-                  subtitleLang === 'hi'
-                    ? 'bg-amber-500 text-slate-950 font-black'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                हिंदी (Hindi)
-              </button>
-              <button
-                onClick={() => setSubtitleLang('en')}
-                className={`px-3 py-1.5 rounded-xl transition cursor-pointer ${
-                  subtitleLang === 'en'
-                    ? 'bg-amber-500 text-slate-950 font-black'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                English
-              </button>
-              <button
-                onClick={() => setSubtitleLang('off')}
-                className={`px-3 py-1.5 rounded-xl transition cursor-pointer ${
-                  subtitleLang === 'off'
-                    ? 'bg-slate-700 text-white'
-                    : 'text-slate-500 hover:text-slate-300'
-                }`}
-              >
-                Off
-              </button>
             </div>
           </div>
         </div>

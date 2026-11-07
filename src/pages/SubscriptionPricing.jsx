@@ -183,7 +183,7 @@ export function SubscriptionPricing() {
       title: 'Omnichannel Pro Delivery Suite',
       price: '1,500',
       period: '/ month',
-      badge: 'Complete Parity',
+      badge: 'Aggregator Hub',
       badgeColor: 'bg-purple-100 text-purple-800 border-purple-200',
       highlight: true,
       tagline: 'Built for high-volume restaurants running Dine-In + Zomato & Swiggy',
@@ -193,15 +193,35 @@ export function SubscriptionPricing() {
         'Swiggy Partner Outlet Real-Time Ingestion',
         'ONDC Network & Magicpin Multi-Channel Dispatch',
         'Unified Single KDS Screen for Kitchen & Delivery Riders',
-        'Native Multi-OS Desktop Apps (Windows .EXE, Android .APK, macOS .DMG)',
-        'Dedicated Cloudflare Reverse Tunnel for On-Premise DB',
+        'Up to 12 Staff User Accounts with Timeclock Records',
+        'Native Multi-OS Desktop Apps (.EXE, .APK, .DMG)',
         'Priority 24/7 Telephone & WhatsApp Technical Support',
+      ],
+    },
+    {
+      id: 'enterprise_5000',
+      title: 'Enterprise Scale & Staff Hub',
+      price: '5,000',
+      period: '/ month',
+      badge: 'Scale & Chains',
+      badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+      highlight: false,
+      tagline: 'For busy dining destinations, multi-counter food halls & franchises',
+      features: [
+        'Up to 30 Staff Accounts with Unique User IDs & Logins',
+        'Staff Arrival & Departure Timeclock Attendance Log',
+        'Multi-Station Kitchen KDS & Waiter Paging Screen',
+        'Automatic Local System Folders (/bills, /inventory, /staff)',
+        'Pay-on-Counter Cash & UPI Split Tender Verification',
+        'Direct Razorpay Settlement (0% Platform Cut)',
+        'Automatic Bill PDFs & Thermal Receipt Invoicing',
+        'Dedicated 1-on-1 WhatsApp & Phone Priority Support',
       ],
     },
   ];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-300">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8 animate-in fade-in duration-300">
       {/* Top Banner */}
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
@@ -257,9 +277,11 @@ export function SubscriptionPricing() {
       )}
 
       {/* Pricing Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {plans.map((plan) => {
-          const isCurrent = subscription?.plan?.amount === (plan.id === 'starter_1000' ? 1000 : 1500);
+          const isCurrent =
+            subscription?.plan?.amount ===
+            (plan.id === 'starter_1000' ? 1000 : plan.id === 'pro_1500' ? 1500 : 5000);
 
           return (
             <div

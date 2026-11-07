@@ -1,0 +1,296 @@
+{
+  "info": {
+    "_postman_id": "dineqr-platform-e2e-suite",
+    "name": "DineQR Enterprise Platform API & Razorpay Standard Suite",
+    "description": "Comprehensive Postman test collection for DineQR multi-tenant restaurant POS, Razorpay standard checkout, staff limits & timeclock, seating, menu customization, and local SQLite data folders.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3005",
+      "type": "string"
+    },
+    {
+      "key": "testOrderId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testRzpOrderId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testMenuItemId",
+      "value": "item_1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health & Server Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        }
+      }
+    },
+    {
+      "name": "2. Razorpay - Create Order (Standard Checkout)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 50000,\n  \"currency\": \"INR\",\n  \"receipt\": \"rcpt_postman_01\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/create-order",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "create-order"]
+        }
+      }
+    },
+    {
+      "name": "3. Razorpay - Create Order (Validation: Amount < 100 paise)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 50,\n  \"currency\": \"INR\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/create-order",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "create-order"]
+        }
+      }
+    },
+    {
+      "name": "4. Razorpay - Verify Payment (Signature Mismatch Failure)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"razorpay_order_id\": \"order_TxIEOzZMVeoNrl\",\n  \"razorpay_payment_id\": \"pay_mock_123\",\n  \"razorpay_signature\": \"invalid_signature_hex\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/verify-payment",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "verify-payment"]
+        }
+      }
+    },
+    {
+      "name": "5. Restaurants - List All Active Tenancies",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/restaurants",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "restaurants"]
+        }
+      }
+    },
+    {
+      "name": "6. Onboarding - Register New Client (Enterprise ₹5000 Plan)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Chai & Sourdough Artisan Bakery\",\n  \"owner_name\": \"Vikramaditya Roy\",\n  \"business_type\": \"cafe\",\n  \"station_type\": \"table\",\n  \"station_count\": 8,\n  \"subscription_plan\": \"Enterprise Scale & Staff Hub (₹5,000/mo)\",\n  \"admin_pin\": \"1234\",\n  \"staff_pin\": \"1234\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/restaurants/onboard",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "restaurants", "onboard"]
+        }
+      }
+    },
+    {
+      "name": "7. Menu - Fetch Items & Categories",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/menu?restaurant_id=rest_losteria",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "menu"],
+          "query": [{ "key": "restaurant_id", "value": "rest_losteria" }]
+        }
+      }
+    },
+    {
+      "name": "8. Menu - Instant Price Change",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"price\": 380\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/menu/items/item_1/price",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "menu", "items", "item_1", "price"]
+        }
+      }
+    },
+    {
+      "name": "9. Menu - Add Custom Dish with Video Loop",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"restaurant_id\": \"rest_losteria\",\n  \"category_id\": \"cat_pizzas\",\n  \"name\": \"Calabrian Spicy Burrata Pizza\",\n  \"description\": \"Crushed San Marzano tomatoes, artisanal creamy burrata, and spicy Calabrian chili paste on 48h sourdough.\",\n  \"price\": 690,\n  \"image_url\": \"https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80\",\n  \"video_url\": \"/videos/item_1.mp4\",\n  \"is_veg\": 1,\n  \"spice_level\": \"Hot\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/menu/items",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "menu", "items"]
+        }
+      }
+    },
+    {
+      "name": "10. Seating - Fetch Tables and Seating Arrangement",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/tables?restaurant_id=rest_losteria",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tables"],
+          "query": [{ "key": "restaurant_id", "value": "rest_losteria" }]
+        }
+      }
+    },
+    {
+      "name": "11. Seating - Add New Dining Table & Floor Slot",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"restaurant_id\": \"rest_losteria\",\n  \"table_number\": \"Table 09\",\n  \"name\": \"Terrace Garden Cabana 09\",\n  \"section\": \"Terrace Garden\",\n  \"capacity\": 6,\n  \"shape\": \"circle\",\n  \"pos_x\": 450,\n  \"pos_y\": 220\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/erp/floor-plan/table",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "erp", "floor-plan", "table"]
+        }
+      }
+    },
+    {
+      "name": "12. Orders - Create Pay-on-Counter Order",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"restaurant_id\": \"rest_losteria\",\n  \"table_id\": \"tbl_1\",\n  \"customer_name\": \"Anand Narayanan\",\n  \"customer_phone\": \"+91 98450 11223\",\n  \"payment_method\": \"CASH_AT_COUNTER\",\n  \"items\": [\n    { \"id\": \"item_1\", \"quantity\": 2, \"notes\": \"Extra parmesan crisp\" }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "orders"]
+        }
+      }
+    },
+    {
+      "name": "13. Staff - List Members & Inspect Plan Limits",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/erp/staff-members?restaurant_id=rest_losteria",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "erp", "staff-members"],
+          "query": [{ "key": "restaurant_id", "value": "rest_losteria" }]
+        }
+      }
+    },
+    {
+      "name": "14. Staff - Add Staff Member with User ID and PIN",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"restaurant_id\": \"rest_losteria\",\n  \"name\": \"Rohan Deshmukh\",\n  \"user_id\": \"STF_ROHAN_105\",\n  \"role\": \"Senior Floor Captain\",\n  \"pin\": \"5678\",\n  \"password\": \"captain5678\",\n  \"phone\": \"+91 97412 88899\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/erp/staff-members",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "erp", "staff-members"]
+        }
+      }
+    },
+    {
+      "name": "15. Staff - Login & Clock-In (Record Arrival Time)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": \"STF_ROHAN_105\",\n  \"pin\": \"5678\",\n  \"current_activity\": \"Morning Table Sanitization & Service Briefing\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/erp/staff/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "erp", "staff", "login"]
+        }
+      }
+    },
+    {
+      "name": "16. Staff - Clock-Out (Record Departure Time)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": \"STF_ROHAN_105\",\n  \"notes\": \"Evening shift handoff complete to Sous Chef\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/erp/staff/logout",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "erp", "staff", "logout"]
+        }
+      }
+    },
+    {
+      "name": "17. System - Inspect Local DineQR-Data Folders",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/system/folders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "system", "folders"]
+        }
+      }
+    },
+    {
+      "name": "18. Subscription - Verify Current Plan & ₹5000 Scalability",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/subscription/status?restaurant_id=rest_losteria",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "subscription", "status"],
+          "query": [{ "key": "restaurant_id", "value": "rest_losteria" }]
+        }
+      }
+    }
+  ]
+}

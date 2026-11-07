@@ -234,6 +234,20 @@ export function initDb() {
 
   // 10. Staff Planning & Shift Schedules (Odoo Staff Planning Parity)
   db.exec(`
+    CREATE TABLE IF NOT EXISTS staff_members (
+      id TEXT PRIMARY KEY,
+      restaurant_id TEXT NOT NULL,
+      user_id TEXT UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'Waiter / Server',
+      pin TEXT NOT NULL DEFAULT '1234',
+      password TEXT NOT NULL DEFAULT 'staff123',
+      phone TEXT,
+      status TEXT DEFAULT 'ACTIVE',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+    );
+
     CREATE TABLE IF NOT EXISTS staff_shifts (
       id TEXT PRIMARY KEY,
       restaurant_id TEXT NOT NULL,
@@ -688,6 +702,25 @@ export function initDb() {
         `INSERT INTO staff_shifts (id, restaurant_id, employee_name, role, shift_date, start_time, end_time, color, status, notes)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [s.id, s.restaurant_id, s.employee_name, s.role, s.shift_date, s.start_time, s.end_time, s.color, s.status, s.notes]
+      );
+    }
+  }
+
+  // Seed sample staff members if empty
+  const staffMemberCount = queryOne(`SELECT COUNT(*) as c FROM staff_members`)?.c || 0;
+  if (staffMemberCount === 0) {
+    const sampleStaff = [
+      { id: 'stf_1', restaurant_id: 'rest_losteria', user_id: 'STF_MARCO', name: 'Marco Rossi', role: 'Head Chef', pin: '1234', password: 'chef123', phone: '+91 98765 11111' },
+      { id: 'stf_2', restaurant_id: 'rest_losteria', user_id: 'STF_SUNIL', name: 'Sunil Rao', role: 'Sous Chef', pin: '1234', password: 'staff123', phone: '+91 98765 22222' },
+      { id: 'stf_3', restaurant_id: 'rest_losteria', user_id: 'STF_KAVITA', name: 'Kavita Menon', role: 'Floor Captain', pin: '1234', password: 'staff123', phone: '+91 98765 33333' },
+      { id: 'stf_4', restaurant_id: 'rest_losteria', user_id: 'STF_AAKASH', name: 'Aakash Verma', role: 'Bartender', pin: '1234', password: 'staff123', phone: '+91 98765 44444' },
+      { id: 'stf_r1', restaurant_id: 'rest_roastery', user_id: 'STF_ANANYA', name: 'Ananya Sharma', role: 'Head Barista', pin: '1234', password: 'coffee123', phone: '+91 98450 12345' },
+    ];
+    for (const sm of sampleStaff) {
+      execute(
+        `INSERT INTO staff_members (id, restaurant_id, user_id, name, role, pin, password, phone, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE')`,
+        [sm.id, sm.restaurant_id, sm.user_id, sm.name, sm.role, sm.pin, sm.password, sm.phone]
       );
     }
   }
