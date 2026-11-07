@@ -8,7 +8,20 @@ const router = express.Router();
 router.get('/', (req, res) => {
   try {
     const { vegOnly, category, search, admin } = req.query;
-    const restId = req.query.restaurant_id || req.query.restaurant || 'rest_losteria';
+    let restId = (req.query.restaurant_id || req.query.restaurant || 'rest_losteria').toLowerCase().trim();
+
+    // Map legacy & colloquial aliases
+    if (restId === 'spicecraft' || restId === 'rest_spicecraft' || restId === 'losteria' || restId === 'l-osteria') {
+      restId = 'rest_losteria';
+    } else if (restId === 'roastery' || restId === 'roastery-cafe' || restId === 'cafe') {
+      restId = 'rest_roastery';
+    } else if (restId === 'clinic' || restId === 'apex' || restId === 'apex-clinic') {
+      restId = 'rest_apex_clinic';
+    } else if (restId === 'gym' || restId === 'ironpulse' || restId === 'ironpulse-gym') {
+      restId = 'rest_ironpulse_gym';
+    } else if (restId === 'salon' || restId === 'glamour' || restId === 'glamour-salon') {
+      restId = 'rest_glamour_salon';
+    }
 
     let itemQuery = `SELECT * FROM menu_items WHERE 1=1`;
     const params = [];

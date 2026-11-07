@@ -54,9 +54,22 @@ router.get('/', (req, res) => {
     `;
     const params = [];
 
-    if (restaurant_id) {
+    let restId = restaurant_id ? String(restaurant_id).toLowerCase().trim() : '';
+    if (restId === 'spicecraft' || restId === 'rest_spicecraft' || restId === 'losteria' || restId === 'l-osteria') {
+      restId = 'rest_losteria';
+    } else if (restId === 'roastery' || restId === 'roastery-cafe' || restId === 'cafe') {
+      restId = 'rest_roastery';
+    } else if (restId === 'clinic' || restId === 'apex' || restId === 'apex-clinic') {
+      restId = 'rest_apex_clinic';
+    } else if (restId === 'gym' || restId === 'ironpulse' || restId === 'ironpulse-gym') {
+      restId = 'rest_ironpulse_gym';
+    } else if (restId === 'salon' || restId === 'glamour' || restId === 'glamour-salon') {
+      restId = 'rest_glamour_salon';
+    }
+
+    if (restId) {
       sql += ` AND (t.restaurant_id = ? OR r.slug = ?)`;
-      params.push(restaurant_id, restaurant_id);
+      params.push(restId, restId);
     }
 
     sql += ` ORDER BY t.table_number ASC`;

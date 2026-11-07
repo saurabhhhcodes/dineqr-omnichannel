@@ -32,6 +32,7 @@ import {
   Clock,
   Sparkles,
   Download,
+  Boxes,
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -303,122 +304,81 @@ export function LandingHero() {
         </div>
       </div>
 
-      {/* REAL VIDEO WALKTHROUGH SUITE */}
+      {/* LIVE OPERATIONAL CAPABILITIES SHOWCASE */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 sm:mt-20">
-        <div className="text-center mb-6 sm:mb-8">
+        <div className="text-center mb-8">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-amber-400 text-xs font-semibold mb-2">
-            <Video className="w-3.5 h-3.5" />
-            <span>Real Screen Recordings</span>
+            <Zap className="w-3.5 h-3.5 text-amber-400" />
+            <span>Interactive Operational Suite</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-            See the Live Software in Action
+            Full-Stack Hospitality & Retail Operations
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-xl mx-auto">
-            Actual screen recordings of table QR ordering, kitchen display chimes, visual floor plans, and mobile margin calculators.
+            Explore live interactive software: customer digital QR ordering, kitchen display systems, visual floor plans, and real-time inventory tracking.
           </p>
         </div>
 
-        {/* Video Selector Tab Bar - Mobile Scrollable */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar scroll-smooth">
-          {VIDEO_SUITE.map((v) => {
-            const isSelected = selectedVideo.id === v.id;
-            return (
-              <button
-                key={v.id}
-                onClick={() => setSelectedVideo(v)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center gap-2 shrink-0 ${
-                  isSelected
-                    ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/10'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700'
-                }`}
-              >
-                <Play className="w-3 h-3 fill-current" />
-                <span>{v.title}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Active Video Player Showcase */}
-        <div className="bg-slate-900 rounded-2xl p-4 sm:p-7 border border-slate-800 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-          {/* Left: Video Player */}
-          <div className="lg:col-span-7 rounded-xl overflow-hidden border border-slate-800 bg-black aspect-video relative group">
-            <video
-              key={selectedVideo.videoUrl}
-              src={selectedVideo.videoUrl}
-              poster={selectedVideo.posterUrl}
-              controls
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              ref={(el) => {
-                if (el) {
-                  el.muted = true;
-                  el.defaultMuted = true;
-                  el.play().catch(() => {});
-                }
-              }}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-sm px-2.5 py-1 rounded-md text-[11px] font-bold text-amber-300 border border-slate-700/80 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span>{selectedVideo.badge}</span>
-            </div>
-          </div>
-
-          {/* Right: Feature Summary & Direct Links */}
-          <div className="lg:col-span-5 space-y-4">
+        {/* Live Operational Capability Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 transition group flex flex-col justify-between">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400">
-                {selectedVideo.badge}
-              </span>
-              <h3 className="text-lg sm:text-2xl font-bold text-white mt-1">
-                {selectedVideo.title}
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mb-4">
+                <QrCode className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition">
+                Customer QR Ordering & Pay
               </h3>
-              <p className="text-xs text-slate-400 mt-1 font-medium">
-                {selectedVideo.subtitle}
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                Table-aware digital menu with dietary filters, cooking notes, cart basket, and instant UPI / Razorpay checkout.
               </p>
             </div>
+            <Link
+              to="/menu?restaurant=losteria&table=tbl_1"
+              className="mt-5 inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300"
+            >
+              <span>Launch Live Customer Menu &rarr;</span>
+            </Link>
+          </div>
 
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              {selectedVideo.description}
-            </p>
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-1.5">
-              {selectedVideo.tags.map((tag, i) => (
-                <span
-                  key={i}
-                  className="px-2 py-1 rounded-md bg-slate-950 text-slate-300 border border-slate-800 text-[11px] font-medium flex items-center gap-1"
-                >
-                  <Check className="w-3 h-3 text-emerald-400" />
-                  <span>{tag}</span>
-                </span>
-              ))}
+          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 transition group flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center mb-4">
+                <ChefHat className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition">
+                Multi-Channel Kitchen KDS
+              </h3>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                Color-coded kitchen workflow (ORDERED &rarr; PREPARING &rarr; READY &rarr; COMPLETED) with audio alerts and elapsed timers.
+              </p>
             </div>
+            <Link
+              to="/admin/kitchen"
+              className="mt-5 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300"
+            >
+              <span>Open Live Kitchen KDS &rarr;</span>
+            </Link>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
-              {selectedVideo.targetRoute && (
-                <Link
-                  to={selectedVideo.targetRoute}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>{selectedVideo.targetLabel || 'Try Feature Live'}</span>
-                </Link>
-              )}
-
-              <Link
-                to="/onboard"
-                className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs flex items-center justify-center gap-1 border border-slate-700 transition"
-              >
-                <span>Onboard Restaurant (₹1,500/mo)</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 transition group flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center mb-4">
+                <Boxes className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-white group-hover:text-sky-400 transition">
+                Inventory & Purchases (RfQ)
+              </h3>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                Stock ledger tracking, low-stock threshold alerts, quick adjustment modal, and automated supplier Request for Quotations.
+              </p>
             </div>
+            <Link
+              to="/admin/inventory"
+              className="mt-5 inline-flex items-center gap-1.5 text-xs font-bold text-sky-400 hover:text-sky-300"
+            >
+              <span>Explore Stock Manager &rarr;</span>
+            </Link>
           </div>
         </div>
       </div>

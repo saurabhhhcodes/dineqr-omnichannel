@@ -20,28 +20,69 @@ import {
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import { getContextualFallbackImage } from '../components/ItemCard.jsx';
 
-// 14 Curated High-Definition Food Photography Presets
-const IMAGE_PRESETS = [
+// Curated High-Definition Photography Presets Per Business Vertical
+const RESTAURANT_PRESETS = [
   { label: 'Wood-Fired Pizza', url: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Smash Cheeseburger', url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Artisan Pasta', url: 'https://images.unsplash.com/photo-1621996346565-e3d5d6281691?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Truffle Fries / Tapas', url: 'https://images.unsplash.com/photo-1576107232684-1279f3908594?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Paneer Tikka / Kebab', url: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Specialty Coffee / Cold Brew', url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Mocktail / Shaken Cooler', url: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=800&q=80&auto=format&fit=crop' },
-  { label: 'French Croissant / Bakery', url: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Sourdough Avocado Toast', url: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Tiramisu / Dessert Cake', url: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Molten Chocolate Cake', url: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Crispy Wings / Fried Chicken', url: 'https://images.unsplash.com/photo-1527477378408-1eddb9eb2130?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Indian Butter Chicken Bowl', url: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=800&q=80&auto=format&fit=crop' },
-  { label: 'Dal Makhani / Lentils', url: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Smash Burger', url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Handmade Pasta', url: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Paneer Tikka', url: 'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Shaken Cooler', url: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Tiramisu Dessert', url: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Butter Chicken Bowl', url: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=800&q=80&auto=format&fit=crop' },
+];
+
+const GYM_PRESETS = [
+  { label: 'Dark Choco Whey', url: 'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Berry Smoothie Bowl', url: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Creatine Cooler', url: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Pre-Workout Pump', url: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Chicken Meal Box', url: 'https://images.unsplash.com/photo-1546069901-d0075e171b30?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Tofu Spinach Wrap', url: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Gym Monthly Pass', url: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80&auto=format&fit=crop' },
+  { label: 'DEXA Body Scan', url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80&auto=format&fit=crop' },
+];
+
+const CLINIC_PRESETS = [
+  { label: 'Doctor OPD Token', url: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Blood CBC Lab Test', url: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Diabetic Lipid Profile', url: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=800&q=80&auto=format&fit=crop' },
+  { label: '12-Lead ECG Test', url: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Annual Health Check', url: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&q=80&auto=format&fit=crop' },
+];
+
+const SALON_PRESETS = [
+  { label: 'Precision Haircut', url: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Beard Sculpting', url: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Hydra Facial', url: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Moroccan Hair Spa', url: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Foot Reflexology', url: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=800&q=80&auto=format&fit=crop' },
+];
+
+const CAFE_PRESETS = [
+  { label: 'Vanilla Affogato', url: 'https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Matcha Latte', url: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Pain au Chocolat', url: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Almond Croissant', url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Avocado Tartine', url: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&q=80&auto=format&fit=crop' },
+  { label: 'Baked Shakshuka', url: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&q=80&auto=format&fit=crop' },
 ];
 
 export function AdminMenu() {
   const { activeRestaurant } = useRestaurant();
   const { addToast } = useToast();
+
+  const currentPresets =
+    activeRestaurant?.business_type === 'gym'
+      ? GYM_PRESETS
+      : activeRestaurant?.business_type === 'clinic'
+      ? CLINIC_PRESETS
+      : activeRestaurant?.business_type === 'salon'
+      ? SALON_PRESETS
+      : activeRestaurant?.business_type === 'cafe'
+      ? CAFE_PRESETS
+      : RESTAURANT_PRESETS;
 
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -59,7 +100,7 @@ export function AdminMenu() {
     category_id: '',
     price: '',
     description: '',
-    image_url: IMAGE_PRESETS[0].url,
+    image_url: currentPresets[0]?.url || RESTAURANT_PRESETS[0].url,
     video_url: '/videos/item_6.mp4',
     is_veg: 1,
     spice_level: 'None',
@@ -387,10 +428,13 @@ export function AdminMenu() {
                     />
                   ) : (
                     <img
-                      src={item.image_url}
+                      src={item.image_url || getContextualFallbackImage(item)}
                       alt={item.name}
                       className="w-full h-full object-cover"
                       loading="lazy"
+                      onError={(e) => {
+                        e.target.src = getContextualFallbackImage(item);
+                      }}
                     />
                   )}
 
@@ -549,7 +593,13 @@ export function AdminMenu() {
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h3 className="text-xl font-black text-slate-900">
-                  {editingItem ? 'Edit Dish' : 'Add New Item to QR Menu'}
+                  {editingItem
+                    ? 'Edit Item / Service'
+                    : activeRestaurant?.business_type === 'gym'
+                    ? 'Add Shake, Pass or Service to Catalog'
+                    : activeRestaurant?.business_type === 'clinic'
+                    ? 'Add OPD Token or Diagnostic Test'
+                    : 'Add New Dish to QR Menu'}
                 </h3>
                 <p className="text-xs text-slate-500">
                   Instantly available for customer ordering upon saving
@@ -567,15 +617,25 @@ export function AdminMenu() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1">
-                    Dish Name *
+                    {activeRestaurant?.business_type === 'gym'
+                      ? 'Item / Service Name *'
+                      : activeRestaurant?.business_type === 'clinic'
+                      ? 'Consultation / Test Name *'
+                      : 'Dish Name *'}
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Truffle Burrata Pizza"
+                    placeholder={
+                      activeRestaurant?.business_type === 'gym'
+                        ? 'e.g. Triple Dark Chocolate Muscle Builder'
+                        : activeRestaurant?.business_type === 'clinic'
+                        ? 'e.g. Senior Consultant Physician OPD Consultation'
+                        : 'e.g. Truffle Burrata Pizza'
+                    }
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition"
                   />
                 </div>
 
@@ -587,7 +647,7 @@ export function AdminMenu() {
                     required
                     value={formData.category_id}
                     onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -610,20 +670,20 @@ export function AdminMenu() {
                     placeholder="e.g. 450"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition"
                   />
                 </div>
 
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1">
-                    Dietary Type
+                    Dietary / Type
                   </label>
                   <select
                     value={formData.is_veg}
                     onChange={(e) => setFormData({ ...formData, is_veg: parseInt(e.target.value, 10) })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition"
                   >
-                    <option value="1">Pure Veg</option>
+                    <option value="1">Pure Veg / Standard</option>
                     <option value="0">Non-Veg</option>
                   </select>
                 </div>
@@ -635,7 +695,7 @@ export function AdminMenu() {
                   <select
                     value={formData.spice_level}
                     onChange={(e) => setFormData({ ...formData, spice_level: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition"
                   >
                     <option value="None">None</option>
                     <option value="Mild">Mild</option>
@@ -654,18 +714,18 @@ export function AdminMenu() {
                   placeholder="Ingredients, preparation technique, serving notes..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition"
                 />
               </div>
 
               {/* Photo Preset Selector */}
               <div>
                 <label className="text-xs font-bold text-slate-700 block mb-1.5 flex items-center justify-between">
-                  <span>Dish Photography (Pick a preset or paste URL)</span>
+                  <span>Photography Presets (Pick a preset or paste URL)</span>
                 </label>
 
                 <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 max-h-36 overflow-y-auto p-2 bg-slate-50 rounded-2xl border border-slate-200">
-                  {IMAGE_PRESETS.map((preset, idx) => (
+                  {currentPresets.map((preset, idx) => (
                     <button
                       type="button"
                       key={idx}
@@ -677,7 +737,14 @@ export function AdminMenu() {
                       }`}
                       title={preset.label}
                     >
-                      <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
+                      <img
+                        src={preset.url}
+                        alt={preset.label}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.src = getContextualFallbackImage({ name: preset.label });
+                        }}
+                      />
                       <span className="absolute inset-x-0 bottom-0 bg-slate-900/80 text-[8px] text-white font-bold truncate px-1 py-0.5">
                         {preset.label}
                       </span>
@@ -690,7 +757,7 @@ export function AdminMenu() {
                   placeholder="Or paste custom image URL..."
                   value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  className="mt-2 w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                  className="mt-2 w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs font-mono focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition"
                 />
               </div>
 
@@ -707,7 +774,7 @@ export function AdminMenu() {
                   placeholder="e.g. /videos/item_6.mp4 or https://videos.pexels.com/...mp4"
                   value={formData.video_url || ''}
                   onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs font-mono focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition"
                 />
               </div>
 

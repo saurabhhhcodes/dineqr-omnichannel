@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { X, Plus, Minus, Clock, Flame, ShieldAlert, Sparkles, Video } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import { getContextualFallbackImage } from './ItemCard.jsx';
 
 export function ItemModal({ item, onClose }) {
   const { addToCart, items } = useCart();
@@ -44,11 +45,11 @@ export function ItemModal({ item, onClose }) {
             />
           ) : (
             <img
-              src={item.image_url}
+              src={item.image_url || getContextualFallbackImage(item)}
               alt={item.name}
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80&auto=format&fit=crop';
+                e.target.src = getContextualFallbackImage(item);
               }}
             />
           )}

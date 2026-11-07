@@ -35,7 +35,10 @@ export function CustomerMenu() {
   const [groupedItems, setGroupedItems] = useState([]);
   const [allItems, setAllItems] = useState([]);
   const [availableTables, setAvailableTables] = useState([]);
-  const [currentRestaurant, setCurrentRestaurant] = useState(null);
+
+  // Immediately and synchronously resolve tenant from query param or activeRestaurant
+  const initialRest = resolveRestaurant(restaurantParam || activeRestaurant?.id);
+  const [currentRestaurant, setCurrentRestaurant] = useState(initialRest);
 
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,24 +48,26 @@ export function CustomerMenu() {
   const [activeModalItem, setActiveModalItem] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Sync restaurant if provided in URL parameter
+  // Sync restaurant if provided in URL parameter or context changes
   useEffect(() => {
-    if (restaurantParam && restaurants.length > 0) {
-      const matched = restaurants.find(
-        (r) => r.id === restaurantParam || r.slug === restaurantParam
-      );
-      if (matched) {
-        setActiveRestaurant(matched);
-        setCurrentRestaurant(matched);
+    if (restaurantParam) {
+      const resolved = resolveRestaurant(restaurantParam);
+      setCurrentRestaurant(resolved);
+      if (activeRestaurant?.id !== resolved.id) {
+        setActiveRestaurant(resolved);
       }
     } else if (activeRestaurant) {
       setCurrentRestaurant(activeRestaurant);
+    } else {
+      const fallback = resolveRestaurant(null);
+      setCurrentRestaurant(fallback);
+      setActiveRestaurant(fallback);
     }
-  }, [restaurantParam, restaurants, activeRestaurant]);
+  }, [restaurantParam, activeRestaurant, setActiveRestaurant]);
 
   // 1. Resolve Table from URL query parameter (with offline-first resilience)
   useEffect(() => {
-    const restId = currentRestaurant?.id || activeRestaurant?.id || 'rest_losteria';
+    const restId = currentRestaurant?.id || (restaurantParam ? resolveRestaurant(restaurantParam)?.id : activeRestaurant?.id) || 'rest_losteria';
     fetch(`/api/tables?restaurant_id=${restId}`)
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -105,11 +110,11 @@ export function CustomerMenu() {
         else if (fbTables.length > 0) setTable(fbTables[0]);
         else setTable({ id: 'counter', table_number: 'Counter Pickup', section: 'Takeaway' });
       });
-  }, [tableParam, setTable, currentRestaurant, activeRestaurant]);
+  }, [tableParam, setTable, currentRestaurant, activeRestaurant, restaurantParam]);
 
   // 2. Fetch Menu (with zero-network offline-first menu fallback)
   useEffect(() => {
-    const restId = currentRestaurant?.id || activeRestaurant?.id || 'rest_losteria';
+    const restId = currentRestaurant?.id || (restaurantParam ? resolveRestaurant(restaurantParam)?.id : activeRestaurant?.id) || 'rest_losteria';
     setIsLoading(true);
     const params = new URLSearchParams();
     params.append('restaurant_id', restId);
@@ -175,12 +180,24 @@ export function CustomerMenu() {
                 {currentRestaurant?.business_type === 'clinic'
                   ? 'Healthcare OPD'
                   : currentRestaurant?.business_type === 'gym'
-                  ? 'Fitness Bar'
+                  ? 'Fitness Bar & Passes'
+                  : currentRestaurant?.business_type === 'salon'
+                  ? 'Salon & Spa Studio'
+                  : currentRestaurant?.business_type === 'cafe'
+                  ? 'Specialty Roastery & Bakes'
                   : 'Artisanal Kitchen'}
               </span>
               <span className="text-emerald-400 text-xs font-semibold flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Open for Dining</span>
+                <span>
+                  {currentRestaurant?.business_type === 'clinic'
+                    ? 'OPD Doctors Available'
+                    : currentRestaurant?.business_type === 'gym'
+                    ? 'Floor Open for Workout'
+                    : currentRestaurant?.business_type === 'salon'
+                    ? 'Stylists Available'
+                    : 'Open for Dining'}
+                </span>
               </span>
               <span className="text-slate-400 text-xs flex items-center gap-1 font-medium">
                 · <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> 4.9 (450+ reviews)
@@ -204,10 +221,18 @@ export function CustomerMenu() {
           {/* Table / Station Designation Badge */}
           <div className="w-full sm:w-auto bg-slate-950/80 rounded-xl p-3 border border-slate-800 flex items-center justify-between sm:justify-start gap-3">
             <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ordering For</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                {currentRestaurant?.station_type === 'room'
+                  ? 'Doctor Suite'
+                  : currentRestaurant?.station_type === 'bay'
+                  ? 'Fitness Bay'
+                  : currentRestaurant?.station_type === 'chair'
+                  ? 'Salon Chair'
+                  : 'Ordering For'}
+              </div>
               <div className="text-sm font-bold text-amber-400 flex items-center gap-1.5 mt-0.5">
                 <Utensils className="w-3.5 h-3.5" />
-                <span>{table ? table.table_number : 'Table 01'}</span>
+                <span>{table ? table.table_number : 'Station 01'}</span>
                 {table?.section && (
                   <span className="text-xs font-normal text-slate-400">({table.section})</span>
                 )}
@@ -248,7 +273,17 @@ export function CustomerMenu() {
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search wood-fired pizzas, pasta, appetizers..."
+                placeholder={
+                  currentRestaurant?.business_type === 'gym'
+                    ? 'Search whey isolate, protein smoothies, gym passes...'
+                    : currentRestaurant?.business_type === 'clinic'
+                    ? 'Search doctor consultations, blood tests, health checkups...'
+                    : currentRestaurant?.business_type === 'salon'
+                    ? 'Search haircuts, styling, hydra facials, spa...'
+                    : currentRestaurant?.business_type === 'cafe'
+                    ? 'Search pour-overs, sourdough tartines, croissants...'
+                    : 'Search wood-fired pizzas, pasta, appetizers...'
+                }
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-100/80 focus:bg-white border-2 border-slate-200 text-xs sm:text-sm font-bold text-slate-950 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition"

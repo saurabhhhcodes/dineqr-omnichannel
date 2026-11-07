@@ -324,16 +324,6 @@ export function Navbar({ onOpenCart }) {
             </Link>
 
             <Link
-              to="/gym-register"
-              className={`hover:text-emerald-400 transition flex items-center gap-1.5 ${
-                location.pathname === '/gym-register' ? 'text-emerald-400 font-bold' : ''
-              }`}
-            >
-              <Dumbbell className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Gym Register</span>
-            </Link>
-
-            <Link
               to="/pricing"
               className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
                 location.pathname === '/pricing' ? 'text-amber-400 font-bold' : ''
@@ -435,17 +425,6 @@ export function Navbar({ onOpenCart }) {
                 <div className="flex items-center gap-2.5">
                   <QrCode className="w-4 h-4 text-amber-400" />
                   <span>Try Customer Table QR Menu</span>
-                </div>
-                <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
-              </Link>
-
-              <Link
-                to="/gym-register"
-                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-emerald-400 transition"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Dumbbell className="w-4 h-4 text-emerald-400" />
-                  <span>Gym Member Digital Register</span>
                 </div>
                 <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
               </Link>
@@ -585,7 +564,7 @@ export function Navbar({ onOpenCart }) {
   // 3. ADMIN BACK-OFFICE HEADER (Clean, Cohesive Enterprise Bar)
   // ============================================================
   return (
-    <header className="sticky top-0 z-40 bg-slate-950 text-white border-b border-slate-800 shadow-md w-full max-w-full">
+    <header className="sticky top-0 z-40 bg-slate-950 text-white border-b border-slate-800 shadow-md w-full max-w-full overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         {/* Restaurant Identity & Active Station */}
         <div className="flex items-center gap-2.5 shrink-0">
@@ -593,14 +572,14 @@ export function Navbar({ onOpenCart }) {
             <DineQRLogo size="md" />
             <div>
               <div className="font-bold text-white text-sm tracking-tight leading-none flex items-center gap-1.5">
-                <span className="truncate max-w-[140px] sm:max-w-[200px]">
+                <span className="truncate max-w-[140px] sm:max-w-[180px]">
                   {activeRestaurant?.name || "L'Osteria Bistro"}
                 </span>
                 <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hidden sm:inline-block">
                   Terminal
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 mt-0.5 hidden sm:block truncate max-w-[200px]">
+              <p className="text-[10px] text-slate-400 mt-0.5 hidden sm:block truncate max-w-[180px]">
                 {activeRestaurant?.tagline || 'Restaurant Operations Suite'}
               </p>
             </div>
@@ -608,7 +587,7 @@ export function Navbar({ onOpenCart }) {
         </div>
 
         {/* Desktop Admin Operations Navigation */}
-        <nav className="hidden lg:flex items-center gap-1 text-xs font-medium text-slate-300">
+        <nav className="hidden lg:flex items-center gap-0.5 text-xs font-medium text-slate-300 shrink">
           {activeRestaurant?.business_type === 'gym' ? (
             <>
               <Link

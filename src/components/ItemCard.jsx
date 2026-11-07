@@ -4,6 +4,23 @@ import { Plus, Minus, Flame, Clock, Sparkles, Video, Image as ImageIcon, Chevron
 import { useCart } from '../context/CartContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
+export function getContextualFallbackImage(item = {}) {
+  const text = `${item.name || ''} ${item.description || ''} ${item.category_id || ''} ${item.restaurant_id || ''}`.toLowerCase();
+  if (text.includes('clinic') || text.includes('doctor') || text.includes('consult') || text.includes('cbc') || text.includes('ecg') || text.includes('opd') || text.includes('health') || text.includes('physio') || text.includes('blood')) {
+    return 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80&auto=format&fit=crop';
+  }
+  if (text.includes('gym') || text.includes('fitness') || text.includes('protein') || text.includes('whey') || text.includes('creatine') || text.includes('pre-workout') || text.includes('pump') || text.includes('ironpulse')) {
+    return 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80&auto=format&fit=crop';
+  }
+  if (text.includes('salon') || text.includes('hair') || text.includes('facial') || text.includes('beard') || text.includes('spa') || text.includes('massage') || text.includes('glamour') || text.includes('reflexology')) {
+    return 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80&auto=format&fit=crop';
+  }
+  if (text.includes('coffee') || text.includes('roastery') || text.includes('latte') || text.includes('croissant') || text.includes('matcha') || text.includes('affogato') || text.includes('bakery')) {
+    return 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80&auto=format&fit=crop';
+  }
+  return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80&auto=format&fit=crop';
+}
+
 export function ItemCard({ item, onSelect }) {
   const { items, addToCart, updateQuantity } = useCart();
   const { addToast } = useToast();
@@ -12,10 +29,12 @@ export function ItemCard({ item, onSelect }) {
   const cartItem = items.find((i) => i.id === item.id);
   const quantity = cartItem ? cartItem.quantity : 0;
 
+  const fallbackImage = getContextualFallbackImage(item);
+
   // Split multiple images if provided as comma-separated
   const imageList = item.image_url
     ? item.image_url.split(',').map((u) => u.trim()).filter(Boolean)
-    : ['https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80&auto=format&fit=crop'];
+    : [fallbackImage];
 
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [videoError, setVideoError] = useState(false);
@@ -85,7 +104,7 @@ export function ItemCard({ item, onSelect }) {
             loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             onError={(e) => {
-              e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80&auto=format&fit=crop';
+              e.target.src = fallbackImage;
             }}
           />
         )}

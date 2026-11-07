@@ -437,6 +437,24 @@ export function resolveRestaurant(restIdOrSlug) {
   if (!restIdOrSlug) return FALLBACK_RESTAURANTS[0];
   const all = getAllAvailableRestaurants();
   const normalized = String(restIdOrSlug).toLowerCase().trim();
+
+  // Legacy & popular aliases
+  if (normalized === 'spicecraft' || normalized === 'rest_spicecraft' || normalized === 'losteria' || normalized === 'l-osteria') {
+    return all.find((r) => r.id === 'rest_losteria') || FALLBACK_RESTAURANTS[0];
+  }
+  if (normalized === 'roastery' || normalized === 'roastery-cafe' || normalized === 'cafe') {
+    return all.find((r) => r.id === 'rest_roastery') || FALLBACK_RESTAURANTS[1];
+  }
+  if (normalized === 'apex' || normalized === 'apex-clinic' || normalized === 'clinic') {
+    return all.find((r) => r.id === 'rest_apex_clinic') || FALLBACK_RESTAURANTS[2];
+  }
+  if (normalized === 'ironpulse' || normalized === 'ironpulse-gym' || normalized === 'gym') {
+    return all.find((r) => r.id === 'rest_ironpulse_gym') || FALLBACK_RESTAURANTS[3];
+  }
+  if (normalized === 'glamour' || normalized === 'glamour-salon' || normalized === 'salon') {
+    return all.find((r) => r.id === 'rest_glamour_salon') || FALLBACK_RESTAURANTS[4] || FALLBACK_RESTAURANTS[0];
+  }
+
   return (
     all.find(
       (r) =>
