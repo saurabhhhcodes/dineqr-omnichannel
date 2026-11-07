@@ -159,43 +159,23 @@ export function SubscriptionPricing() {
 
   const plans = [
     {
-      id: 'starter_1000',
-      title: 'Essential Restaurant Suite',
-      price: '1,000',
-      period: '/ month',
-      badge: 'Most Popular',
-      badgeColor: 'bg-amber-100 text-amber-800 border-amber-200',
-      highlight: false,
-      tagline: 'Ideal for cafes, bistros, dining halls & quick-service restaurants',
-      features: [
-        'Unlimited Table & Counter QR Code Menus',
-        'Interactive Drag & Drop Floor Plan (Odoo Parity)',
-        'Real-Time Kitchen Display System (KDS) & Audio Chimes',
-        'Local SQLite On-Premise Engine (Zero Cloud DB Bills)',
-        'Hardware ESC/POS Thermal Billing Printing (80mm & 58mm)',
-        'Staff Roster Shift Planning & Live Clock-In Ledger',
-        'Direct UPI & Razorpay Settlement to Your Bank',
-        'Permanent Data Ownership (Export DB Anytime)',
-      ],
-    },
-    {
       id: 'pro_1500',
-      title: 'Local DB On-Premise Plan',
+      title: 'Local DB On-Premise Suite',
       price: '1,500',
       period: '/ month',
       badge: 'Most Popular · Zero Cloud DB Cost',
       badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
       highlight: true,
-      tagline: 'Ideal for independent restaurants, cafes, dhabas & QSRs',
+      tagline: 'Ideal for independent restaurants, cafes, gyms, clinics & retail stores',
       features: [
-        'Local SQLite Engine (Zero Cloud Database Server Bills)',
-        'Local Owner Dashboard Access on Restaurant Wi-Fi / LAN',
-        'Automatic 80mm Thermal Receipt Storage in DineQR-Data/bills/',
-        'Captain Waiter Ordering App & Kitchen Display (KDS)',
-        'Table Scan QR Menus with 0% Platform Commission',
-        'Staff Timeclock: Logs Exact Arrival & Departure (Up to 12 Staff)',
-        'Full Offline Operation: Bill Print Works Even Without Internet',
-        'Zomato & Swiggy Webhook Ingestion & 80+ Real-Time Reports',
+        'Local SQLite Engine (Zero Cloud Database Server Bills Forever)',
+        'Unlimited Table, Room & Counter QR Codes with 0% Platform Commission',
+        'Live Kitchen KDS Chimes & Token TV Order Announcer',
+        'Staff Timeclock: Logs Exact Arrival & Departure with PIN Security',
+        'Hardware ESC/POS Thermal Bill Printing (80mm & 58mm)',
+        'Full Offline Operation: Bill Print & Ordering Works Even Without Internet',
+        'Direct UPI & Razorpay Settlement to Your Bank (Zero Holdback)',
+        'Digital Member Register for Gyms & Patient Queues for Clinics',
       ],
     },
     {
@@ -206,14 +186,14 @@ export function SubscriptionPricing() {
       badge: '24/7 Global Remote Access',
       badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
       highlight: false,
-      tagline: 'For busy multi-branch outlets, food halls & remote owners',
+      tagline: 'For busy multi-branch outlets, fitness franchises & remote business owners',
       features: [
-        '24/7 Global Remote Access from Phone (Even if Restaurant PC is OFF)',
+        '24/7 Global Remote Access from Phone (Even if Business PC is OFF)',
         'Real-Time MongoDB Atlas Cloud Replication (Multi-Tenant Partitioned)',
         'Up to 30 Staff User Accounts with Timeclock Pin Verification',
         'Multi-Station Kitchen KDS & Food Court Token TV Display',
         'Multi-Branch Consolidated Reporting & Central Menu Distribution',
-        'Automatic Local Backup Sync to DineQR-Data/ + Cloud Cloud Storage',
+        'Automatic Local Backup Sync to DineQR-Data/ + Cloud Storage',
         'Pay-on-Counter Cash, Card & Razorpay Direct Settlement',
         'Dedicated 1-on-1 VIP WhatsApp & Phone Implementation Specialist',
       ],
@@ -276,8 +256,8 @@ export function SubscriptionPricing() {
         </div>
       )}
 
-      {/* Pricing Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Pricing Cards Grid (2 Clear Tiers: ₹1,500 vs ₹5,000) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
         {plans.map((plan) => {
           const isCurrent =
             subscription?.plan?.amount ===

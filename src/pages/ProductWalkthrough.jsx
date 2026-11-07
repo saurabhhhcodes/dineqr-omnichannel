@@ -56,6 +56,9 @@ export function ProductWalkthrough() {
 
   // Flow specific live interactive states
   const [customerCartCount, setCustomerCartCount] = useState(0);
+  const [customerBasketOpen, setCustomerBasketOpen] = useState(false);
+  const [customerDetailsEntered, setCustomerDetailsEntered] = useState(false);
+  const [customerRazorpayActive, setCustomerRazorpayActive] = useState(false);
   const [customerOrderPlaced, setCustomerOrderPlaced] = useState(false);
   const [captainSelectedTable, setCaptainSelectedTable] = useState('Table 03');
   const [captainKotPunched, setCaptainKotPunched] = useState(false);
@@ -69,6 +72,9 @@ export function ProductWalkthrough() {
   const [ownerStaffClockedIn, setOwnerStaffClockedIn] = useState(false);
   const [onboardingPlanSelected, setOnboardingPlanSelected] = useState('pro_1500');
   const [cloudSynced, setCloudSynced] = useState(false);
+  const [adminActiveNiche, setAdminActiveNiche] = useState('gym');
+  const [adminMemberPunched, setAdminMemberPunched] = useState(false);
+  const [adminFeeCollected, setAdminFeeCollected] = useState(false);
 
   // 8 Platform User Flows Definitions
   const USER_FLOWS = [
@@ -76,41 +82,62 @@ export function ProductWalkthrough() {
       id: 'customer',
       flowNumber: '01',
       role: 'डाइनर / ग्राहक (Customer Flow)',
-      title: 'Table QR Digital Menu & Cashless Order',
+      title: 'Table QR Digital Menu, Order Basket & Razorpay',
       badge: 'Guest Self-Ordering',
       icon: UtensilsCrossed,
       videoUrl: '/videos/walkthrough_restaurant.mp4',
       hindiNarration:
-        'अध्याय 1: ग्राहक फ्लो। ग्राहक टेबल पर बैठे-बैठे मोबाइल से क्यूआर स्कैन करते हैं। उनके सामने फोटो व वीडियो वाला मेनू खुलता है। अब देखिए, हम "Add to Cart" बटन दबा रहे हैं। कार्ट में आइटम जुड़ गया, टैक्स कैलकुलेट हुआ और अब हम "ऑर्डर प्लेस" दबाते हैं। तुरंत ऑर्डर किचन में चला गया और डिजिटल बिल स्क्रीन पर आ गया।',
+        'अध्याय 1: ग्राहक फ्लो। ग्राहक टेबल का क्यूआर स्कैन करते हैं। मेनू से आइटम जोड़ते ही ऑर्डर बास्केट खुलती है। देखिए, ग्राहक अपना नाम "विक्रम मल्होत्रा" और फोन नंबर डालते हैं। रेज़रपे ऑनलाइन यूपीआई चुनकर "Pay & Confirm" दबाते हैं। तुरंत पेमेंट कन्फर्म हो गई, टोकन नंबर 128 मिल गया और टिकट किचन में पहुंच गया। पूरा प्रोसेस बिना वेटर के सिर्फ 15 सेकंड में पूरा हो गया।',
       englishNarration:
-        'Chapter 1: Customer Flow. The guest scans the table QR code. The digital menu opens with food images and videos. Watch as we tap "+ Add to Cart". The cart calculates taxes, and tapping "Submit Order" immediately dispatches the KOT to the kitchen and generates an official GST bill.',
-      stepsCount: 3,
+        'Chapter 1: Diner Flow. Guests scan table QR code. Watch as dishes are added to cart and the slide-over order basket opens. The guest enters their name, phone number, and cooking preferences. After selecting Razorpay instant UPI payment, the order is confirmed with Token #128 and instantly dispatched to the kitchen KDS.',
+      stepsCount: 5,
       executeSimulation: async () => {
         // Step 1: Move cursor to add item button
         setCursorPos({ x: 75, y: 38, visible: true, clicking: true });
         await new Promise((r) => setTimeout(r, 600));
-        setCustomerCartCount((c) => c + 1);
+        setCustomerCartCount(2);
         playChime(660);
-        setActionLog((l) => ['[Customer] Tapped "+ Add to Cart" (Artisan Fries with Truffle Mayo - ₹260)', ...l]);
+        setActionLog((l) => ['[Customer] Added 2 Items: Truffle Fries (₹260) & Wood-Fired Pizza (₹450)', ...l]);
         setInteractiveStep(1);
 
-        // Step 2: Move cursor to Place Order button
-        await new Promise((r) => setTimeout(r, 900));
+        // Step 2: Open Order Basket Drawer
+        await new Promise((r) => setTimeout(r, 800));
         setCursorPos({ x: 50, y: 88, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 500));
+        setCustomerBasketOpen(true);
+        playChime(720);
+        setActionLog((l) => ['[Customer] Opened Order Basket Drawer (Subtotal ₹710 + GST)', ...l]);
         setInteractiveStep(2);
-        setActionLog((l) => ['[Customer] Submitting Order with CGST 2.5% + SGST 2.5%...', ...l]);
 
-        // Step 3: Complete Order Placement
-        await new Promise((r) => setTimeout(r, 1200));
-        setCustomerOrderPlaced(true);
-        playChime(880);
-        setCursorPos({ x: 50, y: 88, visible: false, clicking: false });
+        // Step 3: Enter Customer Details & Cooking Note
+        await new Promise((r) => setTimeout(r, 900));
+        setCursorPos({ x: 40, y: 55, visible: true, clicking: false });
+        setCustomerDetailsEntered(true);
+        setActionLog((l) => ['[Customer] Entered Dining Details: "Vikram Malhotra · +91 98765 43210 · Less Spicy"', ...l]);
         setInteractiveStep(3);
-        setActionLog((l) => ['[Customer] Order #ORD-9128 Confirmed! Token #128 assigned. Sent to Kitchen.', ...l]);
+
+        // Step 4: Trigger Razorpay Checkout
+        await new Promise((r) => setTimeout(r, 900));
+        setCursorPos({ x: 50, y: 85, visible: true, clicking: true });
+        setCustomerRazorpayActive(true);
+        playChime(880);
+        setActionLog((l) => ['[Razorpay] Opened Instant UPI Payment Gateway (₹746 Total)', ...l]);
+        setInteractiveStep(4);
+
+        // Step 5: Complete Order Placement
+        await new Promise((r) => setTimeout(r, 1200));
+        setCustomerRazorpayActive(false);
+        setCustomerBasketOpen(false);
+        setCustomerOrderPlaced(true);
+        playChime(1050);
+        setCursorPos({ x: 50, y: 85, visible: false, clicking: false });
+        setInteractiveStep(5);
+        setActionLog((l) => ['[Customer] Payment Verified! Order #ORD-9128 Confirmed. Token #128 sent to Kitchen.', ...l]);
       },
       resetSimulation: () => {
         setCustomerCartCount(0);
+        setCustomerBasketOpen(false);
+        setCustomerDetailsEntered(false);
+        setCustomerRazorpayActive(false);
         setCustomerOrderPlaced(false);
         setInteractiveStep(0);
       },
@@ -207,7 +234,7 @@ export function ProductWalkthrough() {
       title: 'Food Court Large TV & Audio Buzzer Chime',
       badge: 'TV Announcer',
       icon: Tv,
-      videoUrl: '/videos/walkthrough_trades.mp4',
+      videoUrl: '/videos/walkthrough_kds.mp4',
       hindiNarration:
         'अध्याय 4: टोकन टीवी डिस्प्ले फ्लो। बड़े टीवी स्क्रीन पर बाईं तरफ "Now Preparing" है और दाईं तरफ "Ready for Pickup"। शेफ के रेडी करते ही टोकन 9724 हरे बॉक्स में आ गया और तेज आवाज में अनाउंसमेंट हुआ: "टोकन नंबर 9724, आपका ऑर्डर काउंटर पर तैयार है।"',
       englishNarration:
@@ -383,47 +410,53 @@ export function ProductWalkthrough() {
       },
     },
     {
-      id: 'cloud_superadmin',
+      id: 'admin_business_control',
       flowNumber: '08',
-      role: 'सुपर एडमिन व क्लाउड सिंक (MongoDB Atlas Cloud)',
-      title: 'Free M0 Cluster Multi-Tenant Sync & 24/7 Phone Access',
-      badge: 'Cloud Sync Engine',
-      icon: Database,
-      videoUrl: '/videos/walkthrough_sqlite.mp4',
+      role: 'मालिक व एडमिन कंट्रोल (Admin Multi-Vertical Suite)',
+      title: 'Universal Switcher for Restaurants, Cafes, Gyms & Clinics',
+      badge: 'Admin Back-Office',
+      icon: Store,
+      videoUrl: '/videos/walkthrough_pnl.mp4',
       hindiNarration:
-        'अध्याय 8: सुपर एडमिन व मोंगोडीबी एटलस क्लाउड फ्लो। ₹5,000 का क्लाउड प्लान लेने वाले रेस्टोरेंट्स का डेटा मोंगोडीबी एटलस के फ्री क्लस्टर में सिंक होता है। देखिए, हमने "Sync to Cloud" दबाया। सभी 43 टेबल्स और मेनू का बैकअप मोंगोडीबी में सुरक्षित हो गया और मालिक अब 24 घंटे अपने मोबाइल पर लाइव बिलिंग देख सकते हैं।',
+        'अध्याय 8: बिजनेस एडमिन फ्लो। मालिक एक ही सिस्टम से रेस्टोरेंट, कैफे, जिम का डिजिटल रजिस्टर, या क्लिनिक टोकन सीधे मैनेज कर सकते हैं। देखिए, हमने "Switch to Gym Mode" दबाया और तुरंत जिम के मेंबर्स की हाजिरी और ₹1500 की फीस रिन्यूअल स्क्रीन सामने आ गई। सब कुछ रियल-टाइम में कंट्रोल होता है।',
       englishNarration:
-        'Chapter 8: Super Admin and MongoDB Atlas Cloud Flow. For owners on the ₹5,000 Cloud Plan, data replicates to MongoDB Atlas free M0 cluster. Watch as we tap "Sync to Cloud". Tables, menu, and orders back up instantly, giving owners 24/7 mobile access.',
-      stepsCount: 3,
+        'Chapter 8: Business Admin Flow. Owners can switch effortlessly between restaurant, cafe, gym digital attendance register, and clinic queues. Watch as we switch to Gym Mode, punch member attendance, and collect ₹1,500 renewal fees via Razorpay.',
+      stepsCount: 4,
       executeSimulation: async () => {
-        // Step 1: Trigger Cloud Sync
-        setCursorPos({ x: 50, y: 75, visible: true, clicking: true });
+        // Step 1: Click Switch Business
+        setCursorPos({ x: 75, y: 20, visible: true, clicking: true });
         await new Promise((r) => setTimeout(r, 600));
         setInteractiveStep(1);
-        setActionLog((l) => ['[MongoDB Cloud] Initiating multi-tenant snapshot sync (/api/cloud/sync)...', ...l]);
+        setActionLog((l) => ['[Admin] Tapped Universal Business Switcher...', ...l]);
 
-        // Step 2: Wait for sync
-        await new Promise((r) => setTimeout(r, 1200));
+        // Step 2: Switch to Gym Mode
+        await new Promise((r) => setTimeout(r, 700));
+        setAdminActiveNiche('gym');
+        playChime(750);
         setInteractiveStep(2);
-        const res = await fetch('/api/cloud/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ restaurant_id: activeRestaurant?.id || 'rest_losteria' }),
-        }).catch(() => ({ json: () => ({ success: true, mode: 'CLOUD_STANDBY_LOCAL_BUFFER' }) }));
-        const data = await res.json().catch(() => ({ success: true, mode: 'CLOUD_STANDBY_LOCAL_BUFFER' }));
+        setActionLog((l) => ['[Admin] Activated IronPulse Fitness & Gym Mode! Paperless Member Register loaded.', ...l]);
 
-        // Step 3: Completed
-        setCloudSynced(true);
-        playChime(1170);
-        setCursorPos({ x: 50, y: 75, visible: false, clicking: false });
+        // Step 3: Punch Daily Member Attendance
+        await new Promise((r) => setTimeout(r, 900));
+        setCursorPos({ x: 80, y: 55, visible: true, clicking: true });
+        setAdminMemberPunched(true);
+        playChime(950);
         setInteractiveStep(3);
-        setActionLog((l) => [
-          `[MongoDB Cloud] Sync Completed (${data.mode || 'MONGODB_ATLAS'})! 24/7 Mobile Remote Access Active.`,
-          ...l,
-        ]);
+        setActionLog((l) => ['[Gym Register] 1-Tap Punch In Recorded: Rahul Sharma (08:15 AM). Expiry: 15 Dec.', ...l]);
+
+        // Step 4: Settle ₹1,500 Monthly Fee
+        await new Promise((r) => setTimeout(r, 1100));
+        setCursorPos({ x: 80, y: 75, visible: true, clicking: true });
+        setAdminFeeCollected(true);
+        playChime(1170);
+        setCursorPos({ x: 80, y: 75, visible: false, clicking: false });
+        setInteractiveStep(4);
+        setActionLog((l) => ['[Gym Register] Collected ₹1,500 Monthly Membership via Razorpay UPI! Digital bill generated.', ...l]);
       },
       resetSimulation: () => {
-        setCloudSynced(false);
+        setAdminActiveNiche('restaurant');
+        setAdminMemberPunched(false);
+        setAdminFeeCollected(false);
         setInteractiveStep(0);
       },
     },
@@ -714,66 +747,213 @@ export function ProductWalkthrough() {
               ) : (
                 /* Mode B: Live Real-Time Interactive Device Screen */
                 <div className="w-full max-w-xl mx-auto rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-2xl space-y-4">
-                  {/* Flow 1: Customer Self-Ordering Screen */}
+                  {/* Flow 1: Customer Self-Ordering Screen with Complete Basket & Razorpay Flow */}
                   {currentFlow.id === 'customer' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                        <div>
-                          <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
-                            Table 01 · Digital Menu
-                          </span>
-                          <h3 className="text-base font-extrabold text-white">L'Osteria Gourmet Bistro</h3>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <ShoppingBag className="w-5 h-5 text-amber-400" />
-                          <span className="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 text-xs font-black">
-                            {customerCartCount} Items
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                            <h4 className="text-sm font-bold text-white">Artisan Truffle Fries</h4>
-                          </div>
-                          <p className="text-xs text-slate-400 mt-0.5">Golden fries, herb dips · ₹260</p>
-                        </div>
-                        <button
-                          onClick={() => {
-                            setCustomerCartCount((c) => c + 1);
-                            playChime(660);
-                          }}
-                          className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md flex items-center gap-1 transition active:scale-95"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Add to Cart</span>
-                        </button>
-                      </div>
-
+                    <div className="space-y-3">
                       {customerOrderPlaced ? (
-                        <div className="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-center space-y-1 animate-in zoom-in-95">
-                          <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" />
-                          <h4 className="text-sm font-extrabold">Order #ORD-9128 Confirmed!</h4>
-                          <p className="text-xs text-emerald-200">Table Token #128 · Fired directly to Kitchen KDS</p>
+                        <div className="p-5 rounded-2xl bg-emerald-950/60 border-2 border-emerald-500/50 text-emerald-200 text-center space-y-3 animate-in zoom-in-95 shadow-xl">
+                          <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
+                          <div>
+                            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500 text-slate-950">
+                              Order Live on Kitchen KDS
+                            </span>
+                            <h4 className="text-lg font-black text-white mt-1">Order #ORD-9128 Confirmed!</h4>
+                            <div className="text-2xl font-mono font-black text-amber-400 my-1">
+                              TOKEN #128
+                            </div>
+                            <p className="text-xs text-slate-300">
+                              Billed to <strong className="text-white">Vikram Malhotra</strong> (+91 98765 43210) · Table 01
+                            </p>
+                          </div>
+                          <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-left font-mono space-y-1">
+                            <div className="flex justify-between text-slate-400">
+                              <span>Payment Method:</span>
+                              <span className="text-emerald-400 font-bold">Razorpay UPI (Verified)</span>
+                            </div>
+                            <div className="flex justify-between text-slate-400">
+                              <span>Total Paid:</span>
+                              <span className="text-white font-bold">₹746.00</span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : customerRazorpayActive ? (
+                        <div className="p-5 rounded-2xl bg-slate-950 border-2 border-sky-500/60 text-white space-y-4 animate-in zoom-in-95 shadow-2xl">
+                          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                            <div className="flex items-center gap-2">
+                              <CreditCard className="w-5 h-5 text-sky-400" />
+                              <span className="text-xs font-black tracking-wide">Razorpay Instant Checkout</span>
+                            </div>
+                            <span className="text-xs font-mono font-black text-sky-400">₹746</span>
+                          </div>
+                          <div className="p-3 rounded-xl bg-sky-950/30 border border-sky-800/40 text-xs space-y-1.5">
+                            <div className="flex justify-between text-slate-300">
+                              <span>Selected App:</span>
+                              <span className="font-bold text-white">Google Pay / PhonePe UPI</span>
+                            </div>
+                            <div className="flex justify-between text-slate-300">
+                              <span>Payer:</span>
+                              <span className="font-bold text-white">Vikram Malhotra (98765 43210)</span>
+                            </div>
+                          </div>
+                          <div className="p-3 rounded-xl bg-slate-900 text-center font-bold text-xs text-amber-400 animate-pulse">
+                            Simulating UPI PIN Authorization...
+                          </div>
+                        </div>
+                      ) : customerBasketOpen ? (
+                        <div className="p-4 rounded-2xl bg-white text-slate-950 space-y-3.5 shadow-2xl animate-in slide-in-from-right-4 border-2 border-slate-200">
+                          {/* Basket Header */}
+                          <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                            <div className="flex items-center gap-2">
+                              <ShoppingBag className="w-5 h-5 text-amber-600" />
+                              <h4 className="font-black text-sm text-slate-950">Your Order Basket</h4>
+                            </div>
+                            <span className="text-xs font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full">
+                              Table 01 · 2 Items
+                            </span>
+                          </div>
+
+                          {/* Basket Items List */}
+                          <div className="space-y-1.5 text-xs">
+                            <div className="flex justify-between font-bold text-slate-900 py-1 border-b border-slate-100">
+                              <span>1x Artisan Truffle Fries</span>
+                              <span>₹260</span>
+                            </div>
+                            <div className="flex justify-between font-bold text-slate-900 py-1 border-b border-slate-100">
+                              <span>1x Classic Margherita Pizza</span>
+                              <span>₹450</span>
+                            </div>
+                          </div>
+
+                          {/* High-Contrast Dining Details Form */}
+                          <div className="p-3 rounded-xl bg-slate-100 border-2 border-slate-300 space-y-2">
+                            <div className="text-[11px] font-black text-slate-950 uppercase tracking-wide">
+                              Dining Details & Bill Info
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div>
+                                <label className="block text-[10px] font-black text-slate-900 uppercase">Your Name</label>
+                                <input
+                                  type="text"
+                                  readOnly
+                                  value={customerDetailsEntered ? 'Vikram Malhotra' : ''}
+                                  placeholder="e.g. Vikram Malhotra"
+                                  className="w-full px-2 py-1.5 rounded-lg bg-white border-2 border-slate-300 text-xs font-bold text-slate-950 placeholder:text-slate-500 shadow-xs"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-black text-slate-900 uppercase">Phone Number</label>
+                                <input
+                                  type="tel"
+                                  readOnly
+                                  value={customerDetailsEntered ? '+91 98765 43210' : ''}
+                                  placeholder="+91 98765 43210"
+                                  className="w-full px-2 py-1.5 rounded-lg bg-white border-2 border-slate-300 text-xs font-bold text-slate-950 placeholder:text-slate-500 shadow-xs"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-black text-slate-900 uppercase">Special Note</label>
+                              <input
+                                type="text"
+                                readOnly
+                                value={customerDetailsEntered ? 'Less spicy, extra napkins' : ''}
+                                placeholder="Less spicy..."
+                                className="w-full px-2 py-1.5 rounded-lg bg-white border-2 border-slate-300 text-xs font-bold text-slate-950 placeholder:text-slate-500 shadow-xs"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Bill & Pay CTA */}
+                          <div className="pt-1 flex items-center justify-between text-xs font-bold">
+                            <div>
+                              <span className="text-slate-500 text-[10px] block">Grand Total (Incl. GST)</span>
+                              <span className="text-base font-black text-slate-950">₹746</span>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setCustomerRazorpayActive(true);
+                                playChime(880);
+                              }}
+                              className="px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-black text-xs shadow-lg transition active:scale-95 cursor-pointer"
+                            >
+                              Pay & Confirm Order
+                            </button>
+                          </div>
                         </div>
                       ) : (
-                        <button
-                          onClick={() => {
-                            setCustomerOrderPlaced(true);
-                            playChime(880);
-                          }}
-                          disabled={customerCartCount === 0}
-                          className={`w-full py-3 rounded-xl font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition ${
-                            customerCartCount > 0
-                              ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 hover:from-amber-400 hover:to-orange-400'
-                              : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                          }`}
-                        >
-                          <CreditCard className="w-4 h-4" />
-                          <span>Submit Order (Razorpay UPI / Counter Pay)</span>
-                        </button>
+                        /* Menu Browse Screen */
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <div>
+                              <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
+                                Table 01 · Digital Menu
+                              </span>
+                              <h3 className="text-base font-extrabold text-white">L'Osteria Gourmet Bistro</h3>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <ShoppingBag className="w-5 h-5 text-amber-400" />
+                              <span className="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 text-xs font-black">
+                                {customerCartCount} Items
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                                <h4 className="text-sm font-bold text-white">Artisan Truffle Fries</h4>
+                              </div>
+                              <p className="text-xs text-slate-400 mt-0.5">Golden fries, herb dips · ₹260</p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setCustomerCartCount((c) => c + 1);
+                                playChime(660);
+                              }}
+                              className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md flex items-center gap-1 transition active:scale-95 cursor-pointer"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              <span>Add to Cart</span>
+                            </button>
+                          </div>
+
+                          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                                <h4 className="text-sm font-bold text-white">Classic Margherita Pizza</h4>
+                              </div>
+                              <p className="text-xs text-slate-400 mt-0.5">San Marzano sauce, buffalo mozzarella · ₹450</p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setCustomerCartCount((c) => c + 1);
+                                playChime(660);
+                              }}
+                              className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md flex items-center gap-1 transition active:scale-95 cursor-pointer"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              <span>Add to Cart</span>
+                            </button>
+                          </div>
+
+                          {customerCartCount > 0 && (
+                            <button
+                              onClick={() => {
+                                setCustomerBasketOpen(true);
+                                playChime(720);
+                              }}
+                              className="w-full py-3 rounded-xl font-black text-xs sm:text-sm shadow-xl flex items-center justify-between px-4 transition bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 hover:from-amber-400 hover:to-orange-400 cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2">
+                                <ShoppingBag className="w-4 h-4" />
+                                <span>View Basket ({customerCartCount} Items)</span>
+                              </div>
+                              <span className="font-black">₹710 ➔</span>
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   )}
@@ -1141,59 +1321,82 @@ export function ProductWalkthrough() {
                     </div>
                   )}
 
-                  {/* Flow 8: Super Admin & MongoDB Cloud Sync */}
-                  {currentFlow.id === 'cloud_superadmin' && (
+                  {/* Flow 8: Admin & Multi-Business Control (Replaces Super Admin) */}
+                  {currentFlow.id === 'admin_business_control' && (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                         <div>
                           <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
-                            Multi-Tenant Cloud Sync Engine
+                            Universal Business Control
                           </span>
-                          <h3 className="text-base font-extrabold text-white">MongoDB Atlas Free Cluster M0</h3>
+                          <h3 className="text-base font-extrabold text-white">
+                            {adminActiveNiche === 'gym'
+                              ? 'IronPulse Fitness Club & Protein Bar'
+                              : "L'Osteria Gourmet Bistro"}
+                          </h3>
                         </div>
-                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                          Tenant Partitioned
+                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          {adminActiveNiche === 'gym' ? 'Gym Roster Active' : 'Restaurant Mode'}
                         </span>
                       </div>
 
-                      <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1.5 font-mono text-slate-300">
-                        <div className="flex justify-between">
-                          <span>Target Cluster</span>
-                          <span className="text-amber-400">MongoDB Atlas Free M0</span>
+                      {/* Digital Member Register Card for Gym / Niche */}
+                      <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2.5">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                          <span className="font-bold text-slate-300">Member Attendance & Ledger</span>
+                          <span className="text-[10px] text-amber-400 font-mono">Paperless Register</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Database Name</span>
-                          <span>dineqr_cloud</span>
+
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-slate-800">
+                          <div>
+                            <div className="font-bold text-white">Rahul Sharma (MEM-101)</div>
+                            <div className="text-[10px] text-slate-400">Quarterly Gold · Locker L-14</div>
+                          </div>
+                          <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                            adminMemberPunched
+                              ? 'bg-emerald-500 text-slate-950'
+                              : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          }`}>
+                            {adminMemberPunched ? 'Punched (08:15 AM)' : 'Due In'}
+                          </span>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Tenant Isolation</span>
-                          <span className="text-emerald-400">Verified by restaurant_id</span>
+
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-slate-800">
+                          <div>
+                            <div className="font-bold text-white">Monthly Membership Fee</div>
+                            <div className="text-[10px] text-emerald-400 font-bold">₹1,500 / month flat</div>
+                          </div>
+                          <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                            adminFeeCollected
+                              ? 'bg-emerald-500 text-slate-950'
+                              : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                          }`}>
+                            {adminFeeCollected ? 'Razorpay Verified' : 'Due ₹1,500'}
+                          </span>
                         </div>
                       </div>
 
-                      {cloudSynced ? (
-                        <div className="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-center space-y-1 animate-in zoom-in-95">
-                          <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" />
-                          <h4 className="text-sm font-extrabold">Cloud Replicated to MongoDB Atlas!</h4>
-                          <p className="text-xs text-emerald-200">Owner can view live revenue on phone 24/7</p>
-                        </div>
-                      ) : (
+                      <div className="grid grid-cols-2 gap-2 pt-1">
                         <button
-                          onClick={async () => {
-                            setCloudSynced(true);
+                          onClick={() => {
+                            setAdminActiveNiche('gym');
+                            setAdminMemberPunched(true);
+                            setAdminFeeCollected(true);
                             playChime(1170);
-                            await fetch('/api/cloud/sync', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ restaurant_id: activeRestaurant?.id || 'rest_losteria' }),
-                            }).catch(() => {});
                           }}
-                          className="w-full py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2"
+                          className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
                         >
-                          <Database className="w-4 h-4" />
-                          <span>Trigger Live Cloud Sync to MongoDB</span>
+                          <Dumbbell className="w-3.5 h-3.5" />
+                          <span>Punch Member & Settle Fee</span>
                         </button>
-                      )}
+                        <Link
+                          to="/gym-register"
+                          className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition border border-slate-700"
+                        >
+                          <Users className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Open Full Register ➔</span>
+                        </Link>
+                      </div>
                     </div>
                   )}
                 </div>

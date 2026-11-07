@@ -230,12 +230,12 @@ export function PetpoojaComparison() {
       route: '/admin',
     },
     {
-      title: 'Apronto Marketplace & Porter Cargo',
-      icon: Truck,
-      description: 'Hire verified kitchen tradesmen (chefs, repairers) and book Porter mini-trucks for ingredient hauls.',
+      title: 'Digital Member Register (Gyms & Clinics)',
+      icon: Dumbbell,
+      description: 'Paperless daily member attendance punch-in, subscription renewal alerts, and instant Razorpay fee receipts.',
       petpoojaPrice: 'Not Available',
       dineqrIncluded: true,
-      route: '/services',
+      route: '/gym-register',
     },
     {
       title: 'Self-Service Counter Kiosk',
@@ -260,7 +260,7 @@ export function PetpoojaComparison() {
     {
       feature: 'Pricing Transparency',
       petpooja: '₹15,000 to ₹35,000+ /year + Add-on costs',
-      dineqr: 'Flat ₹1,000 / ₹1,500 / ₹5,000 month (Zero hidden fees)',
+      dineqr: 'Flat ₹1,500 / ₹5,000 month (Zero hidden fees)',
       win: true,
     },
     {
@@ -296,7 +296,7 @@ export function PetpoojaComparison() {
     {
       feature: 'Logistics & Trades Integration',
       petpooja: 'None',
-      dineqr: 'Porter Cargo mini-trucks + Apronto kitchen technician booking',
+      dineqr: 'Digital Gym/Clinic Member Register + Paperless Daily Attendance',
       win: true,
     },
     {

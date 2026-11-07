@@ -26,12 +26,12 @@ import { AdminInventory } from './pages/AdminInventory.jsx';
 import { AdminPurchases } from './pages/AdminPurchases.jsx';
 import { AdminDownloads } from './pages/AdminDownloads.jsx';
 import { SubscriptionPricing } from './pages/SubscriptionPricing.jsx';
-import { MarketplaceServices } from './pages/MarketplaceServices.jsx';
 import { ProductWalkthrough } from './pages/ProductWalkthrough.jsx';
 import { CaptainApp } from './pages/CaptainApp.jsx';
 import { TokenDisplay } from './pages/TokenDisplay.jsx';
 import { PetpoojaComparison } from './pages/PetpoojaComparison.jsx';
 import { MultiBusinessDashboard } from './pages/MultiBusinessDashboard.jsx';
+import { GymRegister } from './pages/GymRegister.jsx';
 import { AdminAuthGate } from './components/AdminAuthGate.jsx';
 
 function AppContent() {
@@ -43,7 +43,6 @@ function AppContent() {
     location.pathname === '/' ||
     location.pathname === '/home' ||
     location.pathname === '/walkthrough' ||
-    location.pathname === '/services' ||
     location.pathname === '/demo' ||
     location.pathname === '/poss' ||
     location.pathname === '/compare/petpooja' ||
@@ -72,9 +71,6 @@ function AppContent() {
           <Route path="/order/:orderId" element={<OrderConfirmation />} />
           <Route path="/invoice/:orderId" element={<InvoiceView />} />
 
-          {/* Standalone Hyperlocal Services Marketplace (Apronto Competitor + Porter Logistics) */}
-          <Route path="/services" element={<MarketplaceServices />} />
-
           {/* Interactive Multi-Vertical Product Walkthrough with Subtitles */}
           <Route path="/walkthrough" element={<ProductWalkthrough />} />
           <Route path="/demo" element={<ProductWalkthrough />} />
@@ -83,6 +79,8 @@ function AppContent() {
           <Route path="/showcase" element={<MultiBusinessDashboard />} />
           <Route path="/dashboards" element={<MultiBusinessDashboard />} />
           <Route path="/business-dashboard" element={<MultiBusinessDashboard />} />
+          <Route path="/gym-register" element={<GymRegister />} />
+          <Route path="/admin/gym-register" element={<GymRegister />} />
 
           {/* Client Self-Onboarding & Join */}
           <Route path="/onboard" element={<ClientOnboarding />} />

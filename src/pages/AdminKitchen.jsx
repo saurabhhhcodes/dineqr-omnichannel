@@ -28,13 +28,58 @@ export function AdminKitchen() {
   const [autoPrintEnabled, setAutoPrintEnabled] = useState(true);
   const [filterStatus, setFilterStatus] = useState('ALL'); // ALL, RECEIVED, PREPARING, READY
   const [isUpdating, setIsUpdating] = useState(false);
+  const [nowTimestamp, setNowTimestamp] = useState(Date.now());
 
   const prevOrderCountRef = useRef(0);
   const autoPrintRef = useRef(autoPrintEnabled);
 
+  // Live timer interval to update "X minutes ago" tickers every 5 seconds accurately
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNowTimestamp(Date.now());
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     autoPrintRef.current = autoPrintEnabled;
   }, [autoPrintEnabled]);
+
+  // Robust live elapsed time calculation (handles SQLite UTC, local offsets & exact punch time)
+  const calculateElapsed = (order) => {
+    let createdDate = null;
+    if (order.created_at_utc) {
+      createdDate = new Date(order.created_at_utc);
+    } else if (order.created_at) {
+      let str = String(order.created_at).trim();
+      if (!str.endsWith('Z') && !str.includes('+')) {
+        str = str.replace(' ', 'T') + 'Z';
+      }
+      createdDate = new Date(str);
+    }
+    
+    let mins = typeof order.elapsed_minutes === 'number' ? order.elapsed_minutes : 0;
+    if (createdDate && !isNaN(createdDate.getTime())) {
+      mins = Math.max(0, Math.floor((nowTimestamp - createdDate.getTime()) / 60000));
+    }
+
+    const timeString = createdDate && !isNaN(createdDate.getTime())
+      ? createdDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : '';
+
+    let label = 'Just now';
+    if (mins === 0) {
+      label = 'Just now (< 1m)';
+    } else if (mins < 60) {
+      label = `${mins}m ago`;
+    } else {
+      const hrs = Math.floor(mins / 60);
+      const remMins = mins % 60;
+      label = `${hrs}h ${remMins}m ago`;
+    }
+
+    return { label, timeString, mins };
+  };
 
   // Fetch active orders for this restaurant
   const fetchOrders = () => {
@@ -268,7 +313,8 @@ export function AdminKitchen() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 w-full min-w-0 max-w-full">
             {filtered.map((order) => {
-              const isUrgent = order.elapsed_minutes >= 15;
+              const elapsed = calculateElapsed(order);
+              const isUrgent = elapsed.mins >= 15;
               const isReceived = order.status === 'RECEIVED';
               const isPreparing = order.status === 'PREPARING';
               const isReady = order.status === 'READY';
@@ -336,14 +382,19 @@ export function AdminKitchen() {
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>
-                          {order.elapsed_minutes === 0 ? 'Just now' : `${order.elapsed_minutes}m ago`}
+                      <div className="flex items-center gap-1.5 text-xs mt-0.5 flex-wrap">
+                        <Clock className={`w-3.5 h-3.5 ${isUrgent ? 'text-rose-400' : 'text-amber-400'}`} />
+                        <span className={`font-bold ${isUrgent ? 'text-rose-300 font-extrabold' : 'text-slate-300'}`}>
+                          {elapsed.label}
                         </span>
+                        {elapsed.timeString && (
+                          <span className="text-[11px] font-mono text-slate-400">
+                            ({elapsed.timeString})
+                          </span>
+                        )}
                         {isUrgent && (
                           <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-rose-600 text-white animate-pulse">
-                            Urgent
+                            Delayed ({elapsed.mins}m)
                           </span>
                         )}
                       </div>

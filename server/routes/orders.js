@@ -237,12 +237,19 @@ router.get('/', (req, res) => {
 
     const enriched = orders.map((order) => {
       const items = queryAll(`SELECT * FROM order_items WHERE order_id = ?`, [order.id]);
-      const createdDate = new Date(order.created_at);
+      
+      // Robust UTC date parsing for SQLite CURRENT_TIMESTAMP (YYYY-MM-DD HH:MM:SS)
+      let dateStr = order.created_at ? String(order.created_at).trim() : '';
+      if (dateStr && !dateStr.endsWith('Z') && !dateStr.includes('+')) {
+        dateStr = dateStr.replace(' ', 'T') + 'Z';
+      }
+      const createdDate = dateStr ? new Date(dateStr) : new Date();
       const elapsedMins = Math.floor((Date.now() - createdDate.getTime()) / 60000);
 
       return {
         ...order,
         items,
+        created_at_utc: createdDate.toISOString(),
         elapsed_minutes: elapsedMins >= 0 ? elapsedMins : 0,
       };
     });

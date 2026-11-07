@@ -86,25 +86,25 @@ const VIDEO_SUITE = [
     targetLabel: 'Open Mobile Profit Calculator',
   },
   {
-    id: 'trades_porter',
-    title: 'Apronto Trades & Porter Logistics',
-    subtitle: 'Hyperlocal Marketplace for Pros, Cement & Mini-Trucks',
-    badge: 'On-Demand & Cargo',
-    videoUrl: '/videos/walkthrough_trades.mp4',
-    posterUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=80',
-    tags: ['Carpenters & Electricians', 'UltraTech Cement Depot', 'Porter Tata Ace Dispatch', 'Live Rates'],
-    description: 'A separate hyperlocal hub connecting local trade professionals and building materials with real-time Porter mini-truck logistics and instant fare estimates.',
-    targetRoute: '/services',
-    targetLabel: 'Open Trades & Porter Hub',
+    id: 'gym_register',
+    title: 'Daily Member Attendance & Gym Register',
+    subtitle: 'Paperless Register for Fitness Studios, Gyms & Crossfit',
+    badge: 'Gym & Attendance',
+    videoUrl: '/videos/walkthrough_cashier.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&q=80',
+    tags: ['Paperless Member Roster', '1-Tap Daily Punch In', 'Membership Expiry Alert', 'Protein Bar Billing'],
+    description: 'Replace physical paper notebooks with a high-speed digital member register, 1-tap attendance punch-in, instant Razorpay renewal, and protein shake bar billing.',
+    targetRoute: '/gym-register',
+    targetLabel: 'Open Digital Gym Register',
   },
   {
     id: 'subscription_checkout',
-    title: 'Flat ₹1,000 / month SaaS Activation',
+    title: 'Flat ₹1,500 / month SaaS Activation',
     subtitle: '0% Commission, Unlimited Orders & Razorpay UPI',
     badge: 'SaaS License',
-    videoUrl: '/videos/walkthrough_subscription.mp4',
+    videoUrl: '/videos/walkthrough_owner.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1556742049-0a67e557224f?w=1200&q=80',
-    tags: ['Flat ₹1,000 / mo', 'Zero Hidden Fees', 'Razorpay UPI & Cards', 'Perpetual Local Data'],
+    tags: ['Flat ₹1,500 / mo', 'Zero Hidden Fees', 'Razorpay UPI & Cards', 'Perpetual Local Data'],
     description: 'Activate your DineQR commercial license with zero commission per order. Includes permanent local SQLite database ownership with zero ongoing cloud hosting bills.',
     targetRoute: '/pricing',
     targetLabel: 'View Subscription Plans',
@@ -204,7 +204,7 @@ export function LandingHero() {
       <div className="border-b border-slate-800 bg-slate-900/80 px-4 py-2.5 text-center text-xs sm:text-sm text-slate-300">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
           <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30 text-[11px]">
-            <Zap className="w-3 h-3" /> Flat ₹1,000 / month
+            <Zap className="w-3 h-3" /> Flat ₹1,500 / month
           </span>
           <span className="font-medium text-slate-200">
             Zero per-order commission · Unlimited tables & orders · Works offline on local SQLite
@@ -242,7 +242,7 @@ export function LandingHero() {
             to="/onboard"
             className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10 transition active:scale-98 cursor-pointer"
           >
-            <span>Start Onboarding - ₹1,000/mo</span>
+            <span>Start Onboarding - ₹1,500/mo</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
 
@@ -251,7 +251,7 @@ export function LandingHero() {
             className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-100 font-semibold text-sm border border-slate-700 flex items-center justify-center gap-2 transition"
           >
             <Play className="w-4 h-4 text-amber-400 fill-amber-400" />
-            <span>Watch 7-Chapter Walkthrough</span>
+            <span>Watch Live Walkthrough</span>
           </Link>
 
           <Link
@@ -263,14 +263,14 @@ export function LandingHero() {
           </Link>
         </div>
 
-        {/* Secondary Hubs (Trades & Admin) */}
+        {/* Secondary Hubs (Gym & Admin) */}
         <div className="mt-4 flex items-center justify-center gap-4 text-xs text-slate-400">
           <Link
-            to="/services"
-            className="inline-flex items-center gap-1.5 text-sky-400 hover:text-sky-300 font-medium"
+            to="/gym-register"
+            className="inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-medium"
           >
-            <Truck className="w-3.5 h-3.5" />
-            <span>Apronto Trades & Porter Logistics &rarr;</span>
+            <Dumbbell className="w-3.5 h-3.5" />
+            <span>Digital Gym Attendance Register &rarr;</span>
           </Link>
           <span className="text-slate-700">·</span>
           <Link
@@ -285,7 +285,7 @@ export function LandingHero() {
         {/* Real Metrics Badges */}
         <div className="mt-10 pt-6 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
           <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
-            <div className="text-xl sm:text-2xl font-extrabold text-white font-mono">₹1,000/mo</div>
+            <div className="text-xl sm:text-2xl font-extrabold text-white font-mono">₹1,500/mo</div>
             <div className="text-xs text-slate-400 mt-0.5">Flat SaaS fee · 0% order cut</div>
           </div>
           <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
@@ -415,7 +415,7 @@ export function LandingHero() {
                 to="/onboard"
                 className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs flex items-center justify-center gap-1 border border-slate-700 transition"
               >
-                <span>Onboard Restaurant (₹1k/mo)</span>
+                <span>Onboard Restaurant (₹1,500/mo)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -584,7 +584,7 @@ export function LandingHero() {
                 <tr>
                   <td className="py-3 px-4 font-semibold text-white">Monthly Subscription</td>
                   <td className="py-3 px-4 text-amber-400 font-bold font-mono">
-                    ₹1,000 / month flat
+                    ₹1,500 / month flat
                   </td>
                   <td className="py-3 px-4 text-slate-400 font-mono">
                     ₹15,000 - ₹25,000 / month
@@ -639,7 +639,7 @@ export function LandingHero() {
               to="/onboard"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition cursor-pointer"
             >
-              <span>Get Started for Flat ₹1,000 / month</span>
+              <span>Get Started for Flat ₹1,500 / month</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

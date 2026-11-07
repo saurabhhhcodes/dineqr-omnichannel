@@ -37,11 +37,177 @@ import {
 import { useCart } from '../context/CartContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import { DineQRLogo } from './DineQRLogo.jsx';
+
+function BusinessSwitcher({ activeRestaurant, setActiveRestaurant, addToast, isDark = true }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const BUSINESS_OPTIONS = [
+    {
+      id: 'rest_losteria',
+      slug: 'losteria',
+      name: "L'Osteria Gourmet Bistro",
+      niche: 'Restaurant & Bar · Tables',
+      icon: Utensils,
+      color: 'bg-amber-500 text-slate-950',
+      badge: 'Fine Dine',
+    },
+    {
+      id: 'rest_roastery',
+      slug: 'roastery-cafe',
+      name: 'The Roastery Coffee House',
+      niche: 'Cafe & Bakery · Counter',
+      icon: Store,
+      color: 'bg-orange-500 text-white',
+      badge: 'Cafe',
+    },
+    {
+      id: 'rest_ironpulse_gym',
+      slug: 'ironpulse-gym',
+      name: 'IronPulse Fitness Club',
+      niche: 'Gym, Member Register & Shakes',
+      icon: Dumbbell,
+      color: 'bg-emerald-500 text-slate-950',
+      badge: 'Gym & Fitness',
+    },
+    {
+      id: 'rest_apex_clinic',
+      slug: 'apex-clinic',
+      name: 'Apex Healthcare Clinic',
+      niche: 'OPD Tokens & Consultations',
+      icon: Stethoscope,
+      color: 'bg-sky-500 text-white',
+      badge: 'Doctor Clinic',
+    },
+    {
+      id: 'rest_glamour_salon',
+      slug: 'glamour-salon',
+      name: 'Glamour & Groom Salon',
+      niche: 'Stylist Chairs & Spa',
+      icon: Sparkles,
+      color: 'bg-purple-500 text-white',
+      badge: 'Salon & Spa',
+    },
+    {
+      id: 'rest_mw6ft1z4h1j',
+      slug: 'saurabh-bajpai-bistro-roastery',
+      name: 'Saurabh Bajpai Bistro & Roastery',
+      niche: 'Custom Onboarded User',
+      icon: Zap,
+      color: 'bg-rose-500 text-white',
+      badge: 'Your Account',
+    },
+  ];
+
+  const currentOption = BUSINESS_OPTIONS.find(
+    (b) => b.id === activeRestaurant?.id || b.slug === activeRestaurant?.slug
+  ) || BUSINESS_OPTIONS[0];
+
+  const CurrentIcon = currentOption.icon;
+
+  const handleSelect = (b) => {
+    setActiveRestaurant(b.id);
+    addToast(`Switched active business to ${b.name}!`, 'info');
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
+          isDark
+            ? 'bg-slate-900 border-slate-700 hover:border-amber-500 text-white'
+            : 'bg-slate-100 border-slate-200 hover:border-amber-500 text-slate-900'
+        }`}
+        title="Switch Business Vertical (Restaurant, Cafe, Gym, Clinic, Salon)"
+      >
+        <span className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 text-[10px] ${currentOption.color}`}>
+          <CurrentIcon className="w-3 h-3" />
+        </span>
+        <span className="max-w-[100px] sm:max-w-[150px] truncate text-left">
+          {activeRestaurant?.name || currentOption.name}
+        </span>
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180 text-amber-400' : 'text-slate-400'}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 sm:left-0 mt-2 w-72 sm:w-80 rounded-2xl bg-slate-950 border border-slate-800 shadow-2xl p-2 z-50 text-xs animate-in fade-in slide-in-from-top-2">
+          <div className="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-800 flex items-center justify-between">
+            <span>Switch Business Niche</span>
+            <span className="text-amber-400 font-mono">1-Tap Switch</span>
+          </div>
+
+          <div className="space-y-1 py-1.5 max-h-72 overflow-y-auto">
+            {BUSINESS_OPTIONS.map((b) => {
+              const Icon = b.icon;
+              const isSelected = activeRestaurant?.id === b.id || activeRestaurant?.slug === b.slug;
+              return (
+                <button
+                  key={b.id}
+                  onClick={() => handleSelect(b)}
+                  className={`w-full text-left p-2 rounded-xl flex items-center gap-2.5 transition cursor-pointer ${
+                    isSelected
+                      ? 'bg-amber-500/15 border border-amber-500/40 text-white'
+                      : 'hover:bg-slate-900 text-slate-300'
+                  }`}
+                >
+                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${b.color}`}>
+                    <Icon className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-bold text-white text-xs truncate flex items-center justify-between">
+                      <span className="truncate">{b.name}</span>
+                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-amber-300 border border-slate-700 font-extrabold shrink-0">
+                        {b.badge}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 truncate">{b.niche}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2 px-1">
+            <Link
+              to="/gym-register"
+              onClick={() => setIsOpen(false)}
+              className="flex-1 text-center py-1.5 px-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-bold text-[11px] border border-emerald-500/30 transition flex items-center justify-center gap-1.5"
+            >
+              <Dumbbell className="w-3.5 h-3.5" />
+              <span>Gym Register</span>
+            </Link>
+            <Link
+              to="/onboard"
+              onClick={() => setIsOpen(false)}
+              className="flex-1 text-center py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold text-[11px] border border-slate-800 transition flex items-center justify-center gap-1.5"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>+ New Client</span>
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Navbar({ onOpenCart }) {
   const location = useLocation();
   const { itemCount, grandTotal, table } = useCart();
-  const { activeRestaurant } = useRestaurant();
+  const { activeRestaurant, setActiveRestaurant } = useRestaurant();
   const { addToast } = useToast();
 
   const [activeOrdersCount, setActiveOrdersCount] = useState(0);
@@ -123,13 +289,11 @@ export function Navbar({ onOpenCart }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 font-black shadow-md shadow-amber-500/10 group-hover:bg-amber-400 transition">
-              <Utensils className="w-5 h-5 text-slate-950" />
-            </div>
+            <DineQRLogo size="md" />
             <div className="flex items-center gap-2">
               <span className="font-extrabold text-white text-lg tracking-tight">DineQR</span>
               <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-900 text-amber-400 border border-slate-800 hidden sm:inline-block">
-                ₹1,000/mo POS
+                ₹1,500/mo POS
               </span>
             </div>
           </Link>
@@ -177,13 +341,13 @@ export function Navbar({ onOpenCart }) {
             </Link>
 
             <Link
-              to="/services"
-              className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
-                location.pathname === '/services' ? 'text-amber-400 font-bold' : ''
+              to="/gym-register"
+              className={`hover:text-emerald-400 transition flex items-center gap-1.5 ${
+                location.pathname === '/gym-register' ? 'text-emerald-400 font-bold' : ''
               }`}
             >
-              <Truck className="w-3.5 h-3.5 text-sky-400" />
-              <span>Trades & Porter Hub</span>
+              <Dumbbell className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Gym Register</span>
             </Link>
 
             <Link
@@ -193,7 +357,7 @@ export function Navbar({ onOpenCart }) {
               }`}
             >
               <Zap className="w-3.5 h-3.5 text-amber-400" />
-              <span>Pricing (₹1k/mo)</span>
+              <span>Pricing (₹1,500/mo)</span>
             </Link>
 
             <Link
@@ -208,7 +372,14 @@ export function Navbar({ onOpenCart }) {
           </nav>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <BusinessSwitcher
+              activeRestaurant={activeRestaurant}
+              setActiveRestaurant={setActiveRestaurant}
+              addToast={addToast}
+              isDark={true}
+            />
+
             <Link
               to="/admin"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold transition"
@@ -286,12 +457,12 @@ export function Navbar({ onOpenCart }) {
               </Link>
 
               <Link
-                to="/services"
-                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-sky-400 transition"
+                to="/gym-register"
+                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-emerald-400 transition"
               >
                 <div className="flex items-center gap-2.5">
-                  <Truck className="w-4 h-4 text-sky-400" />
-                  <span>Apronto Trades & Porter Logistics</span>
+                  <Dumbbell className="w-4 h-4 text-emerald-400" />
+                  <span>Gym Member Digital Register</span>
                 </div>
                 <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
               </Link>
@@ -302,7 +473,7 @@ export function Navbar({ onOpenCart }) {
               >
                 <div className="flex items-center gap-2.5">
                   <Zap className="w-4 h-4 text-amber-400" />
-                  <span>Subscription Pricing (₹1,000/mo)</span>
+                  <span>Subscription Pricing (Flat ₹1,500/mo)</span>
                 </div>
                 <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
               </Link>
@@ -356,9 +527,7 @@ export function Navbar({ onOpenCart }) {
               to={`/menu?restaurant=${activeRestaurant?.slug || activeRestaurant?.id || 'rest_losteria'}`}
               className="flex items-center gap-2.5 min-w-0"
             >
-              <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
-                <Utensils className="w-4.5 h-4.5 text-amber-400" />
-              </div>
+              <DineQRLogo size="md" />
               <div className="min-w-0">
                 <div className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight leading-tight truncate">
                   {activeRestaurant?.name || "L'Osteria Bistro"}
@@ -379,8 +548,15 @@ export function Navbar({ onOpenCart }) {
             </Link>
           </div>
 
-          {/* Right Customer Actions: Call Waiter + Cart Button */}
+          {/* Right Customer Actions: Business Switcher + Call Waiter + Cart Button */}
           <div className="flex items-center gap-2 shrink-0">
+            <BusinessSwitcher
+              activeRestaurant={activeRestaurant}
+              setActiveRestaurant={setActiveRestaurant}
+              addToast={addToast}
+              isDark={false}
+            />
+
             {/* Call Waiter Button */}
             <button
               onClick={handleCallWaiter}
@@ -431,9 +607,7 @@ export function Navbar({ onOpenCart }) {
         {/* Restaurant Identity & Active Station */}
         <div className="flex items-center gap-2.5 shrink-0">
           <Link to="/admin" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold shadow-sm group-hover:bg-amber-400 transition">
-              <Utensils className="w-4.5 h-4.5 text-slate-950" />
-            </div>
+            <DineQRLogo size="md" />
             <div>
               <div className="font-bold text-white text-sm tracking-tight leading-none flex items-center gap-1.5">
                 <span className="truncate max-w-[140px] sm:max-w-[200px]">
@@ -583,12 +757,20 @@ export function Navbar({ onOpenCart }) {
                   <span>Vendor Purchases</span>
                 </Link>
                 <Link
+                  to="/gym-register"
+                  onClick={() => setIsOperationsDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-emerald-400 hover:bg-slate-800 transition"
+                >
+                  <Dumbbell className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Gym Member Register</span>
+                </Link>
+                <Link
                   to="/admin/subscription"
                   onClick={() => setIsOperationsDropdownOpen(false)}
                   className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-amber-400 hover:bg-slate-800 transition"
                 >
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  <span>SaaS Plan (₹1k/mo)</span>
+                  <span>SaaS Plan (₹1,500/mo)</span>
                 </Link>
                 <div className="my-1 border-t border-slate-800" />
                 <Link
@@ -604,8 +786,15 @@ export function Navbar({ onOpenCart }) {
           </div>
         </nav>
 
-        {/* Quick Customer Live Preview + Mobile Admin Menu Toggle */}
+        {/* Quick Customer Live Preview + Business Switcher + Mobile Admin Menu Toggle */}
         <div className="flex items-center gap-2 shrink-0">
+          <BusinessSwitcher
+            activeRestaurant={activeRestaurant}
+            setActiveRestaurant={setActiveRestaurant}
+            addToast={addToast}
+            isDark={true}
+          />
+
           <Link
             to={`/menu?restaurant_id=${activeRestaurant?.id || ''}&table=tbl_1`}
             target="_blank"
@@ -692,7 +881,7 @@ export function Navbar({ onOpenCart }) {
             className="flex items-center gap-2.5 p-2 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20"
           >
             <Zap className="w-4 h-4 text-amber-400" />
-            <span>Subscription Plan (₹1,000/mo)</span>
+            <span>Subscription Plan (₹1,500/mo)</span>
           </Link>
           <Link
             to="/admin/settings"

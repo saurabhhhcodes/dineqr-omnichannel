@@ -104,8 +104,8 @@ export function ClientOnboarding() {
   const [adminPin, setAdminPin] = useState('1234');
   const [staffPin, setStaffPin] = useState('1234');
 
-  // Plan Selection (₹1,000 vs ₹1,500)
-  const [selectedPlan, setSelectedPlan] = useState('Essential Restaurant Suite (₹1,000/mo)');
+  // Plan Selection (₹1,500 vs ₹5,000)
+  const [selectedPlan, setSelectedPlan] = useState('Local DB On-Premise Suite (₹1,500/mo)');
 
   // Direct Payouts Setup
   const [razorpayKeyId, setRazorpayKeyId] = useState('rzp_test_TK088i9wgJLbAg');
@@ -276,7 +276,7 @@ export function ClientOnboarding() {
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/20 text-amber-400 text-xs font-bold mb-3">
             <Zap className="w-3.5 h-3.5" />
-            <span>₹1,000 / month Flat Business Onboarding · 60-Second Setup</span>
+            <span>Flat ₹1,500 / month Commercial Onboarding · 60-Second Setup</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
             Register Your Restaurant & Cafe POS
@@ -638,46 +638,30 @@ export function ClientOnboarding() {
               Pick your monthly subscription. All guest QR payments settle directly into your bank account with zero platform commission.
             </p>
 
-            {/* Plan Selector */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            {/* Plan Selector (Only ₹1,500 and ₹5,000) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div
-                onClick={() => setSelectedPlan('Essential Restaurant Suite (₹1,000/mo)')}
+                onClick={() => setSelectedPlan('Local DB On-Premise Suite (₹1,500/mo)')}
                 className={`p-4 rounded-2xl border-2 transition cursor-pointer ${
-                  selectedPlan.includes('1,000')
+                  selectedPlan.includes('1,500')
                     ? 'border-amber-500 bg-amber-950/20 ring-2 ring-amber-500/20'
                     : 'border-slate-700 bg-slate-900/50 hover:border-slate-600'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">
-                    Starter
-                  </span>
-                  <span className="text-base font-black text-white">₹1,000 <span className="text-[11px] text-slate-400 font-normal">/ mo</span></span>
-                </div>
-                <h4 className="font-extrabold text-xs text-white">Essential POS Suite</h4>
-                <p className="text-[11px] text-slate-400 mt-1">Table QR menus, visual floor plan, KDS, thermal billing & local SQLite DB. Up to 5 staff.</p>
-              </div>
-
-              <div
-                onClick={() => setSelectedPlan('Omnichannel Pro Delivery Suite (₹1,500/mo)')}
-                className={`p-4 rounded-2xl border-2 transition cursor-pointer ${
-                  selectedPlan.includes('1,500')
-                    ? 'border-purple-500 bg-purple-950/20 ring-2 ring-purple-500/20'
-                    : 'border-slate-700 bg-slate-900/50 hover:border-slate-600'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30">
-                    Pro
+                    Starter · Most Popular
                   </span>
                   <span className="text-base font-black text-white">₹1,500 <span className="text-[11px] text-slate-400 font-normal">/ mo</span></span>
                 </div>
-                <h4 className="font-extrabold text-xs text-white">Omnichannel Pro</h4>
-                <p className="text-[11px] text-slate-400 mt-1">Zomato/Swiggy webhook streaming, standalone desktop apps, up to 12 staff.</p>
+                <h4 className="font-extrabold text-xs text-white">Local DB On-Premise Suite</h4>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Table QR menus, visual floor plan, KDS, thermal billing, staff timeclock, and local SQLite engine with zero cloud database bills.
+                </p>
               </div>
 
               <div
-                onClick={() => setSelectedPlan('Enterprise Scale & Staff Hub (₹5,000/mo)')}
+                onClick={() => setSelectedPlan('Enterprise Scale & Cloud Hub (₹5,000/mo)')}
                 className={`p-4 rounded-2xl border-2 transition cursor-pointer ${
                   selectedPlan.includes('5,000')
                     ? 'border-emerald-500 bg-emerald-950/20 ring-2 ring-emerald-500/20'
@@ -690,8 +674,10 @@ export function ClientOnboarding() {
                   </span>
                   <span className="text-base font-black text-white">₹5,000 <span className="text-[11px] text-slate-400 font-normal">/ mo</span></span>
                 </div>
-                <h4 className="font-extrabold text-xs text-white">Scale & Staff Hub</h4>
-                <p className="text-[11px] text-slate-400 mt-1">Up to 30 staff logins, arrival/departure logs, dedicated local folders & multi-station KDS.</p>
+                <h4 className="font-extrabold text-xs text-white">Cloud Sync & MongoDB Atlas</h4>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  24/7 remote phone access (even when PC is OFF), real-time MongoDB Atlas multi-tenant replication, multi-branch consolidated reporting, VIP WhatsApp support.
+                </p>
               </div>
             </div>
 

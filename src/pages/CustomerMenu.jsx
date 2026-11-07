@@ -21,6 +21,7 @@ import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { ItemCard } from '../components/ItemCard.jsx';
 import { ItemModal } from '../components/ItemModal.jsx';
 import { CartDrawer } from '../components/CartDrawer.jsx';
+import { getFallbackMenu, getFallbackTables, resolveRestaurant } from '../data/fallbackMenu.js';
 
 export function CustomerMenu() {
   const [searchParams] = useSearchParams();
@@ -59,13 +60,16 @@ export function CustomerMenu() {
     }
   }, [restaurantParam, restaurants, activeRestaurant]);
 
-  // 1. Resolve Table from URL query parameter
+  // 1. Resolve Table from URL query parameter (with offline-first resilience)
   useEffect(() => {
     const restId = currentRestaurant?.id || activeRestaurant?.id || 'rest_losteria';
     fetch(`/api/tables?restaurant_id=${restId}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then((data) => {
-        if (data.success && data.tables) {
+        if (data.success && data.tables && data.tables.length > 0) {
           setAvailableTables(data.tables);
           let matched = null;
           if (tableParam && tableParam !== 'counter' && tableParam !== 'takeaway') {
@@ -83,12 +87,27 @@ export function CustomerMenu() {
           } else {
             setTable({ id: 'counter', table_number: 'Counter Pickup', section: 'Takeaway' });
           }
+          return;
         }
+        throw new Error('No tables returned');
       })
-      .catch((err) => console.error('Failed to load tables:', err));
+      .catch((err) => {
+        console.warn('API unavailable for tables, using offline-first fallback:', err);
+        const fbTables = getFallbackTables(restId);
+        setAvailableTables(fbTables);
+        let matched = null;
+        if (tableParam && tableParam !== 'counter' && tableParam !== 'takeaway') {
+          matched = fbTables.find(
+            (t) => t.id === tableParam || t.table_number.toLowerCase() === tableParam.toLowerCase()
+          );
+        }
+        if (matched) setTable(matched);
+        else if (fbTables.length > 0) setTable(fbTables[0]);
+        else setTable({ id: 'counter', table_number: 'Counter Pickup', section: 'Takeaway' });
+      });
   }, [tableParam, setTable, currentRestaurant, activeRestaurant]);
 
-  // 2. Fetch Menu
+  // 2. Fetch Menu (with zero-network offline-first menu fallback)
   useEffect(() => {
     const restId = currentRestaurant?.id || activeRestaurant?.id || 'rest_losteria';
     setIsLoading(true);
@@ -99,15 +118,49 @@ export function CustomerMenu() {
     if (selectedCategory !== 'all') params.append('category', selectedCategory);
 
     fetch(`/api/menu?${params.toString()}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then((data) => {
-        if (data.success) {
+        if (data.success && data.grouped && data.grouped.length > 0) {
           setCategories(data.categories || []);
           setGroupedItems(data.grouped || []);
           setAllItems(data.items || []);
+          try {
+            localStorage.setItem(`dineqr_menu_cache_${restId}`, JSON.stringify(data));
+          } catch {}
+          return;
         }
+        throw new Error('Empty menu data from server');
       })
-      .catch((err) => console.error('Error fetching menu:', err))
+      .catch((err) => {
+        console.warn('Network menu fetch failed, activating zero-network offline-first menu fallback:', err);
+        // Try localStorage cache first
+        try {
+          const cached = localStorage.getItem(`dineqr_menu_cache_${restId}`);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (parsed && parsed.grouped && parsed.grouped.length > 0) {
+              setCategories(parsed.categories || []);
+              setGroupedItems(parsed.grouped || []);
+              setAllItems(parsed.items || []);
+              return;
+            }
+          }
+        } catch {}
+
+        // Full offline-first fallback menu generator
+        const fb = getFallbackMenu({
+          restaurantId: restId,
+          category: selectedCategory,
+          vegOnly,
+          search: searchQuery.trim(),
+        });
+        setCategories(fb.categories || []);
+        setGroupedItems(fb.grouped || []);
+        setAllItems(fb.items || []);
+      })
       .finally(() => setIsLoading(false));
   }, [vegOnly, searchQuery, selectedCategory, currentRestaurant, activeRestaurant]);
 
