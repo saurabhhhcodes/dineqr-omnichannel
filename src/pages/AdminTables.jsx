@@ -325,7 +325,7 @@ export function AdminTables() {
 
             <form onSubmit={handleAddTable} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
+                <label className="text-xs font-black text-slate-950 block mb-1 uppercase tracking-wide">
                   Table Number / Label *
                 </label>
                 <input
@@ -334,18 +334,18 @@ export function AdminTables() {
                   placeholder="e.g. Table 09, Patio 3, VIP Lounge"
                   value={newTableNumber}
                   onChange={(e) => setNewTableNumber(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 text-sm font-bold text-slate-950 placeholder:text-slate-500 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 outline-none shadow-xs"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
+                <label className="text-xs font-black text-slate-950 block mb-1 uppercase tracking-wide">
                   Section / Dining Area
                 </label>
                 <select
                   value={newSection}
                   onChange={(e) => setNewSection(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none bg-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 text-sm font-bold text-slate-950 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 outline-none bg-white shadow-xs"
                 >
                   <option value="Main Dining">Main Dining</option>
                   <option value="Terrace Garden">Terrace Garden</option>
@@ -356,7 +356,7 @@ export function AdminTables() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
+                <label className="text-xs font-black text-slate-950 block mb-1 uppercase tracking-wide">
                   Seating Capacity (Guests)
                 </label>
                 <input
@@ -365,7 +365,7 @@ export function AdminTables() {
                   max="50"
                   value={newCapacity}
                   onChange={(e) => setNewCapacity(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 text-sm font-bold text-slate-950 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 outline-none shadow-xs"
                 />
               </div>
 
