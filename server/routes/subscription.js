@@ -7,6 +7,17 @@ import { queryOne, execute } from '../db.js';
 const router = express.Router();
 
 const PLANS = {
+  starter_1000: {
+    id: 'starter_1000',
+    name: 'Legacy Starter Plan',
+    amount: 1000,
+    amount_paise: 100000,
+    billing_period: 'monthly',
+    badge: 'Legacy',
+    staff_limit: 8,
+    description: 'Legacy tier for backward compatibility.',
+    features: ['Offline SQLite Engine', 'QR Menu', 'Kitchen KDS'],
+  },
   starter_1500: {
     id: 'starter_1500',
     name: 'Local SQLite On-Premise POS',
@@ -123,8 +134,8 @@ router.get('/status', (req, res) => {
 // POST /api/subscription/create-order - Create Razorpay subscription checkout order
 router.post('/create-order', async (req, res) => {
   try {
-    const { restaurant_id = 'rest_losteria', plan_id = 'starter_1000' } = req.body;
-    const plan = PLANS[plan_id] || PLANS.starter_1000;
+    const { restaurant_id = 'rest_losteria', plan_id = 'starter_1500' } = req.body;
+    const plan = PLANS[plan_id] || PLANS.starter_1500;
 
     const rest = queryOne(`SELECT * FROM restaurants WHERE id = ?`, [restaurant_id]);
     const rzpKeyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_TK088i9wgJLbAg';
@@ -164,7 +175,7 @@ router.post('/create-order', async (req, res) => {
   } catch (err) {
     // Graceful fallback for offline testing
     const fallbackId = 'order_sub_mock_' + Math.floor(100000 + Math.random() * 900000);
-    const plan = PLANS[req.body.plan_id] || PLANS.starter_1000;
+    const plan = PLANS[req.body?.plan_id] || PLANS.starter_1500;
     res.json({
       success: true,
       order_id: fallbackId,
@@ -184,13 +195,13 @@ router.post('/verify', (req, res) => {
   try {
     const {
       restaurant_id = 'rest_losteria',
-      plan_id = 'starter_1000',
+      plan_id = 'starter_1500',
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
     } = req.body;
 
-    const plan = PLANS[plan_id] || PLANS.starter_1000;
+    const plan = PLANS[plan_id] || PLANS.starter_1500;
     const rzpSecret = process.env.RAZORPAY_KEY_SECRET || 'DyRucfn1FimHG6vcWs6CyePr';
 
     // Verify signature if supplied and not a simulated order

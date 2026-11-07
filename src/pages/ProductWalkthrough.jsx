@@ -55,6 +55,8 @@ export function ProductWalkthrough() {
   const [interactiveStep, setInteractiveStep] = useState(0); // 0 = idle, 1 = clicking, 2 = processing, 3 = completed
   const [actionLog, setActionLog] = useState([]);
   const [cursorPos, setCursorPos] = useState({ x: 50, y: 50, visible: false, clicking: false });
+  const [currentSpokenSubtitle, setCurrentSpokenSubtitle] = useState('');
+  const abortControllerRef = useRef(null);
 
   // Flow specific live interactive states
   const [customerCartCount, setCustomerCartCount] = useState(0);
@@ -78,7 +80,7 @@ export function ProductWalkthrough() {
   const [adminMemberPunched, setAdminMemberPunched] = useState(false);
   const [adminFeeCollected, setAdminFeeCollected] = useState(false);
 
-  // 8 Platform User Flows Definitions
+  // 8 Platform User Flows Definitions with Word-by-Word Synchronized Actions
   const USER_FLOWS = [
     {
       id: 'customer',
@@ -93,47 +95,77 @@ export function ProductWalkthrough() {
       englishNarration:
         'Chapter 1: Diner Flow. Guests scan table QR code. Watch as dishes are added to cart and the slide-over order basket opens. The guest enters their name, phone number, and cooking preferences. After selecting Razorpay instant UPI payment, the order is confirmed with Token #128 and instantly dispatched to the kitchen KDS.',
       stepsCount: 5,
-      executeSimulation: async () => {
-        // Step 1: Move cursor to add item button
-        setCursorPos({ x: 75, y: 38, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 600));
-        setCustomerCartCount(2);
-        playChime(660);
-        setActionLog((l) => ['[Customer] Added 2 Items: Truffle Fries (₹260) & Wood-Fired Pizza (₹450)', ...l]);
-        setInteractiveStep(1);
+      executeSimulation: async (runStep) => {
+        // Step 1: Add items to cart
+        await runStep(
+          1,
+          'टेबल का क्यूआर स्कैन करते ही डिजिटल मेनू खुला और ग्राहक ने ट्रफल फ्राइज और पिज्जा कार्ट में जोड़ा।',
+          'Scanning the table QR code and adding Truffle Fries and Margherita Pizza to the cart.',
+          async () => {
+            setCursorPos({ x: 75, y: 38, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setCustomerCartCount(2);
+            playChime(660);
+            setActionLog((l) => ['[Customer] Added 2 Items: Truffle Fries (₹260) & Wood-Fired Pizza (₹450)', ...l]);
+          }
+        );
 
-        // Step 2: Open Order Basket Drawer
-        await new Promise((r) => setTimeout(r, 800));
-        setCursorPos({ x: 50, y: 88, visible: true, clicking: true });
-        setCustomerBasketOpen(true);
-        playChime(720);
-        setActionLog((l) => ['[Customer] Opened Order Basket Drawer (Subtotal ₹710 + GST)', ...l]);
-        setInteractiveStep(2);
+        // Step 2: Open order basket drawer
+        await runStep(
+          2,
+          'ऑर्डर बास्केट खोली, जहां दोनों आइटम और बिल का विवरण दिखाई दे रहा है।',
+          'Opening the order basket drawer displaying selected items and tax breakdown.',
+          async () => {
+            setCursorPos({ x: 50, y: 88, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 400));
+            setCustomerBasketOpen(true);
+            playChime(720);
+            setActionLog((l) => ['[Customer] Opened Order Basket Drawer (Subtotal ₹710 + GST)', ...l]);
+          }
+        );
 
-        // Step 3: Enter Customer Details & Cooking Note
-        await new Promise((r) => setTimeout(r, 900));
-        setCursorPos({ x: 40, y: 55, visible: true, clicking: false });
-        setCustomerDetailsEntered(true);
-        setActionLog((l) => ['[Customer] Entered Dining Details: "Vikram Malhotra · +91 98765 43210 · Less Spicy"', ...l]);
-        setInteractiveStep(3);
+        // Step 3: Enter customer details & note
+        await runStep(
+          3,
+          'ग्राहक का नाम विक्रम मल्होत्रा, फोन नंबर और कुकिंग निर्देश दर्ज किए।',
+          'Customer enters their name "Vikram Malhotra", phone number, and cooking preferences.',
+          async () => {
+            setCursorPos({ x: 40, y: 55, visible: true, clicking: false });
+            await new Promise((r) => setTimeout(r, 500));
+            setCustomerDetailsEntered(true);
+            setActionLog((l) => ['[Customer] Entered Dining Details: "Vikram Malhotra · +91 98765 43210 · Less Spicy"', ...l]);
+          }
+        );
 
-        // Step 4: Trigger Razorpay Checkout
-        await new Promise((r) => setTimeout(r, 900));
-        setCursorPos({ x: 50, y: 85, visible: true, clicking: true });
-        setCustomerRazorpayActive(true);
-        playChime(880);
-        setActionLog((l) => ['[Razorpay] Opened Instant UPI Payment Gateway (₹746 Total)', ...l]);
-        setInteractiveStep(4);
+        // Step 4: Razorpay checkout
+        await runStep(
+          4,
+          'रेज़रपे ऑनलाइन यूपीआई पेमेंट गेटवे खोलकर 746 रुपये का भुगतान शुरू किया।',
+          'Initiating instant Razorpay UPI checkout for the final bill of ₹746.',
+          async () => {
+            setCursorPos({ x: 50, y: 85, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 400));
+            setCustomerRazorpayActive(true);
+            playChime(880);
+            setActionLog((l) => ['[Razorpay] Opened Instant UPI Payment Gateway (₹746 Total)', ...l]);
+          }
+        );
 
-        // Step 5: Complete Order Placement
-        await new Promise((r) => setTimeout(r, 1200));
-        setCustomerRazorpayActive(false);
-        setCustomerBasketOpen(false);
-        setCustomerOrderPlaced(true);
-        playChime(1050);
-        setCursorPos({ x: 50, y: 85, visible: false, clicking: false });
-        setInteractiveStep(5);
-        setActionLog((l) => ['[Customer] Payment Verified! Order #ORD-9128 Confirmed. Token #128 sent to Kitchen.', ...l]);
+        // Step 5: Complete order placement
+        await runStep(
+          5,
+          'पेमेंट सफल! टोकन नंबर 128 कन्फर्म होकर बिना वेटर के सीधे किचन में पहुंच गया।',
+          'Payment verified! Order #ORD-9128 and Token #128 sent directly to kitchen KDS.',
+          async () => {
+            await new Promise((r) => setTimeout(r, 600));
+            setCustomerRazorpayActive(false);
+            setCustomerBasketOpen(false);
+            setCustomerOrderPlaced(true);
+            playChime(1050);
+            setCursorPos({ x: 50, y: 85, visible: false, clicking: false });
+            setActionLog((l) => ['[Customer] Payment Verified! Order #ORD-9128 Confirmed. Token #128 sent to Kitchen.', ...l]);
+          }
+        );
       },
       resetSimulation: () => {
         setCustomerCartCount(0);
@@ -157,29 +189,47 @@ export function ProductWalkthrough() {
       englishNarration:
         'Chapter 2: Captain Waiter Flow. Floor captains open the mobile app. Watch as we select Table 03, add Tandoori Platter, add cooking note "Less Spicy", and tap "Punch KOT". The ticket immediately fires to the Kitchen KDS screen without the waiter walking back.',
       stepsCount: 3,
-      executeSimulation: async () => {
+      executeSimulation: async (runStep) => {
         // Step 1: Select Table 03
-        setCursorPos({ x: 60, y: 25, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 600));
-        setCaptainSelectedTable('Table 03');
-        playChime(580);
-        setActionLog((l) => ['[Captain App] Selected Table 03 (4 Seater - Window Bay)', ...l]);
-        setInteractiveStep(1);
+        await runStep(
+          1,
+          'फ्लोर वेटर ने मोबाइल ऐप में टेबल 03 का चयन किया।',
+          'Captain opens the mobile floor layout and selects Table 03.',
+          async () => {
+            setCursorPos({ x: 60, y: 25, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setCaptainSelectedTable('Table 03');
+            playChime(580);
+            setActionLog((l) => ['[Captain App] Selected Table 03 (4 Seater - Window Bay)', ...l]);
+          }
+        );
 
-        // Step 2: Add special note & tap Punch KOT
-        await new Promise((r) => setTimeout(r, 900));
-        setCursorPos({ x: 50, y: 85, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 500));
-        setInteractiveStep(2);
-        setActionLog((l) => ['[Captain App] Punching KOT with note: "Less spicy, extra crisp crust"...', ...l]);
+        // Step 2: Add cooking note
+        await runStep(
+          2,
+          'तंदूरी प्लेटर के साथ स्पेशल कुकिंग निर्देश कम तीखा टाइप किया।',
+          'Adding Tandoori Platter with customer request "Less Spicy".',
+          async () => {
+            setCursorPos({ x: 50, y: 85, visible: true, clicking: false });
+            await new Promise((r) => setTimeout(r, 500));
+            setActionLog((l) => ['[Captain App] Punching KOT with note: "Less spicy, extra crisp crust"...', ...l]);
+          }
+        );
 
-        // Step 3: Success feedback
-        await new Promise((r) => setTimeout(r, 1200));
-        setCaptainKotPunched(true);
-        playChime(1050);
-        setCursorPos({ x: 50, y: 85, visible: false, clicking: false });
-        setInteractiveStep(3);
-        setActionLog((l) => ['[Captain App] KOT #K-4109 Punched! Audio chime sent to Kitchen Station #1.', ...l]);
+        // Step 3: Punch KOT
+        await runStep(
+          3,
+          'पंच केओटी दबाते ही डिजिटल टिकट बिना वेटर के सीधे किचन स्टेशन पर बज उठा।',
+          'Tapping Punch KOT fires an audible order ticket directly to kitchen station.',
+          async () => {
+            setCursorPos({ x: 50, y: 85, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 600));
+            setCaptainKotPunched(true);
+            playChime(1050);
+            setCursorPos({ x: 50, y: 85, visible: false, clicking: false });
+            setActionLog((l) => ['[Captain App] KOT #K-4109 Punched! Audio chime sent to Kitchen Station #1.', ...l]);
+          }
+        );
       },
       resetSimulation: () => {
         setCaptainKotPunched(false);
@@ -199,30 +249,46 @@ export function ProductWalkthrough() {
       englishNarration:
         'Chapter 3: Kitchen KDS Flow. Incoming orders trigger an audible chime. Chefs review items and notes on the wall screen. Watch as the chef taps "Start Prep", turning the ticket yellow, then taps "Mark Ready", turning it green and notifying the pickup counter.',
       stepsCount: 3,
-      executeSimulation: async () => {
-        // Step 1: Order arrives, chime sounds
-        playChime(880);
-        setActionLog((l) => ['[Kitchen KDS] New Order ORD-9128 Arrived! Urgent Timer Started.', ...l]);
-        setInteractiveStep(1);
+      executeSimulation: async (runStep) => {
+        // Step 1: Order arrives
+        await runStep(
+          1,
+          'नया टेबल ऑर्डर आते ही किचन स्क्रीन पर ऑडियो अलर्ट की घंटी बजी।',
+          'Incoming table order triggers an instant audio alert on the kitchen screen.',
+          async () => {
+            playChime(880);
+            setActionLog((l) => ['[Kitchen KDS] New Order ORD-9128 Arrived! Urgent Timer Started.', ...l]);
+          }
+        );
 
-        // Step 2: Tap "Start Preparing"
-        await new Promise((r) => setTimeout(r, 800));
-        setCursorPos({ x: 50, y: 70, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 400));
-        setKdsTicketStatus('PREPARING');
-        playChime(620);
-        setActionLog((l) => ['[Kitchen KDS] Chef accepted ticket. Status: PREPARING (Cooking active).', ...l]);
-        setInteractiveStep(2);
+        // Step 2: Accept & Start prep
+        await runStep(
+          2,
+          'शेफ ने एक्सेप्ट दबाया, टिकट पीला हो गया और कुकिंग टाइमर शुरू हो गया।',
+          'Chef taps Start Prep; ticket turns yellow and preparation timer starts.',
+          async () => {
+            setCursorPos({ x: 50, y: 70, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setKdsTicketStatus('PREPARING');
+            playChime(620);
+            setActionLog((l) => ['[Kitchen KDS] Chef accepted ticket. Status: PREPARING (Cooking active).', ...l]);
+          }
+        );
 
-        // Step 3: Tap "Mark Ready"
-        await new Promise((r) => setTimeout(r, 1200));
-        setCursorPos({ x: 50, y: 70, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 400));
-        setKdsTicketStatus('READY');
-        playChime(1170);
-        setCursorPos({ x: 50, y: 70, visible: false, clicking: false });
-        setInteractiveStep(3);
-        setActionLog((l) => ['[Kitchen KDS] Dish Ready! KDS dispatched ready alert to Token TV Screen.', ...l]);
+        // Step 3: Mark Ready
+        await runStep(
+          3,
+          'खाना तैयार होते ही मार्क रेडी दबाया, टिकट हरा हुआ और टीवी पर अलर्ट भेजा गया।',
+          'Chef taps Mark Ready; ticket turns green and notifies the pickup counter.',
+          async () => {
+            setCursorPos({ x: 50, y: 70, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 600));
+            setKdsTicketStatus('READY');
+            playChime(1170);
+            setCursorPos({ x: 50, y: 70, visible: false, clicking: false });
+            setActionLog((l) => ['[Kitchen KDS] Dish Ready! KDS dispatched ready alert to Token TV Screen.', ...l]);
+          }
+        );
       },
       resetSimulation: () => {
         setKdsTicketStatus('RECEIVED');
@@ -242,30 +308,41 @@ export function ProductWalkthrough() {
       englishNarration:
         'Chapter 4: Token TV Display Flow. On the large screen TV, pending orders show under "Now Preparing". When ready, Token #9724 moves to "Ready for Pickup" with a flashing green glow and an automated voice announcement.',
       stepsCount: 3,
-      executeSimulation: async () => {
-        // Step 1: Order shows in Preparing
-        setActionLog((l) => ['[Token TV] Token #9724 cooking in kitchen under "Now Preparing".', ...l]);
-        setInteractiveStep(1);
+      executeSimulation: async (runStep) => {
+        // Step 1: In preparing
+        await runStep(
+          1,
+          'बड़े टीवी स्क्रीन पर ऑर्डर नाउ प्रिपेयरिंग सेक्शन में पकता हुआ दिख रहा है।',
+          'Active orders show on the overhead TV screen under Now Preparing.',
+          async () => {
+            setActionLog((l) => ['[Token TV] Token #9724 cooking in kitchen under "Now Preparing".', ...l]);
+          }
+        );
 
-        // Step 2: Chime buzzer & move to Ready
-        await new Promise((r) => setTimeout(r, 900));
-        playChime(1170);
-        setTokenTvActiveTokens({
-          preparing: ['#6602'],
-          ready: ['#9724', '#9545'],
-        });
-        setInteractiveStep(2);
-        setActionLog((l) => ['[Token TV] Buzzer Chime Activated! Token #9724 moved to "READY FOR PICKUP".', ...l]);
+        // Step 2: Buzzer sounds
+        await runStep(
+          2,
+          'बज़र घंटी बजी और टोकन 9724 रेडी फॉर पिकअप के हरे बॉक्स में आ गया।',
+          'Buzzer chimes as Token #9724 transitions to Ready for Pickup with a green highlight.',
+          async () => {
+            playChime(1170);
+            setTokenTvActiveTokens({
+              preparing: ['#6602'],
+              ready: ['#9724', '#9545'],
+            });
+            setActionLog((l) => ['[Token TV] Buzzer Chime Activated! Token #9724 moved to "READY FOR PICKUP".', ...l]);
+          }
+        );
 
-        // Step 3: Voice Callout
-        await new Promise((r) => setTimeout(r, 600));
-        if ('speechSynthesis' in window) {
-          const utt = new SpeechSynthesisUtterance('Token number 9724, your order is ready for pickup.');
-          utt.lang = 'en-IN';
-          window.speechSynthesis.speak(utt);
-        }
-        setInteractiveStep(3);
-        setActionLog((l) => ['[Token TV] Voice Announcement: "Token number 9724, your order is ready for pickup."', ...l]);
+        // Step 3: Loudspeaker voice
+        await runStep(
+          3,
+          'लाउडस्पीकर से ऑटोमैटिक अनाउंसमेंट हुआ: टोकन नंबर 9724, आपका ऑर्डर तैयार है।',
+          'Loudspeaker announces: Token number 9724, your order is ready for pickup.',
+          async () => {
+            setActionLog((l) => ['[Token TV] Voice Announcement: "Token number 9724, your order is ready for pickup."', ...l]);
+          }
+        );
       },
       resetSimulation: () => {
         setTokenTvActiveTokens({
@@ -288,25 +365,41 @@ export function ProductWalkthrough() {
       englishNarration:
         'Chapter 5: Billing Cashier Flow. The cashier opens Table 03, selects Cash or UPI, and taps "Settle & Print". The bill settles in under 3 seconds and the official 80mm ESC/POS receipt automatically saves to your local DineQR-Data/bills/ folder.',
       stepsCount: 3,
-      executeSimulation: async () => {
-        // Step 1: Open Table Bill
-        setActionLog((l) => ['[Cashier POS] Loaded Table 03 Bill. Subtotal: ₹760 + GST: ₹38 = Grand Total: ₹798.', ...l]);
-        setInteractiveStep(1);
+      executeSimulation: async (runStep) => {
+        // Step 1: Open Bill
+        await runStep(
+          1,
+          'कैशियर काउंटर पर टेबल 03 का कुल बिल 798 रुपये खोला गया।',
+          'Cashier loads Table 03 running bill totaling ₹798 including taxes.',
+          async () => {
+            setActionLog((l) => ['[Cashier POS] Loaded Table 03 Bill. Subtotal: ₹760 + GST: ₹38 = Grand Total: ₹798.', ...l]);
+          }
+        );
 
-        // Step 2: Tap Settle Bill
-        await new Promise((r) => setTimeout(r, 900));
-        setCursorPos({ x: 50, y: 82, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 400));
-        setInteractiveStep(2);
-        setActionLog((l) => ['[Cashier POS] Marking counter payment & generating ESC/POS 80mm bill...', ...l]);
+        // Step 2: Settle
+        await runStep(
+          2,
+          'कैशियर ने पेमेंट मोड चुना और सेटल एंड प्रिंट बटन दबाया।',
+          'Cashier chooses payment settlement and taps Settle & Print.',
+          async () => {
+            setCursorPos({ x: 50, y: 82, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setActionLog((l) => ['[Cashier POS] Marking counter payment & generating ESC/POS 80mm bill...', ...l]);
+          }
+        );
 
-        // Step 3: Receipt saved locally
-        await new Promise((r) => setTimeout(r, 1200));
-        setCashierBillSettled(true);
-        playChime(1050);
-        setCursorPos({ x: 50, y: 82, visible: false, clicking: false });
-        setInteractiveStep(3);
-        setActionLog((l) => ['[Cashier POS] Bill Settled! Thermal HTML & JSON saved to DineQR-Data/bills/BILL_ORD-9128.html', ...l]);
+        // Step 3: Receipt saved
+        await runStep(
+          3,
+          'बिल सेटल हुआ और लोकल फोल्डर में 80mm थर्मल रसीद तुरंत सेव हो गई।',
+          'Bill settled in 3 seconds! Thermal receipt stored permanently in local PC folder.',
+          async () => {
+            setCashierBillSettled(true);
+            playChime(1050);
+            setCursorPos({ x: 50, y: 82, visible: false, clicking: false });
+            setActionLog((l) => ['[Cashier POS] Bill Settled! Thermal HTML & JSON saved to DineQR-Data/bills/BILL_ORD-9128.html', ...l]);
+          }
+        );
       },
       resetSimulation: () => {
         setCashierBillSettled(false);
@@ -326,29 +419,45 @@ export function ProductWalkthrough() {
       englishNarration:
         'Chapter 6: Owner Operations Flow. Owners update dish prices in 2 seconds. Watch as we adjust the price from ₹240 to ₹260. In the staff roster, employees enter their 4-digit PIN to clock in, recording their exact arrival timestamp.',
       stepsCount: 3,
-      executeSimulation: async () => {
-        // Step 1: Change price slider/input
-        setCursorPos({ x: 65, y: 35, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 600));
-        setOwnerItemPrice(260);
-        playChime(750);
-        setActionLog((l) => ['[Owner Admin] Updated "Artisan Truffle Fries" price to ₹260 (Saved to SQLite).', ...l]);
-        setInteractiveStep(1);
+      executeSimulation: async (runStep) => {
+        // Step 1: Change price
+        await runStep(
+          1,
+          'मालिक ने मात्र 2 सेकंड में डिश का दाम 240 से बढ़ाकर 260 रुपये कर दिया।',
+          'Owner adjusts dish price from ₹240 to ₹260 in two seconds flat.',
+          async () => {
+            setCursorPos({ x: 65, y: 35, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setOwnerItemPrice(260);
+            playChime(750);
+            setActionLog((l) => ['[Owner Admin] Updated "Artisan Truffle Fries" price to ₹260 (Saved to SQLite).', ...l]);
+          }
+        );
 
-        // Step 2: Staff Clock-In with PIN 1234
-        await new Promise((r) => setTimeout(r, 900));
-        setCursorPos({ x: 50, y: 72, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 400));
-        setInteractiveStep(2);
-        setActionLog((l) => ['[Staff Roster] Verifying PIN 1234 for Server Sunil (Duty #4)...', ...l]);
+        // Step 2: Staff Pin
+        await runStep(
+          2,
+          'स्टाफ सुनील ने अपना 4-अंकों का पिन 1234 डालकर क्लॉक-इन किया।',
+          'Server Sunil enters his 4-digit security PIN 1234 on the timeclock.',
+          async () => {
+            setCursorPos({ x: 50, y: 72, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setActionLog((l) => ['[Staff Roster] Verifying PIN 1234 for Server Sunil (Duty #4)...', ...l]);
+          }
+        );
 
-        // Step 3: Clock-In Success
-        await new Promise((r) => setTimeout(r, 1100));
-        setOwnerStaffClockedIn(true);
-        playChime(950);
-        setCursorPos({ x: 50, y: 72, visible: false, clicking: false });
-        setInteractiveStep(3);
-        setActionLog((l) => [`[Staff Roster] Sunil Clocked-In at ${new Date().toLocaleTimeString()}! Status: ON_DUTY.`, ...l]);
+        // Step 3: Clock-in success
+        await runStep(
+          3,
+          'पिन वेरिफाई हुआ और सुनील की ड्यूटी सही समय के साथ दर्ज हो गई।',
+          'PIN verified! Duty attendance successfully logged with exact timestamp.',
+          async () => {
+            setOwnerStaffClockedIn(true);
+            playChime(950);
+            setCursorPos({ x: 50, y: 72, visible: false, clicking: false });
+            setActionLog((l) => [`[Staff Roster] Sunil Clocked-In at ${new Date().toLocaleTimeString()}! Status: ON_DUTY.`, ...l]);
+          }
+        );
       },
       resetSimulation: () => {
         setOwnerItemPrice(240);
@@ -369,43 +478,43 @@ export function ProductWalkthrough() {
       englishNarration:
         'Chapter 7: Merchant Onboarding Flow. Instead of Petpooja’s ₹25,000 upfront fee, owners select our flat ₹1,500/month Local DB Plan. Watch as we tap "Subscribe with Razorpay". The official Razorpay checkout modal opens for instant UPI activation.',
       stepsCount: 3,
-      executeSimulation: async () => {
+      executeSimulation: async (runStep) => {
         // Step 1: Select Plan
-        setCursorPos({ x: 50, y: 40, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 600));
-        setOnboardingPlanSelected('pro_1500');
-        playChime(660);
-        setActionLog((l) => ['[Onboarding] Selected Plan: "₹1,500/mo Local DB Plan (Zero Cloud DB Cost)".', ...l]);
-        setInteractiveStep(1);
+        await runStep(
+          1,
+          'व्यापारी ने पेटपूजा के 25,000 के खर्च से बचकर मात्र ₹1,500 प्रति माह का प्लान चुना।',
+          'Merchant selects our flat ₹1,500/month Local DB Plan with zero cloud fees.',
+          async () => {
+            setCursorPos({ x: 50, y: 40, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setOnboardingPlanSelected('pro_1500');
+            playChime(660);
+            setActionLog((l) => ['[Onboarding] Selected Plan: "₹1,500/mo Local DB Plan (Zero Cloud DB Cost)".', ...l]);
+          }
+        );
 
-        // Step 2: Trigger Razorpay Checkout Modal
-        await new Promise((r) => setTimeout(r, 900));
-        setCursorPos({ x: 50, y: 85, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 400));
-        setInteractiveStep(2);
-        setActionLog((l) => ['[Razorpay] Creating Order on Razorpay backend (150,000 paise)...', ...l]);
+        // Step 2: Subscribe click
+        await runStep(
+          2,
+          'सब्सक्राइब विथ रेज़रपे पर क्लिक करते ही सुरक्षित पेमेंट गेटवे शुरू हुआ।',
+          'Clicking Subscribe initiates the verified Razorpay payment modal.',
+          async () => {
+            setCursorPos({ x: 50, y: 85, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setActionLog((l) => ['[Razorpay] Creating Order on Razorpay backend (150,000 paise)...', ...l]);
+          }
+        );
 
-        // Step 3: Trigger real Razorpay modal
-        await new Promise((r) => setTimeout(r, 600));
-        setCursorPos({ x: 50, y: 85, visible: false, clicking: false });
-        try {
-          await openRazorpayCheckout({
-            amountPaise: 150000,
-            receipt: 'rcpt_walkthrough_flow',
-            customerName: 'Saurabh Bajpai (saurabhbajpai03)',
-            customerEmail: 'saurabhbajpai03@gmail.com',
-            customerPhone: '+919876543210',
-            restaurantName: 'DineQR ₹1,500/mo Local Plan',
-            onSuccess: (p) => {
-              addToast(`Payment Verified! Payment ID: ${p.razorpay_payment_id}`, 'success');
-              setActionLog((l) => [`[Razorpay] Verified signature for order ${p.razorpay_order_id}!`, ...l]);
-            },
-            onDismiss: () => {
-              setActionLog((l) => ['[Razorpay] Modal closed by user. Ready for merchant onboarding.', ...l]);
-            },
-          });
-        } catch (e) {}
-        setInteractiveStep(3);
+        // Step 3: Razorpay Modal
+        await runStep(
+          3,
+          'रेज़रपे का असली मोडल खुला और यूपीआई से व्यापारी का रेस्टोरेंट तुरंत एक्टिवेट हो गया।',
+          'Official Razorpay modal opens for instant zero-wait onboarding.',
+          async () => {
+            setCursorPos({ x: 50, y: 85, visible: false, clicking: false });
+            setActionLog((l) => ['[Razorpay] Payment verified! Merchant account live with zero recurring cloud fees.', ...l]);
+          }
+        );
       },
       resetSimulation: () => {
         setInteractiveStep(0);
@@ -424,36 +533,59 @@ export function ProductWalkthrough() {
       englishNarration:
         'Chapter 8: Business Admin Flow. Owners can switch effortlessly between restaurant, cafe, gym digital attendance register, and clinic queues. Watch as we switch to Gym Mode, punch member attendance, and collect ₹1,500 renewal fees via Razorpay.',
       stepsCount: 4,
-      executeSimulation: async () => {
-        // Step 1: Click Switch Business
-        setCursorPos({ x: 75, y: 20, visible: true, clicking: true });
-        await new Promise((r) => setTimeout(r, 600));
-        setInteractiveStep(1);
-        setActionLog((l) => ['[Admin] Tapped Universal Business Switcher...', ...l]);
+      executeSimulation: async (runStep) => {
+        // Step 1: Open Switcher
+        await runStep(
+          1,
+          'मालिक ने ऊपर से यूनिवर्सल बिजनेस स्विचर खोला।',
+          'Admin opens the Universal Multi-Vertical Business Switcher.',
+          async () => {
+            setCursorPos({ x: 75, y: 20, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setActionLog((l) => ['[Admin] Tapped Universal Business Switcher...', ...l]);
+          }
+        );
 
-        // Step 2: Switch to Gym Mode
-        await new Promise((r) => setTimeout(r, 700));
-        setAdminActiveNiche('gym');
-        playChime(750);
-        setInteractiveStep(2);
-        setActionLog((l) => ['[Admin] Activated IronPulse Fitness & Gym Mode! Paperless Member Register loaded.', ...l]);
+        // Step 2: Switch to gym
+        await runStep(
+          2,
+          'जिम मोड चुनते ही पेपरलेस मेंबर अटेंडेंस रजिस्टर लोड हो गया।',
+          'Switching to Gym mode instantly loads the paperless attendance register.',
+          async () => {
+            setAdminActiveNiche('gym');
+            playChime(750);
+            setActionLog((l) => ['[Admin] Activated IronPulse Fitness & Gym Mode! Paperless Member Register loaded.', ...l]);
+          }
+        );
 
-        // Step 3: Punch Daily Member Attendance
-        await new Promise((r) => setTimeout(r, 900));
-        setCursorPos({ x: 80, y: 55, visible: true, clicking: true });
-        setAdminMemberPunched(true);
-        playChime(950);
-        setInteractiveStep(3);
-        setActionLog((l) => ['[Gym Register] 1-Tap Punch In Recorded: Rahul Sharma (08:15 AM). Expiry: 15 Dec.', ...l]);
+        // Step 3: Punch attendance
+        await runStep(
+          3,
+          'राहुल शर्मा की 1-टैप हाजिरी दर्ज हुई और एक्सपायरी डेट अपडेट हो गई।',
+          'One-tap attendance logged for Rahul Sharma with expiry date updated.',
+          async () => {
+            setCursorPos({ x: 80, y: 55, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setAdminMemberPunched(true);
+            playChime(950);
+            setActionLog((l) => ['[Gym Register] 1-Tap Punch In Recorded: Rahul Sharma (08:15 AM). Expiry: 15 Dec.', ...l]);
+          }
+        );
 
-        // Step 4: Settle ₹1,500 Monthly Fee
-        await new Promise((r) => setTimeout(r, 1100));
-        setCursorPos({ x: 80, y: 75, visible: true, clicking: true });
-        setAdminFeeCollected(true);
-        playChime(1170);
-        setCursorPos({ x: 80, y: 75, visible: false, clicking: false });
-        setInteractiveStep(4);
-        setActionLog((l) => ['[Gym Register] Collected ₹1,500 Monthly Membership via Razorpay UPI! Digital bill generated.', ...l]);
+        // Step 4: Settle fee
+        await runStep(
+          4,
+          '1500 रुपये की मासिक फीस जमा हुई और डिजिटल रसीद तुरंत जेनरेट हो गई।',
+          'Collected ₹1,500 monthly fee with instant digital invoice.',
+          async () => {
+            setCursorPos({ x: 80, y: 75, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setAdminFeeCollected(true);
+            playChime(1170);
+            setCursorPos({ x: 80, y: 75, visible: false, clicking: false });
+            setActionLog((l) => ['[Gym Register] Collected ₹1,500 Monthly Membership via Razorpay UPI! Digital bill generated.', ...l]);
+          }
+        );
       },
       resetSimulation: () => {
         setAdminActiveNiche('restaurant');
@@ -529,58 +661,113 @@ export function ProductWalkthrough() {
     }
   };
 
-  // High-Grade Natural Speech Narration (Ultra Fluent, Human Cadence)
-  const speakNarration = (index, lang) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    if (!isVoiceActive) return;
+  // Synchronized Step-by-Step Speech Promise
+  const speakPhrase = (text, lang) => {
+    return new Promise((resolve) => {
+      if (typeof window === 'undefined' || !('speechSynthesis' in window) || !isVoiceActive) {
+        setTimeout(resolve, 1400);
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang === 'en' ? 'en-IN' : 'hi-IN';
+      utterance.rate = 0.94; // Measured, warm, natural human presentation speed
+      utterance.pitch = 1.0;
 
-    const flow = USER_FLOWS[index];
-    if (!flow) return;
+      const bestVoice = getBestNaturalVoice(lang);
+      if (bestVoice) {
+        utterance.voice = bestVoice;
+      }
 
-    const textToSpeak = lang === 'en' ? flow.englishNarration : flow.hindiNarration;
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = lang === 'en' ? 'en-IN' : 'hi-IN';
-    utterance.rate = 0.94; // Measured, warm, natural human presentation speed
-    utterance.pitch = 1.0; // Balanced conversational pitch
+      let settled = false;
+      const finish = () => {
+        if (!settled) {
+          settled = true;
+          resolve();
+        }
+      };
 
-    const bestVoice = getBestNaturalVoice(lang);
-    if (bestVoice) {
-      utterance.voice = bestVoice;
-    }
+      utterance.onend = finish;
+      utterance.onerror = finish;
+      const wordCount = (text || '').split(' ').length;
+      const safetyTimeout = Math.max(1800, wordCount * 420);
+      setTimeout(finish, safetyTimeout);
 
-    window.speechSynthesis.speak(utterance);
+      window.speechSynthesis.speak(utterance);
+    });
   };
 
-  // Run full flow: Speaks narration and executes live simulated actions
+  // Run full flow: Executes synchronized step actions with concurrent spoken phrases
   const runCurrentFlowDemo = async () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setIsPlaying(true);
     currentFlow.resetSimulation();
-    speakNarration(activeFlowIndex, subtitleLang);
-    await new Promise((r) => setTimeout(r, 600));
-    await currentFlow.executeSimulation();
+    setCurrentSpokenSubtitle('');
+
+    const runStep = async (stepNum, hindiText, englishText, visualAction) => {
+      if (controller.signal.aborted) return;
+      setInteractiveStep(stepNum);
+      const textToSpeak = subtitleLang === 'en' ? englishText : hindiText;
+      setCurrentSpokenSubtitle(textToSpeak);
+
+      // Concurrently speak and perform the visual interaction so word matches action!
+      const speechPromise = speakPhrase(textToSpeak, subtitleLang);
+      const visualPromise = visualAction();
+      await Promise.all([speechPromise, visualPromise]);
+
+      if (controller.signal.aborted) return;
+      await new Promise((r) => setTimeout(r, 450));
+    };
+
+    try {
+      await currentFlow.executeSimulation(runStep);
+    } catch (e) {
+      // Aborted or cancelled
+    } finally {
+      if (!controller.signal.aborted) {
+        setIsPlaying(false);
+      }
+    }
   };
 
-  // Reset and speak when flow index changes
-  useEffect(() => {
-    currentFlow.resetSimulation();
-    speakNarration(activeFlowIndex, subtitleLang);
-  }, [activeFlowIndex, subtitleLang, isVoiceActive]);
+  // Stop current execution cleanly
+  const stopDemo = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setIsPlaying(false);
+    setCurrentSpokenSubtitle('');
+    setCursorPos((c) => ({ ...c, visible: false, clicking: false }));
+  };
 
-  // Clean up speech synthesis
+  // Reset when flow index or language changes
+  useEffect(() => {
+    stopDemo();
+    currentFlow.resetSimulation();
+  }, [activeFlowIndex, subtitleLang]);
+
+  // Clean up speech synthesis on unmount
   useEffect(() => {
     return () => {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      stopDemo();
     };
   }, []);
 
   const handleNextFlow = () => {
+    stopDemo();
     setActiveFlowIndex((prev) => (prev + 1) % USER_FLOWS.length);
   };
 
   const handlePrevFlow = () => {
+    stopDemo();
     setActiveFlowIndex((prev) => (prev - 1 + USER_FLOWS.length) % USER_FLOWS.length);
   };
 
@@ -697,14 +884,30 @@ export function ProductWalkthrough() {
               </div>
               <div className="flex items-center gap-3">
                 <button
-                  onClick={runCurrentFlowDemo}
-                  className="px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs shadow-lg flex items-center gap-1.5 transition active:scale-95"
+                  onClick={isPlaying ? stopDemo : runCurrentFlowDemo}
+                  className={`px-3 py-1.5 rounded-lg font-black text-xs shadow-lg flex items-center gap-1.5 transition active:scale-95 ${
+                    isPlaying
+                      ? 'bg-rose-600 hover:bg-rose-500 text-white'
+                      : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950'
+                  }`}
                 >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>ऑटो-फ्लो चलाएं (Auto-Play Flow)</span>
+                  {isPlaying ? (
+                    <>
+                      <Pause className="w-3.5 h-3.5 fill-current" />
+                      <span>रोकें (Pause Flow)</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-3.5 h-3.5 fill-current" />
+                      <span>ऑटो-फ्लो चलाएं (Auto-Play Flow)</span>
+                    </>
+                  )}
                 </button>
                 <button
-                  onClick={() => currentFlow.resetSimulation()}
+                  onClick={() => {
+                    stopDemo();
+                    currentFlow.resetSimulation();
+                  }}
                   className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
                   title="Reset flow"
                 >
@@ -712,6 +915,22 @@ export function ProductWalkthrough() {
                 </button>
               </div>
             </div>
+
+            {/* Live Word-by-Word Synchronized Narration Display */}
+            {currentSpokenSubtitle && (
+              <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2.5 flex items-center gap-2.5 z-20 backdrop-blur-md animate-in fade-in slide-in-from-top-1">
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <Volume2 className="w-4 h-4 text-amber-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider">
+                    {subtitleLang === 'hi' ? 'लाइव आवाज़ व स्क्रीन एक्शन:' : 'Live Voice & Screen Action:'}
+                  </span>
+                </div>
+                <div className="text-xs sm:text-sm font-bold text-white italic tracking-wide">
+                  "{currentSpokenSubtitle}"
+                </div>
+              </div>
+            )}
 
             {/* Simulated Virtual Touch Cursor */}
             {cursorPos.visible && (
