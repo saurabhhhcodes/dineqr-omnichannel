@@ -25,30 +25,8 @@ import {
 
 const CHAPTERS = [
   {
-    id: 'library',
-    number: '01',
-    title: 'Study Library Desk QR Recharge',
-    badge: 'Education & Co-Working',
-    icon: BookOpen,
-    videoUrl: '/videos/walkthrough_library.mp4',
-    posterUrl: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1200&q=80',
-    duration: 10,
-    actionLabel: 'Launch Alexandria Library Demo',
-    actionRoute: '/menu?restaurant=alexandria-library&table=tbl_lib_1',
-    subtitles: {
-      en: '[Chapter 1: Study Library Desk QR] Live recording of physical desk QR scan on Desk 01 (Silent AC Pod). The reader selects 6-Hour Deep Work Pass (₹49), enters their student name, and receives a digital seat token without disturbing anyone in the quiet room.',
-      hi: '[अध्याय 1: स्टडी लाइब्रेरी डेस्क क्यूआर] डेस्क 01 (साइलेंट एसी पॉड) पर लगे असली क्यूआर कोड स्कैनिंग का लाइव वॉकथ्रू। छात्र 6-घंटे का पास (₹49) चुनते हैं, अपना नाम दर्ज करते हैं और बिना किसी रुकावट के डिजिटल सीट पास तुरंत प्राप्त करते हैं।',
-    },
-    keyPoints: [
-      'Desk & Silent Cabin Specific QR Placards',
-      'Hourly (₹49), Full-Day (₹99) & Monthly (₹1,499) Recharge Passes',
-      'Silent Coffee & Beverage Top-Ups Delivered to Desk',
-      'Direct Razorpay UPI Settlement with Zero Commission',
-    ],
-  },
-  {
     id: 'restaurant',
-    number: '02',
+    number: '01',
     title: 'Restaurant Table QR & Invoicing',
     badge: 'Dining & Kitchen',
     icon: UtensilsCrossed,
@@ -58,8 +36,8 @@ const CHAPTERS = [
     actionLabel: 'Launch Bistro Table POS Demo',
     actionRoute: '/menu?restaurant=losteria&table=tbl_1',
     subtitles: {
-      en: '[Chapter 2: Restaurant & Table POS] Live screen capture of guest table self-ordering. Diners browse the digital menu, add items to cart, view CGST + SGST tax breakdown, and submit their order for Dining Table 01.',
-      hi: '[अध्याय 2: रेस्टोरेंट टेबल पीओएस व बिलिंग] डाइनिंग टेबल 01 से असली कस्टमर सेल्फ-ऑर्डर का लाइव वीडियो। ग्राहक डिजिटल मेनू देखकर कार्ट में आइटम जोड़ते हैं, जीएसटी टैक्स देखते हैं और टेबल के लिए ऑर्डर सबमिट करते हैं।',
+      en: '[Chapter 1: Restaurant & Table POS] Live screen capture of guest table self-ordering. Diners browse the digital menu, add items to cart, view CGST + SGST tax breakdown, and submit their order for Dining Table 01.',
+      hi: '[अध्याय 1: रेस्टोरेंट टेबल पीओएस व बिलिंग] डाइनिंग टेबल 01 से असली कस्टमर सेल्फ-ऑर्डर का लाइव वीडियो। ग्राहक डिजिटल मेनू देखकर कार्ट में आइटम जोड़ते हैं, जीएसटी टैक्स देखते हैं और टेबल के लिए ऑर्डर सबमिट करते हैं।',
     },
     keyPoints: [
       'Interactive Digital Table Menu with Search & Category Filters',
@@ -70,7 +48,7 @@ const CHAPTERS = [
   },
   {
     id: 'kds',
-    number: '03',
+    number: '02',
     title: 'Kitchen KDS & Order Chimes',
     badge: 'Kitchen Operations',
     icon: ChefHat,
@@ -80,8 +58,8 @@ const CHAPTERS = [
     actionLabel: 'Open Live Kitchen Display (KDS)',
     actionRoute: '/admin/kitchen',
     subtitles: {
-      en: '[Chapter 3: Kitchen Display System] Live recording of kitchen staff KDS screen. Incoming table orders appear instantly. Chefs click "Accept & Start Prep" to update status to Preparing, followed by Ready and Complete with audio alerts.',
-      hi: '[अध्याय 3: किचन केडीएस व लाइव टिकट] किचन शेफ स्क्रीन का लाइव वीडियो। जैसे ही ग्राहक ऑर्डर करता है, स्क्रीन पर तुरंत टिकट आ जाता है। शेफ "Accept & Start Prep" पर क्लिक करके स्टेटस अपडेट करते हैं और अलर्ट घंटी बजती है।',
+      en: '[Chapter 2: Kitchen Display System] Live recording of kitchen staff KDS screen. Incoming table orders appear instantly. Chefs click "Accept & Start Prep" to update status to Preparing, followed by Ready and Complete with audio alerts.',
+      hi: '[अध्याय 2: किचन केडीएस व लाइव टिकट] किचन शेफ स्क्रीन का लाइव वीडियो। जैसे ही ग्राहक ऑर्डर करता है, स्क्रीन पर तुरंत टिकट आ जाता है। शेफ "Accept & Start Prep" पर क्लिक करके स्टेटस अपडेट करते हैं और अलर्ट घंटी बजती है।',
     },
     keyPoints: [
       'Real-Time Webhook & Server-Sent Ticket Streams',
@@ -92,7 +70,7 @@ const CHAPTERS = [
   },
   {
     id: 'floorplan',
-    number: '04',
+    number: '03',
     title: 'Premises Floor Plan Management',
     badge: 'Floor Layout',
     icon: Layers,
@@ -102,8 +80,8 @@ const CHAPTERS = [
     actionLabel: 'Open Floor Plan Designer',
     actionRoute: '/admin/floor-plan',
     subtitles: {
-      en: '[Chapter 4: Visual Floor Plan Management] Real video demonstrating premises table layouts. Managers drag-and-drop dining tables to match their room architecture, inspect live seated tabs, and add new tables dynamically.',
-      hi: '[अध्याय 4: विजुअल फ्लोर प्लान व टेबल सेटिंग] रेस्टोरेंट व कैफे फ्लोर प्लान का लाइव वीडियो। मैनेजर अपनी जगह के अनुसार टेबलों को ड्रैग करके सेट करते हैं, खाली व बैठी टेबलों का स्टेटस देखते हैं और नई टेबल जोड़ते हैं।',
+      en: '[Chapter 3: Visual Floor Plan Management] Real video demonstrating premises table layouts. Managers drag-and-drop dining tables to match their room architecture, inspect live seated tabs, and add new tables dynamically.',
+      hi: '[अध्याय 3: विजुअल फ्लोर प्लान व टेबल सेटिंग] रेस्टोरेंट व कैफे फ्लोर प्लान का लाइव वीडियो। मैनेजर अपनी जगह के अनुसार टेबलों को ड्रैग करके सेट करते हैं, खाली व बैठी टेबलों का स्टेटस देखते हैं और नई टेबल जोड़ते हैं।',
     },
     keyPoints: [
       'Visual Coordinate Drag-and-Drop Canvas',
@@ -114,7 +92,7 @@ const CHAPTERS = [
   },
   {
     id: 'trades',
-    number: '05',
+    number: '04',
     title: 'Apronto Trades & Porter Logistics',
     badge: 'On-Demand & Cargo',
     icon: Truck,
@@ -124,8 +102,8 @@ const CHAPTERS = [
     actionLabel: 'Launch Trades & Porter Hub',
     actionRoute: '/services',
     subtitles: {
-      en: '[Chapter 5: Apronto Trades & Porter Dispatch] Live demonstration of the standalone services hub. Customers browse verified carpenters, electricians, private chefs, select 50kg UltraTech cement, calculate Porter Tata Ace truck fare, and dispatch drivers.',
-      hi: '[अध्याय 5: ऑन-डिमांड कारीगर व पोर्टर डिलीवरी] सेपरेट सर्विसेज हब का लाइव वीडियो। कारपेंटर, इलेक्ट्रीशियन व शेफ को बुक करें, 50 किलो अल्ट्राटेक सीमेंट ऑर्डर करें और पोर्टर टाटा एस का किराया देखकर ड्राइवर डिस्पैच करें।',
+      en: '[Chapter 4: Apronto Trades & Porter Dispatch] Live demonstration of the standalone services hub. Customers browse verified carpenters, electricians, private chefs, select 50kg UltraTech cement, calculate Porter Tata Ace truck fare, and dispatch drivers.',
+      hi: '[अध्याय 4: ऑन-डिमांड कारीगर व पोर्टर डिलीवरी] सेपरेट सर्विसेज हब का लाइव वीडियो। कारपेंटर, इलेक्ट्रीशियन व शेफ को बुक करें, 50 किलो अल्ट्राटेक सीमेंट ऑर्डर करें और पोर्टर टाटा एस का किराया देखकर ड्राइवर डिस्पैच करें।',
     },
     keyPoints: [
       'Private Chefs, Carpenters, Electricians & Submersible Pump Techs',
@@ -136,7 +114,7 @@ const CHAPTERS = [
   },
   {
     id: 'profit',
-    number: '06',
+    number: '05',
     title: 'Mobile Profit & Loss Estimator',
     badge: 'Financial Analytics',
     icon: TrendingUp,
@@ -146,19 +124,19 @@ const CHAPTERS = [
     actionLabel: 'Open Mobile Profit Dashboard',
     actionRoute: '/admin',
     subtitles: {
-      en: '[Chapter 6: Mobile Phone P&L Estimator] Real capture on mobile viewport. Owners adjust touch sliders for monthly rent, electricity & AC, and staff payroll to see real-time net take-home profit and margin percentages calculate dynamically.',
-      hi: '[अध्याय 6: मोबाइल फोन पर नेट प्रॉफिट कैलकुलेटर] मोबाइल स्क्रीन का लाइव वीडियो। दुकान व लाइब्रेरी मालिक अपनी दुकान का किराया, बिजली बिल और स्टाफ की सैलरी वाले स्लाइडर घुमाकर रोज और महीने का नेट प्रॉफिट लाइव देखते हैं।',
+      en: '[Chapter 5: Mobile Phone P&L Estimator] Real capture on mobile viewport. Owners adjust touch sliders for monthly rent, electricity & AC, and staff payroll to see real-time net take-home profit and margin percentages calculate dynamically.',
+      hi: '[अध्याय 5: मोबाइल फोन पर नेट प्रॉफिट कैलकुलेटर] मोबाइल स्क्रीन का लाइव वीडियो। दुकान व रेस्टोरेंट मालिक अपनी दुकान का किराया, बिजली बिल और स्टाफ की सैलरी वाले स्लाइडर घुमाकर रोज और महीने का नेट प्रॉफिट लाइव देखते हैं।',
     },
     keyPoints: [
       'Phone-Friendly Touch Sliders for Rent, Electricity & Staff Wages',
-      'Dynamic Industry COGS (8% Library, 16% Salon, 32% Restaurant, 12% Gym)',
+      'Dynamic Industry COGS (16% Salon, 32% Restaurant, 12% Gym)',
       'Real-Time Net Profit (₹) & Take-Home Margin % Calculations',
       'Zero Cloud Fees with Instant On-Device Computation',
     ],
   },
   {
     id: 'sqlite',
-    number: '07',
+    number: '06',
     title: 'Local SQLite Engine & Webhook Sync',
     badge: 'Offline-First Engine',
     icon: Database,
@@ -168,8 +146,8 @@ const CHAPTERS = [
     actionLabel: 'Verify SQLite Webhook Now',
     actionRoute: '/admin',
     subtitles: {
-      en: '[Chapter 7: Local SQLite DB & Webhook] Live recording of the cryptographic integrity check. Clicking "Verify Database Webhook" generates a real SHA-256 checksum of restaurant.db and audits all 18 tables with 395 verified records.',
-      hi: '[अध्याय 7: लोकल SQLite डेटाबेस व क्रिप्टोग्राफिक वेबहुक] डेटा वेरिफिकेशन का लाइव वीडियो। "Verify Database Webhook" पर क्लिक करने पर लोकल फाइल का SHA-256 हैश बनता है और सभी 18 टेबलों के 395 रिकॉर्ड्स का ऑडिट हो जाता है।',
+      en: '[Chapter 6: Local SQLite DB & Webhook] Live recording of the cryptographic integrity check. Clicking "Verify Database Webhook" generates a real SHA-256 checksum of restaurant.db and audits all 18 tables with 395 verified records.',
+      hi: '[अध्याय 6: लोकल SQLite डेटाबेस व क्रिप्टोग्राफिक वेबहुक] डेटा वेरिफिकेशन का लाइव वीडियो। "Verify Database Webhook" पर क्लिक करने पर लोकल फाइल का SHA-256 हैश बनता है और सभी 18 टेबलों के 395 रिकॉर्ड्स का ऑडिट हो जाता है।',
     },
     keyPoints: [
       'Embedded SQLite Engine with Zero Cloud DB Monthly Costs',
@@ -180,7 +158,7 @@ const CHAPTERS = [
   },
   {
     id: 'subscription',
-    number: '08',
+    number: '07',
     title: 'Razorpay ₹1,000/mo SaaS Activation',
     badge: 'Merchant Billing',
     icon: CreditCard,
@@ -190,8 +168,8 @@ const CHAPTERS = [
     actionLabel: 'Subscribe for ₹1,000 / month',
     actionRoute: '/pricing',
     subtitles: {
-      en: '[Chapter 8: Flat ₹1,000/Month SaaS Plan] Live recording of the subscription checkout flow. Businesses choose monthly or annual flat pricing with zero per-order commissions and activate their license via Razorpay UPI.',
-      hi: '[अध्याय 8: फ्लैट ₹1,000 प्रति माह लाइसेंस] सब्सक्रिप्शन पेमेंट का लाइव वीडियो। व्यापारी बिना किसी कमीशन के मात्र ₹1,000/माह में पूरा सॉफ्टवेयर रेजरपे यूपीआई से एक्टिवेट करके तुरंत काम शुरू करते हैं।',
+      en: '[Chapter 7: Flat ₹1,000/Month SaaS Plan] Live recording of the subscription checkout flow. Businesses choose monthly or annual flat pricing with zero per-order commissions and activate their license via Razorpay UPI.',
+      hi: '[अध्याय 7: फ्लैट ₹1,000 प्रति माह लाइसेंस] सब्सक्रिप्शन पेमेंट का लाइव वीडियो। व्यापारी बिना किसी कमीशन के मात्र ₹1,000/माह में पूरा सॉफ्टवेयर रेजरपे यूपीआई से एक्टिवेट करके तुरंत काम शुरू करते हैं।',
     },
     keyPoints: [
       'Flat ₹1,000 / Month (Zero Hidden User, Seat or Table Commission)',
@@ -273,7 +251,7 @@ export function ProductWalkthrough() {
                 Complete Platform Walkthrough
               </h1>
               <p className="text-slate-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
-                Watch how Study Library QR passes, Restaurant POS, Apronto Hyperlocal Trades, Porter Logistics, and Mobile Profit Estimators operate with zero cloud database costs.
+                Watch how Restaurant Table QR, Kitchen KDS, Premises Floor Plans, Apronto Hyperlocal Trades, Porter Logistics, and Mobile Profit Estimators operate with zero cloud database costs.
               </p>
             </div>
 

@@ -1,4 +1,4 @@
-// server/routes/stats.js - Real-time cafe, restaurant & library profit analytics & sales metrics
+// server/routes/stats.js - Real-time cafe & restaurant profit analytics & sales metrics
 import express from 'express';
 import { queryOne, queryAll } from '../db.js';
 
@@ -92,7 +92,6 @@ router.get('/', (req, res) => {
     const cogsMap = {
       restaurant: 0.32,
       cafe: 0.28,
-      library: 0.08, // Very high margin for study libraries
       salon: 0.16,
       gym: 0.12,
       clinic: 0.22,
@@ -105,9 +104,9 @@ router.get('/', (req, res) => {
     const grossMarginPct = totalRev > 0 ? Math.round((grossProfit / totalRev) * 100) : 0;
 
     // Monthly Overhead Run-Rate Estimates
-    const rentEstimate = bType === 'library' ? 18000 : bType === 'gym' ? 28000 : 25000;
-    const electricityEstimate = bType === 'library' ? 6500 : bType === 'restaurant' ? 8500 : 5000;
-    const staffSalaryEstimate = bType === 'library' ? 12000 : bType === 'restaurant' ? 24000 : 15000;
+    const rentEstimate = bType === 'gym' ? 28000 : bType === 'clinic' ? 32000 : 25000;
+    const electricityEstimate = bType === 'restaurant' ? 8500 : bType === 'gym' ? 9500 : 5000;
+    const staffSalaryEstimate = bType === 'restaurant' ? 24000 : bType === 'clinic' ? 35000 : 15000;
     const totalMonthlyOverhead = rentEstimate + electricityEstimate + staffSalaryEstimate;
 
     // Estimated monthly revenue run rate

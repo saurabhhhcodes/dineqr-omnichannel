@@ -14,15 +14,6 @@ const FALLBACK_RESTAURANTS = [
     staff_pin: '1234',
   },
   {
-    id: 'rest_alexandria_library',
-    name: 'Alexandria Study Lounge & Digital Library',
-    slug: 'alexandria-library',
-    tagline: 'Silent Desks & Daily Passes',
-    business_type: 'library',
-    station_type: 'desk',
-    staff_pin: '1234',
-  },
-  {
     id: 'rest_glamour_salon',
     name: 'Glamour & Groom Salon & Spa',
     slug: 'glamour-salon',

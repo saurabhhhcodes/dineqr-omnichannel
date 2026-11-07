@@ -237,11 +237,11 @@ export function Navbar({ onOpenCart }) {
             <span>Trades & Porter</span>
           </Link>
           <Link
-            to="/menu?restaurant=alexandria-library&table=tbl_lib_1"
+            to="/menu?restaurant=losteria&table=tbl_1"
             className="px-3 py-1 rounded-lg text-slate-300 bg-slate-800/80 hover:text-white transition flex items-center gap-1.5 shrink-0"
           >
-            <BookOpen className="w-3 h-3 text-amber-400" />
-            <span>Library Desk QR</span>
+            <Utensils className="w-3 h-3 text-amber-400" />
+            <span>Table QR Menu</span>
           </Link>
           <Link
             to="/downloads"

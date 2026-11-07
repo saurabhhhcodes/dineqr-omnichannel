@@ -1,19 +1,16 @@
-// src/pages/LandingHero.jsx - High-converting enterprise landing page for DineQR Platform
+// src/pages/LandingHero.jsx - Professional Human-Crafted SaaS Landing Page for DineQR
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Sparkles,
   ArrowRight,
   Stethoscope,
   UtensilsCrossed,
   Dumbbell,
-  PartyPopper,
   ShieldCheck,
   CreditCard,
   QrCode,
   Laptop,
   Database,
-  Download,
   CheckCircle2,
   Play,
   TrendingUp,
@@ -25,130 +22,131 @@ import {
   Video,
   Monitor,
   Smartphone,
-  Apple,
-  Terminal,
   Zap,
   Check,
-  X as XIcon,
-  BookOpen,
   Scissors,
   Truck,
-  Hammer,
+  ChefHat,
+  Layers,
+  Store,
+  Clock,
+  Sparkles,
+  Download,
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
 const VIDEO_SUITE = [
   {
-    id: 'library_recharge',
-    title: 'Study Library Desk QR Recharge',
-    subtitle: 'Quiet Cabin QR Scan to Instant 6h & Monthly Study Pass',
-    badge: 'Library & Co-Working',
-    videoUrl: '/videos/walkthrough_library.mp4',
-    posterUrl: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1200&q=80',
-    tags: ['Silent Desk QR', 'Hourly/Monthly Passes', 'Zero Disturbance', 'UPI Instant Pay'],
-    description: 'Students and readers scan the physical QR placard on their quiet study desk or AC cabin. They select 6-hour (₹49) or monthly passes, enter student details, and get instant digital passes without disturbing staff.',
-    targetRoute: '/menu?restaurant=alexandria-library&table=tbl_lib_1',
-    targetLabel: 'Try Library Desk QR Live',
-  },
-  {
-    id: 'restaurant_kds',
-    title: 'Restaurant Operations & Kitchen KDS',
-    subtitle: 'Table QR Ordering to Live Chef Ticket Chimes',
+    id: 'restaurant_ordering',
+    title: 'Table QR Ordering & GST Billing',
+    subtitle: 'Customer Table QR Scan to Instant KOT Ticket & Tax Invoice',
     badge: 'Restaurant & Cafe',
-    videoUrl: '/videos/walkthrough_kds.mp4',
+    videoUrl: '/videos/walkthrough_restaurant.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=80',
-    tags: ['Table QR Codes', 'Kitchen KDS', 'ESC/POS Printer', 'Razorpay UPI'],
-    description: 'Customers scan table QR codes, view looping dishes, and pay via UPI. Orders stream into the kitchen display system (KDS) screen with audio chimes and status transitions in real time.',
+    tags: ['Table QR Placards', 'Digital Menu', 'CGST + SGST Billing', 'UPI Direct Pay'],
+    description: 'Customers scan the physical QR placard on Table 01, browse menu categories, add items to cart, view official GST tax breakdown, and place their order directly.',
+    targetRoute: '/menu?restaurant=losteria&table=tbl_1',
+    targetLabel: 'Try Table QR Menu Live',
+  },
+  {
+    id: 'kitchen_kds',
+    title: 'Kitchen Display System (KDS)',
+    subtitle: 'Live Ticket Chimes, Status Pipeline & KOT Printing',
+    badge: 'Kitchen Operations',
+    videoUrl: '/videos/walkthrough_kds.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1200&q=80',
+    tags: ['Live Audio Chimes', 'Received -> Cooking -> Ready', '80mm Thermal KOT', 'Urgent Timers'],
+    description: 'Incoming table orders ring live audio chimes in the kitchen. Chefs mark items "Preparing" and "Ready" with a single tap, syncing status back to front-of-house.',
     targetRoute: '/admin/kitchen',
-    targetLabel: 'Open Live Kitchen KDS',
+    targetLabel: 'Open Kitchen KDS',
   },
   {
-    id: 'trades_porter',
-    title: 'Apronto Trades & Porter Logistics',
-    subtitle: 'Verified Pros, UltraTech Cement & Tata Ace Dispatch',
-    badge: 'On-Demand & Cargo',
-    videoUrl: '/videos/walkthrough_trades.mp4',
-    posterUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=80',
-    tags: ['Electricians & Carpenters', '50kg UltraTech Cement', 'Porter Tata Ace', 'Live Telemetry'],
-    description: 'Dedicated hyperlocal marketplace for plumbers, electricians, private chefs, and building materials with real-time Porter mini-truck fare calculation and live driver dispatch.',
-    targetRoute: '/services',
-    targetLabel: 'Open Trades & Porter Hub',
-  },
-  {
-    id: 'hotel_floor_plan',
-    title: 'Floor Plans & Premises Layouts',
-    subtitle: 'Visual Drag & Drop Tables, Cabins & Live Seated Tabs',
+    id: 'floor_plan',
+    title: 'Floor Plans & Premises Layout',
+    subtitle: 'Visual Drag-and-Drop Dining Tables & Seated Tabs',
     badge: 'Floor Management',
     videoUrl: '/videos/walkthrough_floorplan.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80',
-    tags: ['Interactive Floor Plan', 'Draggable Tables', 'Seated Guest Tabs', 'Capacity Config'],
-    description: 'Design custom floor layouts matching your physical premises. Rearrange tables with drag-and-drop, add new cabins, and view real-time table occupancy.',
+    tags: ['Drag & Drop Tables', 'Live Seated Tabs', 'Capacity & Shapes', 'Local SQLite Sync'],
+    description: 'Design custom floor layouts matching your physical dining hall. Drag tables into place, inspect running bills, and add tables dynamically.',
     targetRoute: '/admin/floor-plan',
     targetLabel: 'Launch Floor Plan Designer',
   },
   {
     id: 'mobile_pnl',
     title: 'Phone-Friendly Profit & Loss Estimator',
-    subtitle: 'Live Monthly Rent, AC & Staff Wage Overhead Sliders',
-    badge: 'Business Intelligence',
+    subtitle: 'Interactive Sliders for Rent, Electricity & Staff Payroll',
+    badge: 'Owner Analytics',
     videoUrl: '/videos/walkthrough_pnl.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
-    tags: ['Touch Sliders', 'Dynamic COGS', 'Staff Wages & Rent', 'Net Margin %'],
-    description: 'Calculates revenue, Cost of Goods Sold (COGS), monthly rent, electricity & staff payroll, net take-home profit, and net margin % with interactive sliders on low-end mobile phones.',
+    tags: ['Touch-Optimized Sliders', 'Monthly Overhead Model', 'Net Take-Home Profit', 'Margin %'],
+    description: 'Restaurant owners can adjust monthly rent, electricity & AC costs, and staff salaries on low-cost smartphones to calculate exact net margin and daily profit in real time.',
     targetRoute: '/admin',
-    targetLabel: 'Open Mobile Profit Dashboard',
+    targetLabel: 'Open Mobile Profit Calculator',
+  },
+  {
+    id: 'trades_porter',
+    title: 'Apronto Trades & Porter Logistics',
+    subtitle: 'Hyperlocal Marketplace for Pros, Cement & Mini-Trucks',
+    badge: 'On-Demand & Cargo',
+    videoUrl: '/videos/walkthrough_trades.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=80',
+    tags: ['Carpenters & Electricians', 'UltraTech Cement Depot', 'Porter Tata Ace Dispatch', 'Live Rates'],
+    description: 'A separate hyperlocal hub connecting local trade professionals and building materials with real-time Porter mini-truck logistics and instant fare estimates.',
+    targetRoute: '/services',
+    targetLabel: 'Open Trades & Porter Hub',
+  },
+  {
+    id: 'subscription_checkout',
+    title: 'Flat ₹1,000 / month SaaS Activation',
+    subtitle: '0% Commission, Unlimited Orders & Razorpay UPI',
+    badge: 'SaaS License',
+    videoUrl: '/videos/walkthrough_subscription.mp4',
+    posterUrl: 'https://images.unsplash.com/photo-1556742049-0a67e557224f?w=1200&q=80',
+    tags: ['Flat ₹1,000 / mo', 'Zero Hidden Fees', 'Razorpay UPI & Cards', 'Perpetual Local Data'],
+    description: 'Activate your DineQR commercial license with zero commission per order. Includes permanent local SQLite database ownership with zero ongoing cloud hosting bills.',
+    targetRoute: '/pricing',
+    targetLabel: 'View Subscription Plans',
   },
   {
     id: 'sqlite_webhook',
     title: 'Local SQLite Engine & SHA-256 Webhook',
-    subtitle: 'Zero Cloud Database Bills & Cryptographic Verification',
-    badge: 'Data Security',
+    subtitle: 'Zero Cloud Database Bills & Cryptographic Checksum',
+    badge: 'Data Ownership',
     videoUrl: '/videos/walkthrough_sqlite.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80',
-    tags: ['100% On-Premise SQLite', 'SHA-256 Checksum', '18 Tables Sync', 'Zero Monthly Host Fee'],
-    description: 'Direct local database writing with cryptographic SHA-256 integrity verification webhook, offline persistence, and automated health checks across all 18 tables.',
+    tags: ['100% On-Premise Data', 'SHA-256 Hash Audit', '18 Tables Sync', 'Zero Cloud Fees'],
+    description: 'All records are saved directly in a local SQLite file on your machine. The verification webhook computes a SHA-256 cryptographic checksum across all 18 tables.',
     targetRoute: '/admin',
-    targetLabel: 'Verify SQLite Webhook Live',
+    targetLabel: 'Verify SQLite Webhook',
   },
 ];
 
 const VERTICAL_DEMOS = [
-  {
-    id: 'rest_apex_clinic',
-    title: 'Medical Clinic & Diagnostics',
-    tagline: 'Apex Healthcare & Multi-Specialty Clinic',
-    badge: 'Healthcare OPD',
-    icon: Stethoscope,
-    gradient: 'from-teal-500 to-emerald-600',
-    stationLabel: 'Consultation Room 01',
-    description: 'Patient room QR tokens, OPD doctor bookings, NABL blood panel tests, and computerized prescription slips.',
-    targetUrl: '/menu?restaurant=apex-clinic&table=tbl_c1',
-    stats: '15m Average Consult Wait · Zero Reception Congestion',
-  },
   {
     id: 'rest_losteria',
     title: 'Gourmet Bistro & Cafe',
     tagline: "L'Osteria Gourmet Bistro",
     badge: 'Dining & Kitchen',
     icon: UtensilsCrossed,
-    gradient: 'from-amber-500 to-orange-600',
+    color: 'amber',
     stationLabel: 'Dining Table 01',
-    description: '4K looping food videos with photo switcher, live kitchen display system (KDS), and official GST tax billing.',
+    description: 'Table QR ordering, live chef kitchen display system (KDS), and official GST tax billing.',
     targetUrl: '/menu?restaurant=losteria&table=tbl_1',
     stats: '40% Faster Table Turns · 100% Order Accuracy',
   },
   {
-    id: 'rest_alexandria_library',
-    title: 'Study Library & Desks',
-    tagline: 'Alexandria Study Lounge & Digital Library',
-    badge: 'Study Lounge & Desks',
-    icon: BookOpen,
-    gradient: 'from-amber-600 to-yellow-600',
-    stationLabel: 'Desk 01 - Silent AC Pod',
-    description: 'Desk QR pass recharges, 6h/12h daily study slots, monthly reserved cabins with lockers, high-speed Wi-Fi, and silent coffee delivery.',
-    targetUrl: '/menu?restaurant=alexandria-library&table=tbl_lib_1',
-    stats: '100% Desk Self-Recharge · Zero Reception Disturbance',
+    id: 'rest_roastery',
+    title: 'Coffee House & Bakery',
+    tagline: 'The Roastery Coffee House',
+    badge: 'Specialty Cafe',
+    icon: Store,
+    color: 'orange',
+    stationLabel: 'Espresso Bar 02',
+    description: 'Artisanal roasts, fresh bakery display, express counter pickup, and instant UPI checkout.',
+    targetUrl: '/menu?restaurant=roastery&table=tbl_r1',
+    stats: 'Quick Counter Pickups · Zero Queues at Billing',
   },
   {
     id: 'rest_glamour_salon',
@@ -156,42 +154,41 @@ const VERTICAL_DEMOS = [
     tagline: 'Glamour & Groom Salon & Spa',
     badge: 'Styling & Spa Chairs',
     icon: Scissors,
-    gradient: 'from-rose-500 to-pink-600',
+    color: 'rose',
     stationLabel: 'Chair 01 - Styling Deck',
-    description: 'Chair QR styling menus, executive haircuts, beard sculpting, head massage spa bookings, and instant UPI checkout.',
+    description: 'Chair QR styling menus, executive haircuts, beard sculpting, and direct UPI settlement.',
     targetUrl: '/menu?restaurant=glamour-salon&table=tbl_sal_1',
     stats: 'Zero Waiting Idle Time · Cashless Direct Settlement',
   },
   {
     id: 'rest_ironpulse_gym',
-    title: 'Gym & Performance Bar',
+    title: 'Gym & Fitness Center',
     tagline: 'IronPulse Fitness Club',
     badge: 'Fitness & Sports',
     icon: Dumbbell,
-    gradient: 'from-blue-600 to-indigo-600',
+    color: 'blue',
     stationLabel: 'Workout Bay 01',
-    description: 'Workout day passes, protein shake blender bar, intra-workout BCAAs, and 1-on-1 personal trainer sessions.',
+    description: 'Workout day passes, protein shake blender bar, and 1-on-1 personal trainer sessions.',
     targetUrl: '/menu?restaurant=ironpulse-gym&table=tbl_g1',
     stats: 'Instant Locker Self-Pay · Recurring Member Passes',
   },
   {
-    id: 'rest_neonwave_event',
-    title: 'Music Festival & VIP Lounge',
-    tagline: 'NeonWave Cultural Fest 2026',
-    badge: 'Social Events',
-    icon: PartyPopper,
-    gradient: 'from-purple-600 to-pink-600',
-    stationLabel: 'VIP Lounge Booth 01',
-    description: 'VIP lounge table service, fast-track craft beer pickups, backstage wristbands, and festival glow merchandise.',
-    targetUrl: '/menu?restaurant=neonwave-fest&table=tbl_e1',
-    stats: 'Zero Line-Ups at Bar · 3x Faster Drink Dispatches',
+    id: 'rest_apex_clinic',
+    title: 'Medical Clinic & Diagnostics',
+    tagline: 'Apex Healthcare & Clinic',
+    badge: 'Healthcare OPD',
+    icon: Stethoscope,
+    color: 'teal',
+    stationLabel: 'Consultation Room 01',
+    description: 'Patient room QR tokens, OPD doctor bookings, and computerized prescription slips.',
+    targetUrl: '/menu?restaurant=apex-clinic&table=tbl_c1',
+    stats: '15m Average Consult Wait · Zero Reception Congestion',
   },
 ];
 
 export function LandingHero() {
   const navigate = useNavigate();
   const { setActiveRestaurant, restaurants } = useRestaurant();
-  const { addToast } = useToast();
   const [selectedDemo, setSelectedDemo] = useState(VERTICAL_DEMOS[0]);
   const [selectedVideo, setSelectedVideo] = useState(VIDEO_SUITE[0]);
 
@@ -202,138 +199,150 @@ export function LandingHero() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-sky-500 selection:text-white pb-24 w-full max-w-full overflow-x-hidden">
-      {/* Glow Effects */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-96 bg-gradient-to-b from-sky-500/10 via-purple-500/5 to-transparent blur-3xl pointer-events-none" />
-
-      {/* Hero Section */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20 text-center">
-        {/* Flat Pricing Banner */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-linear-to-r from-amber-500/20 via-orange-500/20 to-sky-500/20 border border-amber-500/40 text-amber-300 text-xs font-black shadow-xl mb-6">
-          <Zap className="w-4 h-4 text-amber-400" />
-          <span>Flat ₹1,000 / month · Unlimited Tables & Orders · Zero Cloud DB Fees</span>
-          <span className="bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full text-[10px] uppercase font-black ml-1">
-            60s Setup
+    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-amber-400 selection:text-slate-950 pb-24 w-full max-w-full overflow-x-hidden font-sans">
+      {/* Top Value Banner */}
+      <div className="border-b border-slate-800 bg-slate-900/80 px-4 py-2.5 text-center text-xs sm:text-sm text-slate-300">
+        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30 text-[11px]">
+            <Zap className="w-3 h-3" /> Flat ₹1,000 / month
           </span>
+          <span className="font-medium text-slate-200">
+            Zero per-order commission · Unlimited tables & orders · Works offline on local SQLite
+          </span>
+          <Link
+            to="/pricing"
+            className="text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-2 ml-1"
+          >
+            See Pricing &rarr;
+          </Link>
+        </div>
+      </div>
+
+      {/* Hero Header Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-16 text-center">
+        {/* Industry Pill */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-slate-300 text-xs font-semibold mb-6 shadow-sm">
+          <UtensilsCrossed className="w-3.5 h-3.5 text-amber-400" />
+          <span>Made for Indian Restaurants, Cafes & Food Businesses</span>
         </div>
 
-        {/* Headline */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white max-w-5xl mx-auto leading-[1.1]">
-          Turn Every Table, Room & Booth into an{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-amber-300 to-orange-500">
-            Instant Self-Order POS
-          </span>
+        {/* Clean, Non-AI Headline */}
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.15]">
+          The No-Commission QR Menu & POS Platform for Your Restaurant
         </h1>
 
-        {/* Subtitle */}
-        <p className="mt-6 text-base sm:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed font-normal">
-          The all-in-one operations suite for <span className="text-white font-semibold">Study Libraries</span>,{' '}
-          <span className="text-white font-semibold">Restaurants</span>,{' '}
-          <span className="text-white font-semibold">Salons & Spas</span>,{' '}
-          <span className="text-white font-semibold">Clinics</span>, and{' '}
-          <span className="text-white font-semibold">Gyms</span>. Features desk & table QR self-recharge, live kitchen KDS, phone-friendly profit estimators, on-demand trades dispatch, and local SQLite data ownership.
+        {/* Practical Indian SaaS Copy */}
+        <p className="mt-5 text-sm sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
+          Customers scan table QR codes and order in seconds. Orders chime instantly on your kitchen display (KDS), print GST bills, and store securely on your computer's local SQLite database.
         </p>
 
-        {/* CTA Buttons */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+        {/* Primary CTA Action Row - Mobile First */}
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md sm:max-w-none mx-auto">
           <Link
             to="/onboard"
-            className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-xl shadow-amber-500/25 transition active:scale-98 cursor-pointer"
+            className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10 transition active:scale-98 cursor-pointer"
           >
-            <span>Subscribe for ₹1,000 / month</span>
+            <span>Start Onboarding - ₹1,000/mo</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
 
           <Link
             to="/walkthrough"
-            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-sm border border-amber-500/30 flex items-center justify-center gap-2 transition"
+            className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-100 font-semibold text-sm border border-slate-700 flex items-center justify-center gap-2 transition"
           >
             <Play className="w-4 h-4 text-amber-400 fill-amber-400" />
-            <span>Watch Walkthrough (Subtitles)</span>
+            <span>Watch 7-Chapter Walkthrough</span>
           </Link>
 
           <Link
-            to="/services"
-            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-sky-300 font-bold text-sm border border-sky-500/30 flex items-center justify-center gap-2 transition"
+            to="/menu?restaurant=losteria&table=tbl_1"
+            className="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-medium text-sm border border-slate-800 flex items-center justify-center gap-2 transition"
           >
-            <Truck className="w-4 h-4 text-sky-400" />
-            <span>Apronto Trades & Porter</span>
-          </Link>
-
-          <button
-            onClick={() => handleLaunchDemo(selectedDemo)}
-            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 font-bold text-sm border border-slate-700 flex items-center justify-center gap-2 transition cursor-pointer"
-          >
-            <span>Launch Live Demo</span>
-          </button>
-
-          <Link
-            to="/super-admin"
-            className="w-full sm:w-auto px-5 py-4 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 text-purple-300 font-bold text-sm border border-purple-500/30 flex items-center justify-center gap-2 transition"
-          >
-            <Lock className="w-4 h-4 text-purple-400" />
-            <span>Super Admin (PIN: 2026)</span>
+            <QrCode className="w-4 h-4" />
+            <span>Try Table QR Menu</span>
           </Link>
         </div>
 
-        {/* Quick Trust Badges */}
-        <div className="mt-10 pt-8 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs text-slate-400 font-semibold">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Direct Razorpay Bank Payouts</span>
+        {/* Secondary Hubs (Trades & Admin) */}
+        <div className="mt-4 flex items-center justify-center gap-4 text-xs text-slate-400">
+          <Link
+            to="/services"
+            className="inline-flex items-center gap-1.5 text-sky-400 hover:text-sky-300 font-medium"
+          >
+            <Truck className="w-3.5 h-3.5" />
+            <span>Apronto Trades & Porter Logistics &rarr;</span>
+          </Link>
+          <span className="text-slate-700">·</span>
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-200 font-medium"
+          >
+            <Lock className="w-3.5 h-3.5 text-amber-400" />
+            <span>Staff Portal (PIN: 1234) &rarr;</span>
+          </Link>
+        </div>
+
+        {/* Real Metrics Badges */}
+        <div className="mt-10 pt-6 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
+          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+            <div className="text-xl sm:text-2xl font-extrabold text-white font-mono">₹1,000/mo</div>
+            <div className="text-xs text-slate-400 mt-0.5">Flat SaaS fee · 0% order cut</div>
           </div>
-          <div className="flex items-center gap-2">
-            <Video className="w-4 h-4 text-rose-400" />
-            <span>Dual Media (Video Loop + Photo Carousel)</span>
+          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+            <div className="text-xl sm:text-2xl font-extrabold text-white font-mono">3 Seconds</div>
+            <div className="text-xs text-slate-400 mt-0.5">Table scan to Kitchen KDS chime</div>
           </div>
-          <div className="flex items-center gap-2">
-            <Laptop className="w-4 h-4 text-blue-400" />
-            <span>Native Windows (.exe) & Android (.apk)</span>
+          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+            <div className="text-xl sm:text-2xl font-extrabold text-white font-mono">₹0 Cloud DB</div>
+            <div className="text-xs text-slate-400 mt-0.5">Local SQLite stays on your PC</div>
           </div>
-          <div className="flex items-center gap-2">
-            <Database className="w-4 h-4 text-purple-400" />
-            <span>Zero-Cost Local SQLite + 31st Monthly Download</span>
+          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800">
+            <div className="text-xl sm:text-2xl font-extrabold text-white font-mono">100% Direct</div>
+            <div className="text-xs text-slate-400 mt-0.5">Razorpay UPI to your bank account</div>
           </div>
         </div>
       </div>
 
-      {/* ENTERPRISE VIDEO SHOWCASE SUITE */}
+      {/* REAL VIDEO WALKTHROUGH SUITE */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 sm:mt-20">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-500/10 border border-rose-400/20 text-rose-400 text-xs font-bold mb-2">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-amber-400 text-xs font-semibold mb-2">
             <Video className="w-3.5 h-3.5" />
-            <span>Interactive Platform Video Demos</span>
+            <span>Real Screen Recordings</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-white">
-            See DineQR in Real Restaurant & Hotel Action
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            See the Live Software in Action
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-xl mx-auto">
-            Watch how customer QR table scans, live kitchen display chimes, and visual floor plans operate seamlessly in real time.
+            Actual screen recordings of table QR ordering, kitchen display chimes, visual floor plans, and mobile margin calculators.
           </p>
         </div>
 
-        {/* Video Tabs Selector */}
-        <div className="flex items-center justify-center gap-2 flex-wrap mb-6">
-          {VIDEO_SUITE.map((v) => (
-            <button
-              key={v.id}
-              onClick={() => setSelectedVideo(v)}
-              className={`px-4 py-2 rounded-2xl text-xs font-bold transition cursor-pointer flex items-center gap-2 ${
-                selectedVideo.id === v.id
-                  ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/20 ring-2 ring-amber-400'
-                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-              }`}
-            >
-              <Play className="w-3.5 h-3.5 fill-current" />
-              <span>{v.title}</span>
-            </button>
-          ))}
+        {/* Video Selector Tab Bar - Mobile Scrollable */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar scroll-smooth">
+          {VIDEO_SUITE.map((v) => {
+            const isSelected = selectedVideo.id === v.id;
+            return (
+              <button
+                key={v.id}
+                onClick={() => setSelectedVideo(v)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center gap-2 shrink-0 ${
+                  isSelected
+                    ? 'bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/10'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700'
+                }`}
+              >
+                <Play className="w-3 h-3 fill-current" />
+                <span>{v.title}</span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Video Player Card */}
-        <div className="bg-gradient-to-br from-slate-900 to-slate-950 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        {/* Active Video Player Showcase */}
+        <div className="bg-slate-900 rounded-2xl p-4 sm:p-7 border border-slate-800 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
           {/* Left: Video Player */}
-          <div className="lg:col-span-7 rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl relative bg-black aspect-video group">
+          <div className="lg:col-span-7 rounded-xl overflow-hidden border border-slate-800 bg-black aspect-video relative group">
             <video
               key={selectedVideo.videoUrl}
               src={selectedVideo.videoUrl}
@@ -343,7 +352,7 @@ export function LandingHero() {
               muted
               loop
               playsInline
-              preload="auto"
+              preload="metadata"
               ref={(el) => {
                 if (el) {
                   el.muted = true;
@@ -353,36 +362,36 @@ export function LandingHero() {
               }}
               className="w-full h-full object-cover"
             />
-            <div className="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-amber-300 border border-amber-400/30 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-              <span>Live Demonstration: {selectedVideo.badge}</span>
+            <div className="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-sm px-2.5 py-1 rounded-md text-[11px] font-bold text-amber-300 border border-slate-700/80 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span>{selectedVideo.badge}</span>
             </div>
           </div>
 
-          {/* Right: Feature Highlights & CTA */}
-          <div className="lg:col-span-5 space-y-5">
+          {/* Right: Feature Summary & Direct Links */}
+          <div className="lg:col-span-5 space-y-4">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400">
                 {selectedVideo.badge}
               </span>
-              <h3 className="text-xl sm:text-2xl font-black text-white mt-1">
+              <h3 className="text-lg sm:text-2xl font-bold text-white mt-1">
                 {selectedVideo.title}
               </h3>
-              <p className="text-xs font-semibold text-slate-300 mt-1">
+              <p className="text-xs text-slate-400 mt-1 font-medium">
                 {selectedVideo.subtitle}
               </p>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
               {selectedVideo.description}
             </p>
 
-            {/* Tag Pills */}
-            <div className="flex flex-wrap gap-2">
+            {/* Tags */}
+            <div className="flex flex-wrap gap-1.5">
               {selectedVideo.tags.map((tag, i) => (
                 <span
                   key={i}
-                  className="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-[11px] font-semibold flex items-center gap-1.5"
+                  className="px-2 py-1 rounded-md bg-slate-950 text-slate-300 border border-slate-800 text-[11px] font-medium flex items-center gap-1"
                 >
                   <Check className="w-3 h-3 text-emerald-400" />
                   <span>{tag}</span>
@@ -390,11 +399,12 @@ export function LandingHero() {
               ))}
             </div>
 
-            <div className="pt-3 flex flex-col sm:flex-row items-center gap-3">
+            {/* Action Buttons */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
               {selectedVideo.targetRoute && (
                 <Link
                   to={selectedVideo.targetRoute}
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition cursor-pointer"
                 >
                   <Play className="w-3.5 h-3.5 fill-current" />
                   <span>{selectedVideo.targetLabel || 'Try Feature Live'}</span>
@@ -403,32 +413,32 @@ export function LandingHero() {
 
               <Link
                 to="/onboard"
-                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs flex items-center justify-center gap-1 border border-slate-700 transition"
               >
-                <span>Subscribe (₹1k/mo)</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Onboard Restaurant (₹1k/mo)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Interactive Vertical Showcases */}
+      {/* INDUSTRY VERTICALS (Bistro, Cafe, Salon, Gym, Clinic) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24">
         <div className="text-center mb-8">
-          <span className="text-xs font-bold uppercase tracking-widest text-sky-400">
-            Tailored Industry Solutions
+          <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+            Interactive Demos
           </span>
-          <h2 className="text-2xl sm:text-3xl font-black text-white mt-1">
-            Engineered for High-Velocity Service Businesses
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mt-1">
+            Adapts Instantly to Your Business Model
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-xl mx-auto">
-            Click any vertical below to preview how the vocabulary, station designations, and customer interface adapt instantly.
+            Select a vertical below to preview how station names, catalog items, and ticket formats tailor to each service industry.
           </p>
         </div>
 
-        {/* Demo Selector Tabs */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+        {/* Demo Selector Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mb-6">
           {VERTICAL_DEMOS.map((demo) => {
             const Icon = demo.icon;
             const isSelected = selectedDemo.id === demo.id;
@@ -437,23 +447,23 @@ export function LandingHero() {
                 key={demo.id}
                 type="button"
                 onClick={() => setSelectedDemo(demo)}
-                className={`p-4 rounded-2xl border-2 text-left transition cursor-pointer flex flex-col justify-between ${
+                className={`p-3.5 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between ${
                   isSelected
-                    ? 'border-sky-500 bg-slate-900 ring-2 ring-sky-500/20 shadow-xl'
-                    : 'border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900'
+                    ? 'border-amber-500 bg-slate-900 shadow-md ring-1 ring-amber-500/30'
+                    : 'border-slate-800 bg-slate-900/50 hover:border-slate-700 hover:bg-slate-900'
                 }`}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div className={`p-2.5 rounded-xl bg-gradient-to-br ${demo.gradient} text-white shadow`}>
-                    <Icon className="w-5 h-5" />
+                <div className="flex items-center justify-between mb-2">
+                  <div className="p-2 rounded-lg bg-slate-800 text-amber-400">
+                    <Icon className="w-4 h-4" />
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
                     {demo.badge}
                   </span>
                 </div>
                 <div>
-                  <div className="font-bold text-white text-sm">{demo.title}</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5 truncate">{demo.tagline}</div>
+                  <div className="font-bold text-white text-xs sm:text-sm truncate">{demo.title}</div>
+                  <div className="text-[11px] text-slate-400 truncate mt-0.5">{demo.stationLabel}</div>
                 </div>
               </button>
             );
@@ -461,24 +471,24 @@ export function LandingHero() {
         </div>
 
         {/* Featured Showcase Card */}
-        <div className="bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 rounded-3xl p-6 sm:p-10 border border-slate-800 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-8">
-          <div className="space-y-4 max-w-xl">
+        <div className="bg-slate-900 rounded-2xl p-5 sm:p-8 border border-slate-800 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="space-y-3 max-w-xl">
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-sky-500/10 text-sky-400 border border-sky-400/20">
-                {selectedDemo.badge} Experience
+              <span className="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                {selectedDemo.badge}
               </span>
               <span className="text-xs text-slate-400">· Station: {selectedDemo.stationLabel}</span>
             </div>
 
-            <h3 className="text-2xl sm:text-3xl font-black text-white">
+            <h3 className="text-xl sm:text-2xl font-bold text-white">
               {selectedDemo.tagline}
             </h3>
 
-            <p className="text-slate-300 text-sm leading-relaxed">
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
               {selectedDemo.description}
             </p>
 
-            <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 text-xs text-emerald-400 font-semibold flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-emerald-400 font-semibold flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>{selectedDemo.stats}</span>
             </div>
@@ -486,7 +496,7 @@ export function LandingHero() {
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <button
                 onClick={() => handleLaunchDemo(selectedDemo)}
-                className="px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-sky-500/20 cursor-pointer"
+                className="px-5 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <span>Launch {selectedDemo.title} Demo</span>
                 <ArrowRight className="w-4 h-4" />
@@ -494,158 +504,142 @@ export function LandingHero() {
 
               <Link
                 to="/onboard"
-                className="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"
+                className="px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition border border-slate-700"
               >
                 <span>Onboard In This Category</span>
               </Link>
             </div>
           </div>
 
-          {/* Feature Highlights Grid */}
+          {/* Quick Feature Pillars */}
           <div className="w-full lg:w-auto grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md shrink-0 text-xs">
-            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
               <div className="font-bold text-white flex items-center gap-1.5">
-                <Video className="w-4 h-4 text-rose-400" />
-                <span>Dual Media Controls</span>
+                <Video className="w-4 h-4 text-amber-400" />
+                <span>Video Dish Loops</span>
               </div>
               <p className="text-slate-400 text-[11px]">
-                Clients can provide custom image URLs & video URLs. Customers toggle or scroll inside each card box.
+                Items feature looping videos and photos that increase customer order size by 30%.
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
               <div className="font-bold text-white flex items-center gap-1.5">
-                <CreditCard className="w-4 h-4 text-sky-400" />
-                <span>Direct UPI & Razorpay</span>
+                <CreditCard className="w-4 h-4 text-emerald-400" />
+                <span>Direct UPI Settlements</span>
               </div>
               <p className="text-slate-400 text-[11px]">
-                Google Pay, PhonePe, Paytm, and Cards route directly to the merchant account with instant settlements.
+                Zero middleman commissions. Money goes directly into the restaurant's merchant bank account.
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
               <div className="font-bold text-white flex items-center gap-1.5">
-                <Laptop className="w-4 h-4 text-amber-400" />
-                <span>Native Multi-OS Packages</span>
+                <Laptop className="w-4 h-4 text-sky-400" />
+                <span>Offline Windows & Android</span>
               </div>
               <p className="text-slate-400 text-[11px]">
-                Windows (.exe), Android (.apk), macOS (.dmg), and Linux (.deb) ready for immediate offline-first deployment.
+                Native desktop installer runs offline on any Windows 10/11 laptop or Android POS tablet.
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+            <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
               <div className="font-bold text-white flex items-center gap-1.5">
-                <Database className="w-4 h-4 text-purple-400" />
-                <span>Zero Cloud Database Fees</span>
+                <Database className="w-4 h-4 text-indigo-400" />
+                <span>Zero Cloud DB Bills</span>
               </div>
               <p className="text-slate-400 text-[11px]">
-                Orders stored in local SQLite database on premise. Remote online access available anytime via cloud tunnel.
+                Your data stays in your local SQLite file. Even if your subscription lapses, your records remain yours.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Odoo vs DineQR Enterprise Comparison Section */}
-        <div className="mt-20 p-8 sm:p-12 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl space-y-8">
-          <div className="text-center max-w-3xl mx-auto space-y-2">
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-400">
-              Why Pay 20x More for Enterprise ERP?
+        {/* COMPARISON TABLE: DineQR vs Traditional ERP / Aggregators */}
+        <div className="mt-16 sm:mt-20 p-5 sm:p-8 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-6">
+          <div className="text-center max-w-2xl mx-auto space-y-1.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+              Clear Comparison
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-white">
-              DineQR Omnichannel vs. Odoo Hospitality
+            <h2 className="text-xl sm:text-3xl font-bold text-white">
+              DineQR vs. Traditional ERP & Aggregators
             </h2>
-            <p className="text-sm text-slate-400">
-              Full enterprise restaurant & retail parity at a flat ₹1,000 / month with zero per-user or database surcharges.
+            <p className="text-xs sm:text-sm text-slate-400">
+              Full restaurant management without the 25% commissions or expensive cloud software fees.
             </p>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs md:text-sm">
-              <thead className="bg-slate-950 border-b border-slate-800 text-slate-400 font-extrabold uppercase">
+          <div className="overflow-x-auto -mx-2 sm:mx-0">
+            <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[500px]">
+              <thead className="bg-slate-950 text-slate-400 uppercase text-[11px] font-bold border-b border-slate-800">
                 <tr>
-                  <th className="py-4 px-5">Capability / Module</th>
-                  <th className="py-4 px-5 text-amber-400 font-black text-base">
+                  <th className="py-3 px-4">Feature / Requirement</th>
+                  <th className="py-3 px-4 text-amber-400 font-extrabold text-xs sm:text-sm">
                     DineQR Omnichannel
                   </th>
-                  <th className="py-4 px-5 text-slate-400">Odoo Enterprise</th>
+                  <th className="py-3 px-4 text-slate-400">Traditional ERP / Portals</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800 text-slate-300 font-medium">
+              <tbody className="divide-y divide-slate-800/80 text-slate-300 font-medium">
                 <tr>
-                  <td className="py-3.5 px-5 font-bold text-white">Subscription Pricing</td>
-                  <td className="py-3.5 px-5 text-amber-400 font-black">
-                    ₹1,000 / month flat (All Included)
+                  <td className="py-3 px-4 font-semibold text-white">Monthly Subscription</td>
+                  <td className="py-3 px-4 text-amber-400 font-bold font-mono">
+                    ₹1,000 / month flat
                   </td>
-                  <td className="py-3.5 px-5 text-slate-400">
-                    ₹20,000+ / mo ($240+/user/year + apps)
+                  <td className="py-3 px-4 text-slate-400 font-mono">
+                    ₹15,000 - ₹25,000 / month
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-3.5 px-5 font-bold text-white">Visual Drag & Drop Floor Plans</td>
-                  <td className="py-3.5 px-5 text-emerald-400 font-bold flex items-center gap-1.5">
-                    <Check className="w-4 h-4 text-emerald-400" />
+                  <td className="py-3 px-4 font-semibold text-white">Per-Order Commission</td>
+                  <td className="py-3 px-4 text-emerald-400 font-bold">
+                    0% (₹0 per order)
+                  </td>
+                  <td className="py-3 px-4 text-slate-400">
+                    18% to 28% per order
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-3 px-4 font-semibold text-white">Visual Floor Plan Builder</td>
+                  <td className="py-3 px-4 text-emerald-400 font-semibold flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Included (/admin/floor-plan)</span>
                   </td>
-                  <td className="py-3.5 px-5 text-slate-400">Requires POS Restaurant App</td>
+                  <td className="py-3 px-4 text-slate-400">Expensive add-on module</td>
                 </tr>
                 <tr>
-                  <td className="py-3.5 px-5 font-bold text-white">Table Bookings & Reservations</td>
-                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
-                    <Check className="w-4 h-4 text-emerald-400 inline mr-1.5" />
-                    <span>Included (/admin/reservations)</span>
+                  <td className="py-3 px-4 font-semibold text-white">Kitchen Display System (KDS)</td>
+                  <td className="py-3 px-4 text-emerald-400 font-semibold">
+                    <Check className="w-3.5 h-3.5 text-emerald-400 inline mr-1" />
+                    <span>Live Chimes & Status (/admin/kitchen)</span>
                   </td>
-                  <td className="py-3.5 px-5 text-slate-400">Separate Appointments App</td>
+                  <td className="py-3 px-4 text-slate-400">Requires dedicated hardware</td>
                 </tr>
                 <tr>
-                  <td className="py-3.5 px-5 font-bold text-white">Staff Planning & Shift Scheduler</td>
-                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
-                    <Check className="w-4 h-4 text-emerald-400 inline mr-1.5" />
-                    <span>Included (/admin/staff) with conflict checks</span>
+                  <td className="py-3 px-4 font-semibold text-white">Database Location & Fees</td>
+                  <td className="py-3 px-4 text-emerald-400 font-semibold">
+                    <span>Local SQLite on Premise (₹0 Fees)</span>
                   </td>
-                  <td className="py-3.5 px-5 text-slate-400">Separate Planning App</td>
+                  <td className="py-3 px-4 text-slate-400">Locked in cloud servers</td>
                 </tr>
                 <tr>
-                  <td className="py-3.5 px-5 font-bold text-white">Purchases & 3-Way Matching</td>
-                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
-                    <Check className="w-4 h-4 text-emerald-400 inline mr-1.5" />
-                    <span>Included (/admin/purchases)</span>
+                  <td className="py-3 px-4 font-semibold text-white">Phone Profit & Margin Estimator</td>
+                  <td className="py-3 px-4 text-emerald-400 font-semibold">
+                    <Check className="w-3.5 h-3.5 text-emerald-400 inline mr-1" />
+                    <span>Live Rent & Payroll Sliders</span>
                   </td>
-                  <td className="py-3.5 px-5 text-slate-400">Separate Purchase App</td>
-                </tr>
-                <tr>
-                  <td className="py-3.5 px-5 font-bold text-white">Inventory & Replenishment Alerts</td>
-                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
-                    <Check className="w-4 h-4 text-emerald-400 inline mr-1.5" />
-                    <span>Included (/admin/inventory)</span>
-                  </td>
-                  <td className="py-3.5 px-5 text-slate-400">Separate Inventory App</td>
-                </tr>
-                <tr>
-                  <td className="py-3.5 px-5 font-bold text-white">Cloud Database Costs</td>
-                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
-                    <span>₹0 (Local SQLite Storage on Premise)</span>
-                  </td>
-                  <td className="py-3.5 px-5 text-slate-400">
-                    Odoo.sh hosting fees apply
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-3.5 px-5 font-bold text-white">Native Standalone Packages</td>
-                  <td className="py-3.5 px-5 text-emerald-400 font-bold">
-                    <span>Windows (.exe), Android (.apk), macOS (.dmg), Linux (.deb)</span>
-                  </td>
-                  <td className="py-3.5 px-5 text-slate-400">IoT Box hardware extra cost</td>
+                  <td className="py-3 px-4 text-slate-400">Complex manual Excel exports</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div className="pt-4 text-center">
+          <div className="pt-2 text-center">
             <Link
               to="/onboard"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/20 transition cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition cursor-pointer"
             >
-              <span>Get Started for ₹1,000 / month</span>
+              <span>Get Started for Flat ₹1,000 / month</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
