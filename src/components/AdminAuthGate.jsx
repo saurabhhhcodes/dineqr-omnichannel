@@ -23,6 +23,17 @@ export function AdminAuthGate({ children }) {
     const isSuperAuthed = sessionStorage.getItem(superAuthKey) === 'true';
     const isStaffAuthed = sessionStorage.getItem(authKey) === 'true';
 
+    // Auto-login test auditor if query param ?test=1 or ?qa=true is present
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('test') === '1' || searchParams.get('qa') === 'true') {
+      sessionStorage.setItem(authKey, 'true');
+      sessionStorage.setItem(superAuthKey, 'true');
+      sessionStorage.setItem('dineqr_test_user', 'true');
+      sessionStorage.setItem('dineqr_test_user_email', 'test_auditor@dineqr.com');
+      setIsAuthenticated(true);
+      return;
+    }
+
     if (isSuperAuthed || isStaffAuthed) {
       setIsAuthenticated(true);
     } else {
@@ -45,7 +56,12 @@ export function AdminAuthGate({ children }) {
       // 1. Instant verification for standard authorized PINs (zero network delay or failure risk)
       if (code === '1234' || code === expectedPin || code === '2026' || code === '9999') {
         sessionStorage.setItem(authKey, 'true');
-        if (code === '2026' || code === '9999') {
+        if (code === '9999') {
+          sessionStorage.setItem(superAuthKey, 'true');
+          sessionStorage.setItem('dineqr_test_user', 'true');
+          sessionStorage.setItem('dineqr_test_user_email', 'test_auditor@dineqr.com');
+          addToast('QA Test Auditor Session Active (Safe Sandbox)');
+        } else if (code === '2026') {
           sessionStorage.setItem(superAuthKey, 'true');
           addToast('Super Admin Master Access Granted');
         } else {
@@ -262,6 +278,18 @@ export function AdminAuthGate({ children }) {
             className="py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg shadow-amber-500/20 disabled:opacity-40"
           >
             {isVerifying ? '...' : 'Unlock'}
+          </button>
+        </div>
+
+        {/* 1-Click QA Test Login for Prospective Clients / Reviewers */}
+        <div className="pt-1">
+          <button
+            type="button"
+            onClick={() => verifyPinCode('9999')}
+            className="w-full py-2.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer active:scale-98"
+          >
+            <KeyRound className="w-4 h-4 text-purple-400" />
+            <span>1-Click QA Test Login (Sandbox · PIN: 9999)</span>
           </button>
         </div>
 

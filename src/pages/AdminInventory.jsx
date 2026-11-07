@@ -354,24 +354,24 @@ export function AdminInventory() {
 
             <form onSubmit={handleCreateItem} className="space-y-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Item Name *</label>
+                <label className="text-xs font-bold text-slate-950 block mb-1">Item Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Buffalo Mozzarella, Truffle Oil"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                  className="w-full px-3 py-2 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs placeholder:text-slate-500 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none shadow-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Category</label>
+                  <label className="text-xs font-bold text-slate-950 block mb-1">Category</label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white outline-none"
+                    className="w-full px-3 py-2 rounded-xl border-2 border-slate-300 text-xs bg-white text-slate-950 font-bold outline-none shadow-xs"
                   >
                     <option value="Raw Ingredients">Raw Ingredients</option>
                     <option value="Dairy & Cheese">Dairy & Cheese</option>
@@ -383,11 +383,11 @@ export function AdminInventory() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Unit</label>
+                  <label className="text-xs font-bold text-slate-950 block mb-1">Unit</label>
                   <select
                     value={unit}
                     onChange={(e) => setUnit(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white outline-none"
+                    className="w-full px-3 py-2 rounded-xl border-2 border-slate-300 text-xs bg-white text-slate-950 font-bold outline-none shadow-xs"
                   >
                     <option value="kg">kg (Kilogram)</option>
                     <option value="liters">liters</option>
@@ -400,46 +400,46 @@ export function AdminInventory() {
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Current Stock</label>
+                  <label className="text-xs font-bold text-slate-950 block mb-1">Current Stock</label>
                   <input
                     type="number"
                     step="0.5"
                     value={currentStock}
                     onChange={(e) => setCurrentStock(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs outline-none"
+                    className="w-full px-3 py-2 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs outline-none shadow-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Min Reorder</label>
+                  <label className="text-xs font-bold text-slate-950 block mb-1">Min Reorder</label>
                   <input
                     type="number"
                     step="0.5"
                     value={minReorderLevel}
                     onChange={(e) => setMinReorderLevel(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs outline-none"
+                    className="w-full px-3 py-2 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs outline-none shadow-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Unit Cost (₹)</label>
+                  <label className="text-xs font-bold text-slate-950 block mb-1">Unit Cost (₹)</label>
                   <input
                     type="number"
                     value={unitCost}
                     onChange={(e) => setUnitCost(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs outline-none"
+                    className="w-full px-3 py-2 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs outline-none shadow-xs"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Primary Supplier</label>
+                <label className="text-xs font-bold text-slate-950 block mb-1">Primary Supplier</label>
                 <input
                   type="text"
                   placeholder="e.g. Metro Wholesale Foods"
                   value={supplierName}
                   onChange={(e) => setSupplierName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs outline-none"
+                  className="w-full px-3 py-2 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-xs placeholder:text-slate-500 outline-none shadow-xs"
                 />
               </div>
 

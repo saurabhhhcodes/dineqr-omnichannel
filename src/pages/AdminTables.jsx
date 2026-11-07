@@ -463,48 +463,48 @@ export function AdminTables() {
 
             <form onSubmit={handleConfirmReservation} className="mt-5 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Guest Full Name *</label>
+                <label className="block text-xs font-bold text-slate-950 mb-1">Guest Full Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Vikram Malhotra"
                   value={reserveForm.guest_name}
                   onChange={(e) => setReserveForm({ ...reserveForm, guest_name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number</label>
+                  <label className="block text-xs font-bold text-slate-950 mb-1">Phone Number</label>
                   <input
                     type="tel"
                     placeholder="+91 98765 43210"
                     value={reserveForm.phone}
                     onChange={(e) => setReserveForm({ ...reserveForm, phone: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-xs"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Reservation Time</label>
+                  <label className="block text-xs font-bold text-slate-950 mb-1">Reservation Time</label>
                   <input
                     type="time"
                     value={reserveForm.time}
                     onChange={(e) => setReserveForm({ ...reserveForm, time: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-xs"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Party Size (Pax)</label>
+                <label className="block text-xs font-bold text-slate-950 mb-1">Party Size (Pax)</label>
                 <input
                   type="number"
                   min="1"
                   max="20"
                   value={reserveForm.pax}
                   onChange={(e) => setReserveForm({ ...reserveForm, pax: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-xs"
                 />
               </div>
 
@@ -552,7 +552,7 @@ export function AdminTables() {
 
             <form onSubmit={handleAddTable} className="mt-5 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-950 mb-1">
                   {unitLabel} Identifier / Number *
                 </label>
                 <input
@@ -561,40 +561,40 @@ export function AdminTables() {
                   placeholder={bType === 'gym' ? 'e.g. Bay 05' : bType === 'clinic' ? 'e.g. Room 102' : 'e.g. Table 14'}
                   value={newTableNumber}
                   onChange={(e) => setNewTableNumber(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Friendly Display Name</label>
+                <label className="block text-xs font-bold text-slate-950 mb-1">Friendly Display Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Window Corner / Balcony"
                   value={newTableName}
                   onChange={(e) => setNewTableName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Floor Section</label>
+                  <label className="block text-xs font-bold text-slate-950 mb-1">Floor Section</label>
                   <input
                     type="text"
                     value={newSection}
                     onChange={(e) => setNewSection(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-xs"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Capacity (Pax)</label>
+                  <label className="block text-xs font-bold text-slate-950 mb-1">Capacity (Pax)</label>
                   <input
                     type="number"
                     min="1"
                     max="50"
                     value={newCapacity}
                     onChange={(e) => setNewCapacity(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-xs"
                   />
                 </div>
               </div>

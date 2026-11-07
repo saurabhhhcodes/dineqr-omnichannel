@@ -253,8 +253,8 @@ export function MultiBusinessDashboard() {
       await openRazorpayCheckout({
         amountPaise: 150000,
         receipt: `rcpt_test_${Date.now()}`,
-        customerName: 'Saurabh Bajpai',
-        customerEmail: 'saurabhbajpai03@gmail.com',
+        customerName: 'Verified Business Partner',
+        customerEmail: 'merchant@dineqr.com',
         customerPhone: '+919876543210',
         restaurantName: activeVertical.name,
         onSuccess: (p) => {

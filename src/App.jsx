@@ -108,8 +108,13 @@ function AppContent() {
           <Route path="/super-admin" element={<AdminAuthGate><SuperAdmin /></AdminAuthGate>} />
           <Route path="/admin/super" element={<AdminAuthGate><SuperAdmin /></AdminAuthGate>} />
 
-          {/* Catch-all */}
-          <Route path="*" element={<Navigate to="/menu" replace />} />
+          {/* Public Live Interactive Demonstrations (Consumer & Merchant Exploration) */}
+          <Route path="/tokens" element={<TokenDisplay />} />
+          <Route path="/display/tokens" element={<TokenDisplay />} />
+          <Route path="/captain" element={<CaptainApp />} />
+          <Route path="/kds-demo" element={<AdminKitchen isPublicDemo={true} />} />
+          <Route path="/poss" element={<Navigate to="/pricing" replace />} />
+          <Route path="/compare/petpooja" element={<Navigate to="/pricing" replace />} />
         </Routes>
       </div>
 

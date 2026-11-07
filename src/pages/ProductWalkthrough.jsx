@@ -35,6 +35,7 @@ import {
   Zap,
   Dumbbell,
   Users,
+  Wifi,
 } from 'lucide-react';
 import { openRazorpayCheckout } from '../utils/razorpayCheckout.js';
 import { useToast } from '../context/ToastContext.jsx';
@@ -474,15 +475,15 @@ export function ProductWalkthrough() {
       icon: Zap,
       videoUrl: '/videos/walkthrough_subscription.mp4',
       hindiNarration:
-        'अध्याय 7: नए रेस्टोरेंट का ऑनबोर्डिंग फ्लो। व्यापारी पेटपूजा के 25,000 रुपये के खर्च से बचकर मात्र ₹1,500 प्रति माह के लोकल डीबी प्लान को चुनते हैं। देखिए, हम "Subscribe with Razorpay" बटन दबा रहे हैं। असली रेज़रपे का चेकआउट मोडल खुल गया, जहां यूपीआई और कार्ड से तुरंत पेमेंट हो जाती है।',
+        'अध्याय 7: नए रेस्टोरेंट का ऑनबोर्डिंग फ्लो। व्यापारी भारी हार्डवेयर या लेगेसी सेटअप खर्च से बचकर मात्र ₹1,500 प्रति माह के लोकल डीबी प्लान को चुनते हैं। देखिए, हम "Subscribe with Razorpay" बटन दबा रहे हैं। असली रेज़रपे का चेकआउट मोडल खुल गया, जहां यूपीआई और कार्ड से तुरंत पेमेंट हो जाती है।',
       englishNarration:
-        'Chapter 7: Merchant Onboarding Flow. Instead of Petpooja’s ₹25,000 upfront fee, owners select our flat ₹1,500/month Local DB Plan. Watch as we tap "Subscribe with Razorpay". The official Razorpay checkout modal opens for instant UPI activation.',
+        'Chapter 7: Merchant Onboarding Flow. Instead of expensive legacy hardware lock-in fees, owners select our flat ₹1,500/month Local DB Plan. Watch as we tap "Subscribe with Razorpay". The official Razorpay checkout modal opens for instant UPI activation.',
       stepsCount: 3,
       executeSimulation: async (runStep) => {
         // Step 1: Select Plan
         await runStep(
           1,
-          'व्यापारी ने पेटपूजा के 25,000 के खर्च से बचकर मात्र ₹1,500 प्रति माह का प्लान चुना।',
+          'व्यापारी ने भारी सेटअप खर्च से बचकर मात्र ₹1,500 प्रति माह का प्लान चुना।',
           'Merchant selects our flat ₹1,500/month Local DB Plan with zero cloud fees.',
           async () => {
             setCursorPos({ x: 50, y: 40, visible: true, clicking: true });
@@ -792,32 +793,11 @@ export function ProductWalkthrough() {
           </h1>
         </div>
 
-        {/* View Mode & Language Toggles */}
+        {/* Hardware Reality Mode Badge & Language Toggles */}
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Display Mode: Live Interactive Canvas vs Video */}
-          <div className="flex items-center rounded-xl bg-slate-800 p-1 border border-slate-700 text-xs font-bold">
-            <button
-              onClick={() => setDisplayMode('interactive')}
-              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-                displayMode === 'interactive'
-                  ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                  : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              <MousePointerClick className="w-3.5 h-3.5" />
-              <span>Live App Simulator</span>
-            </button>
-            <button
-              onClick={() => setDisplayMode('video')}
-              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-                displayMode === 'video'
-                  ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                  : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              <MonitorPlay className="w-3.5 h-3.5" />
-              <span>Recorded Video</span>
-            </button>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700/80 text-xs font-bold text-amber-300">
+            <Smartphone className="w-3.5 h-3.5 text-amber-400" />
+            <span>Interactive Device & Hardware Reality</span>
           </div>
 
           {/* Hindi / English Audio Switcher */}
@@ -860,11 +840,12 @@ export function ProductWalkthrough() {
           </div>
 
           <Link
-            to="/poss"
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-white transition flex items-center gap-1.5"
+            to="/tokens"
+            className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-amber-300 transition flex items-center gap-1.5"
+            title="Open Fullscreen TV Announcer"
           >
-            <Store className="w-4 h-4 text-amber-400" />
-            <span>Petpooja Comparison</span>
+            <Tv className="w-4 h-4 text-amber-400" />
+            <span>Token TV Screen</span>
           </Link>
         </div>
       </header>
@@ -951,23 +932,47 @@ export function ProductWalkthrough() {
               </div>
             )}
 
-            {/* DEVICE CANVAS: Content changes based on active user flow */}
+            {/* DEVICE CANVAS: Interactive Hardware & Device Reality */}
             <div className="flex-1 p-4 sm:p-6 flex flex-col justify-center relative overflow-hidden bg-slate-950/60">
-              {displayMode === 'video' ? (
-                /* Mode A: Real Captured Platform Video */
-                <div className="w-full h-full aspect-video rounded-2xl overflow-hidden bg-black flex items-center justify-center">
-                  <video
-                    src={currentFlow.videoUrl}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                /* Mode B: Live Real-Time Interactive Device Screen */
-                <div className="w-full max-w-xl mx-auto rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-2xl space-y-4">
+              {currentFlow.id === 'customer' || currentFlow.id === 'captain' ? (
+                /* Mode 1: Authentic iPhone 16 Pro Mockup Chassis (Dynamic Island, 9:41 Status, Safari Bar, Home Indicator) */
+                <div className="w-full max-w-[380px] mx-auto rounded-[52px] border-[10px] border-slate-900 bg-slate-950 shadow-2xl relative flex flex-col overflow-hidden ring-1 ring-slate-800 shadow-amber-500/5">
+                  {/* Dynamic Island Notch & iOS 9:41 Status Bar */}
+                  <div className="bg-slate-950 pt-3 px-6 pb-2 shrink-0 border-b border-slate-900 select-none">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-white mb-2">
+                      <span className="font-semibold tracking-tight">9:41</span>
+                      
+                      {/* Dynamic Island Pill */}
+                      <div className="w-24 h-5 bg-black rounded-full flex items-center justify-between px-2.5 shadow-inner">
+                        <div className="w-2 h-2 rounded-full bg-slate-900 border border-slate-800" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/80 animate-pulse" />
+                      </div>
+
+                      {/* 5G, Wi-Fi, Battery */}
+                      <div className="flex items-center gap-1.5 text-slate-200">
+                        <span className="text-[9px] font-extrabold uppercase tracking-tighter">5G</span>
+                        <Wifi className="w-3.5 h-3.5" />
+                        <div className="w-5 h-2.5 rounded-[4px] border border-white/80 p-0.5 flex items-center">
+                          <div className="h-full w-full bg-white rounded-[2px]" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Safari Compact Mobile Address Bar */}
+                    <div className="flex items-center justify-between bg-slate-900/90 border border-slate-800/80 rounded-full px-3 py-1 text-[11px] text-slate-300 shadow-inner">
+                      <span className="text-[10px] font-bold text-slate-400">aA</span>
+                      <div className="flex items-center gap-1.5 text-slate-200 font-mono text-[10px]">
+                        <Lock className="w-2.5 h-2.5 text-emerald-400" />
+                        <span>
+                          {currentFlow.id === 'customer' ? 'dineqr.live/losteria/tbl_1' : 'dineqr.live/captain'}
+                        </span>
+                      </div>
+                      <RotateCcw className="w-2.5 h-2.5 text-slate-400 hover:text-white cursor-pointer" />
+                    </div>
+                  </div>
+
+                  {/* iPhone Screen Viewport */}
+                  <div className="p-4 overflow-y-auto max-h-[620px] space-y-4 bg-slate-900/90">
                   {/* Flow 1: Customer Self-Ordering Screen with Complete Basket & Razorpay Flow */}
                   {currentFlow.id === 'customer' && (
                     <div className="space-y-3">
@@ -1238,7 +1243,16 @@ export function ProductWalkthrough() {
                       )}
                     </div>
                   )}
+                  </div>
 
+                  {/* iOS Home Swipe Bar Indicator */}
+                  <div className="py-2.5 bg-slate-950 flex justify-center shrink-0">
+                    <div className="w-32 h-1 bg-slate-500/40 rounded-full" />
+                  </div>
+                </div>
+              ) : (
+                /* Mode 2: Enterprise Chef KDS & Back-Office Station Screen */
+                <div className="w-full max-w-xl mx-auto rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-2xl space-y-4">
                   {/* Flow 3: Kitchen KDS Screen */}
                   {currentFlow.id === 'kitchen' && (
                     <div className="space-y-4">
@@ -1524,8 +1538,8 @@ export function ProductWalkthrough() {
                             await openRazorpayCheckout({
                               amountPaise: onboardingPlanSelected === 'cloud_5000' ? 500000 : 150000,
                               receipt: 'rcpt_demo_onboard',
-                              customerName: 'Saurabh Bajpai (saurabhbajpai03)',
-                              customerEmail: 'saurabhbajpai03@gmail.com',
+                              customerName: 'Verified Merchant Partner',
+                              customerEmail: 'merchant@dineqr.com',
                               customerPhone: '+919876543210',
                               restaurantName: `DineQR ${onboardingPlanSelected === 'cloud_5000' ? '₹5,000 Cloud' : '₹1,500 Local'} Plan`,
                               onSuccess: (p) => {
@@ -1735,22 +1749,22 @@ export function ProductWalkthrough() {
             })}
           </div>
 
-          {/* Quick Onboarding for Saurabh Bajpai */}
+          {/* Verified Merchant Partner License Status */}
           <div className="mt-2 p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/30">
             <div className="flex items-center gap-2 text-xs font-black text-amber-400">
               <Sparkles className="w-4 h-4" />
-              <span>Verified Onboarding Active</span>
+              <span>Enterprise Commercial License Active</span>
             </div>
             <p className="text-xs text-slate-300 mt-1">
-              Account: <strong className="text-white">saurabhbajpai03</strong><br />
-              Restaurant: <strong className="text-white">Saurabh Bajpai Bistro & Roastery</strong>
+              Organization: <strong className="text-white">Apex Grand Bistro & Cafe Network</strong><br />
+              Tier: <strong className="text-white">Commercial Verified (100% On-Premise SQLite)</strong>
             </p>
             <div className="mt-2 flex items-center gap-2">
               <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                ₹1,500 Local DB Ready
+                ₹1,500 Flat License Ready
               </span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 border border-sky-500/30">
-                MongoDB Atlas Free M0
+                0% Commission Verified
               </span>
             </div>
           </div>

@@ -156,7 +156,7 @@ export function ItemModal({ item, onClose }) {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Less spicy, dressing on the side, extra crispy..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition"
+              className="w-full px-3.5 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-950 font-bold text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition shadow-xs"
               maxLength={120}
             />
           </div>

@@ -20,7 +20,40 @@ import { playOrderChime } from '../utils/audioAlert.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 
-export function AdminKitchen() {
+const DEMO_ORDERS = [
+  {
+    id: 'ord_demo_1',
+    order_code: 'ORD-9128',
+    table_id: 'tbl_3',
+    table_number: 'Table 03',
+    token_number: 128,
+    status: 'RECEIVED',
+    created_at_utc: new Date(Date.now() - 180000).toISOString(),
+    customer_name: 'Vikram Malhotra',
+    notes: 'Less spicy, extra crispy crust',
+    items: [
+      { id: 'item_1', name: 'Wood-Fired Margherita Pizza', quantity: 2, price: 450 },
+      { id: 'item_2', name: 'Artisan Truffle Fries', quantity: 1, price: 260 },
+    ],
+  },
+  {
+    id: 'ord_demo_2',
+    order_code: 'ORD-9129',
+    table_id: 'tbl_7',
+    table_number: 'Table 07',
+    token_number: 129,
+    status: 'PREPARING',
+    created_at_utc: new Date(Date.now() - 420000).toISOString(),
+    customer_name: 'Ananya Roy',
+    notes: 'Jain preparation - no onion / garlic',
+    items: [
+      { id: 'item_3', name: 'Penne Arrabiata', quantity: 1, price: 380 },
+      { id: 'item_4', name: 'Garlic Herb Breadsticks', quantity: 2, price: 180 },
+    ],
+  },
+];
+
+export function AdminKitchen({ isPublicDemo = false }) {
   const { activeRestaurant } = useRestaurant();
   const { addToast } = useToast();
   const [orders, setOrders] = useState([]);
@@ -83,11 +116,11 @@ export function AdminKitchen() {
 
   // Fetch active orders for this restaurant
   const fetchOrders = () => {
-    if (!activeRestaurant) return;
-    fetch(`/api/orders?status=active&restaurant_id=${activeRestaurant.id}`)
+    const restId = activeRestaurant?.id || 'rest_losteria';
+    fetch(`/api/orders?status=active&restaurant_id=${restId}`)
       .then((r) => r.json())
       .then((data) => {
-        if (data.success && data.orders) {
+        if (data.success && data.orders && data.orders.length > 0) {
           if (data.orders.length > prevOrderCountRef.current) {
             if (soundEnabled && prevOrderCountRef.current > 0) {
               playOrderChime();
@@ -96,9 +129,16 @@ export function AdminKitchen() {
           }
           prevOrderCountRef.current = data.orders.length;
           setOrders(data.orders);
+        } else if (isPublicDemo) {
+          setOrders((prev) => (prev.length > 0 ? prev : DEMO_ORDERS));
         }
       })
-      .catch((err) => console.error('Failed to load orders:', err));
+      .catch((err) => {
+        console.error('Failed to load orders:', err);
+        if (isPublicDemo) {
+          setOrders((prev) => (prev.length > 0 ? prev : DEMO_ORDERS));
+        }
+      });
   };
 
   const handlePrintTicket = async (orderId, orderCode) => {
@@ -173,6 +213,15 @@ export function AdminKitchen() {
   // Status transitions
   const updateStatus = async (orderId, newStatus) => {
     setIsUpdating(true);
+    if (String(orderId).startsWith('ord_demo_')) {
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+      );
+      playOrderChime();
+      addToast(`Demo Order marked as ${newStatus}! (State synced)`, 'success');
+      setIsUpdating(false);
+      return;
+    }
     try {
       const res = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PATCH',
@@ -198,6 +247,20 @@ export function AdminKitchen() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 pb-20">
+      {/* Public Interactive Demonstration Header */}
+      {isPublicDemo && (
+        <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border-b border-amber-500/40 px-4 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-amber-200">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span className="font-black text-amber-400 uppercase tracking-wide">PUBLIC KDS LIVE TEST:</span>
+            <span>Tap "Start Prep" & "Mark Ready" to test real-time sound chimes and pipeline!</span>
+          </div>
+          <Link to="/tokens" className="text-white hover:text-amber-400 font-bold underline text-xs">
+            Open Token TV Announcer ➔
+          </Link>
+        </div>
+      )}
+
       {/* Top KDS Control Bar */}
       <div className="bg-slate-950/95 border-b border-slate-800 px-3 sm:px-6 py-3.5 backdrop-blur-md w-full max-w-full">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">

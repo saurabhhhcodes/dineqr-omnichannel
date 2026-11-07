@@ -84,3 +84,58 @@ iframe[src*="netlify"] {
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+/* Universal High-Contrast Form Inputs & Modals (Prevents faint grey or invisible text) */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+textarea,
+select {
+  color: #020617; /* Slate-950 high contrast text */
+  background-color: #ffffff;
+  font-weight: 600;
+}
+
+/* Inside dark panels and dark back-office containers */
+.bg-slate-900 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.bg-slate-900 textarea,
+.bg-slate-900 select,
+.bg-slate-950 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.bg-slate-950 textarea,
+.bg-slate-950 select,
+.dark-input {
+  color: #f8fafc !important; /* Pure Slate-50 */
+  background-color: #020617 !important;
+  font-weight: 600 !important;
+}
+
+/* Force pure dark bold text in all white modal dialogs, drawers and cards */
+.bg-white input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.bg-white textarea,
+.bg-white select,
+.bg-slate-50 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.bg-slate-50 textarea,
+.bg-slate-50 select,
+.bg-slate-100 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.bg-slate-100 textarea,
+.bg-slate-100 select,
+div[role="dialog"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+div[role="dialog"] textarea,
+div[role="dialog"] select {
+  color: #020617 !important; /* Pure Slate-950 */
+  background-color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* Ensure placeholders are visible, crisp slate-500, not faint invisible grey */
+input::placeholder,
+textarea::placeholder {
+  color: #64748b !important; /* Slate-500 */
+  font-weight: 500 !important;
+  opacity: 1 !important;
+}
+
+.bg-slate-900 input::placeholder,
+.bg-slate-950 input::placeholder {
+  color: #94a3b8 !important; /* Slate-400 */
+  opacity: 1 !important;
+}
+
