@@ -26,7 +26,8 @@ import {
   XCircle,
   Smartphone,
   Eye,
-  Percent
+  Percent,
+  Database,
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';

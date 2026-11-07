@@ -13,7 +13,9 @@
     "electron:dev": "concurrently \"node server/index.js\" \"vite\" \"electron electron/main.cjs\"",
     "test": "node tests/postman-runner.js && node tests/full-system.test.js",
     "test:system": "node tests/full-system.test.js",
-    "test:postman": "node tests/postman-runner.js"
+    "test:postman": "node tests/postman-runner.js",
+    "code-review": "node scripts/code_review_bot.cjs",
+    "review": "node scripts/code_review_bot.cjs"
   },
   "keywords": [],
   "author": "",

@@ -33,6 +33,8 @@ import {
   X as CloseIcon,
   Store,
   Compass,
+  Sparkles,
+  Plus,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';

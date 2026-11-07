@@ -33,6 +33,8 @@ import {
   ChevronRight,
   Lock,
   Zap,
+  Dumbbell,
+  Users,
 } from 'lucide-react';
 import { openRazorpayCheckout } from '../utils/razorpayCheckout.js';
 import { useToast } from '../context/ToastContext.jsx';

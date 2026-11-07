@@ -26,6 +26,7 @@ import {
   Award,
   ChevronRight,
   TrendingUp,
+  Dumbbell,
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
