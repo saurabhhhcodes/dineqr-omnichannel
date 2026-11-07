@@ -15,6 +15,8 @@ import {
   FolderPlus,
   RefreshCw,
   X,
+  Pencil,
+  Check,
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -70,6 +72,39 @@ export function AdminMenu() {
   const [showCatModal, setShowCatModal] = useState(false);
   const [newCatName, setNewCatName] = useState('');
   const [newCatDesc, setNewCatDesc] = useState('');
+
+  // Quick Inline Price Editing
+  const [inlinePriceItem, setInlinePriceItem] = useState(null);
+  const [inlinePriceVal, setInlinePriceVal] = useState('');
+  const [isSavingPrice, setIsSavingPrice] = useState(false);
+
+  const handleQuickPriceSave = async (itemId) => {
+    if (!inlinePriceVal || isNaN(parseFloat(inlinePriceVal))) {
+      addToast('Please enter a valid price number', 'error');
+      return;
+    }
+    setIsSavingPrice(true);
+    try {
+      const res = await fetch(`/api/menu/items/${itemId}/price`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ price: parseFloat(inlinePriceVal) }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        addToast(data.message || `Price updated to ₹${inlinePriceVal}!`);
+        setInlinePriceItem(null);
+        setInlinePriceVal('');
+        fetchMenuData();
+      } else {
+        addToast(data.error || 'Failed to update price', 'error');
+      }
+    } catch (err) {
+      addToast('Error updating price: ' + err.message, 'error');
+    } finally {
+      setIsSavingPrice(false);
+    }
+  };
 
   const fetchMenuData = () => {
     if (!activeRestaurant) return;
@@ -402,9 +437,50 @@ export function AdminMenu() {
                   <div>
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="font-bold text-slate-900 text-sm">{item.name}</h3>
-                      <span className="font-black text-slate-900 text-base shrink-0">
-                        ₹{item.price}
-                      </span>
+                      
+                      {inlinePriceItem === item.id ? (
+                        <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+                          <span className="text-xs font-bold text-slate-500">₹</span>
+                          <input
+                            type="number"
+                            autoFocus
+                            value={inlinePriceVal}
+                            onChange={(e) => setInlinePriceVal(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleQuickPriceSave(item.id);
+                              if (e.key === 'Escape') setInlinePriceItem(null);
+                            }}
+                            className="w-20 px-2 py-0.5 text-xs font-black border border-amber-500 rounded-lg outline-none focus:ring-1 focus:ring-amber-500 bg-white"
+                          />
+                          <button
+                            onClick={() => handleQuickPriceSave(item.id)}
+                            disabled={isSavingPrice}
+                            className="p-1 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 transition cursor-pointer"
+                            title="Save new price"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => setInlinePriceItem(null)}
+                            className="p-1 rounded-md bg-slate-200 text-slate-600 hover:bg-slate-300 transition cursor-pointer"
+                            title="Cancel"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setInlinePriceItem(item.id);
+                            setInlinePriceVal(item.price.toString());
+                          }}
+                          className="group/price flex items-center gap-1 font-black text-slate-900 text-base shrink-0 hover:text-amber-600 transition cursor-pointer px-1.5 py-0.5 rounded-lg hover:bg-amber-50 border border-transparent hover:border-amber-200"
+                          title="Click to quickly change price"
+                        >
+                          <span>₹{item.price}</span>
+                          <Pencil className="w-3 h-3 text-slate-400 opacity-60 group-hover/price:opacity-100 group-hover/price:text-amber-600 transition" />
+                        </button>
+                      )}
                     </div>
 
                     <p className="text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed">

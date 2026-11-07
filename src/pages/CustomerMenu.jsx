@@ -4,7 +4,6 @@ import { useSearchParams } from 'react-router-dom';
 import {
   Search,
   SlidersHorizontal,
-  Sparkles,
   ShoppingBag,
   Utensils,
   ChevronDown,
@@ -13,6 +12,9 @@ import {
   Star,
   MapPin,
   Zap,
+  Check,
+  Clock,
+  Sparkles,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
@@ -57,7 +59,7 @@ export function CustomerMenu() {
     }
   }, [restaurantParam, restaurants, activeRestaurant]);
 
-  // 1. Resolve Table from URL query parameter (or Counter Scanner mode)
+  // 1. Resolve Table from URL query parameter
   useEffect(() => {
     const restId = currentRestaurant?.id || activeRestaurant?.id || 'rest_losteria';
     fetch(`/api/tables?restaurant_id=${restId}`)
@@ -73,13 +75,13 @@ export function CustomerMenu() {
           }
 
           if (tableParam === 'counter' || tableParam === 'takeaway' || (!tableParam && data.tables.length === 0)) {
-            setTable({ id: 'counter', table_number: 'Counter Pickup · Daily Token', section: 'Express Takeaway' });
+            setTable({ id: 'counter', table_number: 'Counter Pickup', section: 'Takeaway' });
           } else if (matched) {
             setTable(matched);
           } else if (data.tables.length > 0) {
             setTable(data.tables[0]);
           } else {
-            setTable({ id: 'counter', table_number: 'Counter Pickup · Daily Token', section: 'Express Takeaway' });
+            setTable({ id: 'counter', table_number: 'Counter Pickup', section: 'Takeaway' });
           }
         }
       })
@@ -110,127 +112,98 @@ export function CustomerMenu() {
   }, [vegOnly, searchQuery, selectedCategory, currentRestaurant, activeRestaurant]);
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-28">
-      {/* Table Welcome Banner */}
-      <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-zinc-900 text-white px-4 py-6 sm:py-8 shadow-lg border-b border-white/5 relative overflow-hidden">
-        {/* Ambient Warm Glow */}
-        <div className="absolute -top-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto relative flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-3 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-400/30 text-[10px] font-black tracking-widest uppercase">
+    <div className="min-h-screen bg-slate-50 pb-28 font-sans">
+      {/* Restaurant Header Banner - Compact & Luxury Mobile First */}
+      <div className="bg-slate-900 text-white px-4 py-5 sm:py-7 border-b border-slate-800">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
                 {currentRestaurant?.business_type === 'clinic'
-                  ? 'Certified Medical OPD & Diagnostics'
+                  ? 'Healthcare OPD'
                   : currentRestaurant?.business_type === 'gym'
-                  ? 'Premium Strength & Nutrition Bar'
-                  : currentRestaurant?.business_type === 'event'
-                  ? 'Official Festival VIP Service'
-                  : 'Artisanal Kitchen & Digital Menu'}
+                  ? 'Fitness Bar'
+                  : 'Artisanal Kitchen'}
               </span>
               <span className="text-emerald-400 text-xs font-semibold flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Open Now</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Open for Dining</span>
               </span>
-              <span className="text-slate-400 text-xs font-medium hidden sm:inline-flex items-center gap-1">
-                · <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> 4.9 (450+ verified reviews)
+              <span className="text-slate-400 text-xs flex items-center gap-1 font-medium">
+                · <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> 4.9 (450+ reviews)
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
+            <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-white">
               {currentRestaurant?.name || "L'Osteria Gourmet Bistro"}
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl font-normal leading-relaxed">
-              {currentRestaurant?.tagline || "Authentic culinary selections and quick self-ordering."}
-              <span className="hidden sm:inline text-slate-400 ml-1">
-                Tap items to toggle between live video loops and high-res photos.
-              </span>
+              {currentRestaurant?.tagline || "Artisanal Kitchen & Wood-Fired Oven."}
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 pt-0.5">
+            <div className="flex items-center gap-3 text-[11px] text-slate-400 pt-0.5">
               <span className="flex items-center gap-1"><MapPin className="w-3 h-3 text-slate-400" /> {currentRestaurant?.address || 'Indiranagar, Bengaluru'}</span>
-              <span className="flex items-center gap-1">· <Zap className="w-3 h-3 text-amber-400" /> Instant Razorpay & UPI Settlement</span>
+              <span className="hidden sm:inline">· Direct UPI & Card Payments</span>
             </div>
           </div>
 
-          {/* Current Table / Room / Counter Selector */}
-          <div className="w-full md:w-auto bg-white/10 backdrop-blur-xl rounded-2xl p-3.5 border border-white/15 flex items-center justify-between gap-4 shadow-xl">
-            <div className="text-left">
-              <div className="text-[10px] text-amber-300 font-extrabold uppercase tracking-widest">
-                {currentRestaurant?.business_type === 'clinic'
-                  ? 'Patient Room / Token'
-                  : currentRestaurant?.business_type === 'gym'
-                  ? 'Workout Bay / Locker'
-                  : currentRestaurant?.business_type === 'event'
-                  ? 'VIP Lounge / Booth'
-                  : table?.id === 'counter'
-                  ? 'Service Station'
-                  : 'Table Number'}
-              </div>
-              <div className="text-sm font-black text-white flex items-center gap-1.5 mt-0.5">
-                <Utensils className="w-4 h-4 text-amber-400 shrink-0" />
-                <span className="truncate max-w-[150px] sm:max-w-none">
-                  {table
-                    ? table.table_number
-                    : 'Counter Pickup · Daily Token'}
-                </span>
+          {/* Table / Station Designation Badge */}
+          <div className="w-full sm:w-auto bg-slate-950/80 rounded-xl p-3 border border-slate-800 flex items-center justify-between sm:justify-start gap-3">
+            <div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ordering For</div>
+              <div className="text-sm font-bold text-amber-400 flex items-center gap-1.5 mt-0.5">
+                <Utensils className="w-3.5 h-3.5" />
+                <span>{table ? table.table_number : 'Table 01'}</span>
                 {table?.section && (
-                  <span className="text-xs font-normal text-slate-300 hidden sm:inline">({table.section})</span>
+                  <span className="text-xs font-normal text-slate-400">({table.section})</span>
                 )}
               </div>
             </div>
 
-            <select
-              value={table ? table.id : 'counter'}
-              onChange={(e) => {
-                if (e.target.value === 'counter') {
-                  setTable({ id: 'counter', table_number: 'Counter Pickup · Daily Token', section: 'Express Takeaway' });
-                } else {
-                  const found = availableTables.find((t) => t.id === e.target.value);
-                  setTable(found || null);
-                }
-              }}
-              className="bg-slate-900/90 hover:bg-slate-900 text-white text-xs font-bold px-3 py-2 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer shadow-inner shrink-0"
-            >
-              <option value="counter">Counter Pickup / Daily Token</option>
-              {availableTables.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.table_number} ({t.section})
-                </option>
-              ))}
-            </select>
+            {availableTables.length > 1 && (
+              <select
+                value={table ? table.id : 'counter'}
+                onChange={(e) => {
+                  if (e.target.value === 'counter') {
+                    setTable({ id: 'counter', table_number: 'Counter Pickup', section: 'Takeaway' });
+                  } else {
+                    const found = availableTables.find((t) => t.id === e.target.value);
+                    setTable(found || null);
+                  }
+                }}
+                className="bg-slate-900 text-slate-200 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-700 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer"
+                title="Switch Table"
+              >
+                {availableTables.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.table_number}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Sticky Search & Category Filter Navigation */}
-      <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 space-y-3">
+      {/* Sticky Search & Category Filter Navigation Bar */}
+      <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 space-y-2.5">
           {/* Search bar + Veg Filter toggle */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder={
-                  currentRestaurant?.business_type === 'clinic'
-                    ? 'Search consultations, blood tests, health panels...'
-                    : currentRestaurant?.business_type === 'gym'
-                    ? 'Search day passes, whey protein shakes, trainers...'
-                    : currentRestaurant?.business_type === 'event'
-                    ? 'Search VIP passes, craft beers, cocktails, merch...'
-                    : 'Search pizzas, pasta, starters, mocktails...'
-                }
+                placeholder="Search wood-fired pizzas, pasta, appetizers..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-100/80 focus:bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition shadow-inner"
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-100/80 focus:bg-white border border-slate-200 text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-semibold"
                 >
                   Clear
                 </button>
@@ -240,13 +213,13 @@ export function CustomerMenu() {
             {/* Pure Veg Switch */}
             <button
               onClick={() => setVegOnly(!vegOnly)}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-xs font-black transition cursor-pointer shrink-0 shadow-xs active:scale-95 ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition cursor-pointer shrink-0 ${
                 vegOnly
-                  ? 'bg-emerald-50 border-emerald-500 text-emerald-800 ring-2 ring-emerald-500/20'
+                  ? 'bg-emerald-50 border-emerald-500 text-emerald-800'
                   : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <span className="w-3.5 h-3.5 border-2 border-emerald-600 rounded-xs flex items-center justify-center">
+              <span className="w-3 h-3 border-2 border-emerald-600 rounded-xs flex items-center justify-center">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
               </span>
               <span>Veg Only</span>
@@ -254,26 +227,26 @@ export function CustomerMenu() {
           </div>
 
           {/* Category Navigation Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
             <button
               onClick={() => setSelectedCategory('all')}
-              className={`px-4 py-2 rounded-full font-black whitespace-nowrap transition cursor-pointer shadow-xs ${
+              className={`px-3.5 py-1.5 rounded-lg font-bold whitespace-nowrap transition cursor-pointer ${
                 selectedCategory === 'all'
-                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20'
-                  : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700'
+                  ? 'bg-amber-500 text-slate-950 shadow-xs'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
               }`}
             >
-              All Categories
+              All Items
             </button>
 
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-full font-black whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 shadow-xs ${
+                className={`px-3.5 py-1.5 rounded-lg font-bold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
                   selectedCategory === cat.id
-                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20'
-                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700'
+                    ? 'bg-amber-500 text-slate-950 shadow-xs'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                 }`}
               >
                 <span>{cat.name}</span>
@@ -284,38 +257,40 @@ export function CustomerMenu() {
       </div>
 
       {/* Main Dishes Catalog */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-5">
         {isLoading ? (
           <div className="py-20 flex flex-col items-center justify-center text-slate-400">
-            <span className="w-8 h-8 border-3 border-amber-500/30 border-t-amber-600 rounded-full animate-spin mb-3"></span>
-            <p className="text-sm font-semibold">Loading culinary catalog...</p>
+            <span className="w-7 h-7 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin mb-3"></span>
+            <p className="text-xs font-semibold">Loading menu...</p>
           </div>
         ) : allItems.length === 0 ? (
           <div className="py-20 text-center text-slate-400">
-            <Utensils className="w-12 h-12 stroke-[1.5] text-slate-300 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-slate-700">No dishes match your filter</h3>
+            <Utensils className="w-10 h-10 stroke-[1.5] text-slate-300 mx-auto mb-2" />
+            <h3 className="text-sm font-bold text-slate-700">No dishes match your filter</h3>
             <p className="text-xs text-slate-500 mt-1">
               Try adjusting your search query or vegetarian filter.
             </p>
           </div>
         ) : selectedCategory === 'all' && !searchQuery ? (
           // Grouped by Category view
-          <div className="space-y-10">
+          <div className="space-y-8">
             {groupedItems.map((group) => (
               <section key={group.id} className="scroll-mt-36">
-                <div className="mb-4">
-                  <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                    <span>{group.name}</span>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
-                      {group.items.length}
-                    </span>
-                  </h2>
-                  {group.description && (
-                    <p className="text-xs text-slate-500 mt-0.5">{group.description}</p>
-                  )}
+                <div className="mb-3.5 flex items-center justify-between border-b border-slate-200 pb-2">
+                  <div>
+                    <h2 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                      <span>{group.name}</span>
+                      <span className="text-[11px] font-semibold px-2 py-0.2 rounded-full bg-slate-200 text-slate-700">
+                        {group.items.length}
+                      </span>
+                    </h2>
+                    {group.description && (
+                      <p className="text-xs text-slate-500 mt-0.5">{group.description}</p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {group.items.map((dish) => (
                     <ItemCard
                       key={dish.id}
@@ -330,12 +305,12 @@ export function CustomerMenu() {
         ) : (
           // Filtered list view
           <div>
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between">
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Showing {allItems.length} dishes
               </span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {allItems.map((dish) => (
                 <ItemCard
                   key={dish.id}
@@ -348,26 +323,26 @@ export function CustomerMenu() {
         )}
       </main>
 
-      {/* Floating Bottom Cart Bar */}
+      {/* Floating Bottom Cart Bar (Sticky on Mobile Phones) */}
       {itemCount > 0 && (
-        <div className="fixed bottom-4 inset-x-4 max-w-lg mx-auto z-40 animate-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed bottom-4 inset-x-4 max-w-md mx-auto z-40 animate-in slide-in-from-bottom-5 duration-200">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="w-full p-4 rounded-2xl bg-orange-600 hover:bg-orange-700 active:scale-98 text-white font-bold text-sm shadow-xl shadow-orange-600/35 transition flex items-center justify-between cursor-pointer"
+            className="w-full p-3.5 rounded-xl bg-slate-950 hover:bg-slate-900 active:scale-98 text-white font-bold text-xs shadow-xl shadow-slate-950/25 transition flex items-center justify-between cursor-pointer border border-slate-800"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center font-black text-xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center font-extrabold text-xs">
                 {itemCount}
               </div>
               <div className="text-left">
-                <div className="text-xs leading-none opacity-90">View Order Basket</div>
-                <div className="text-base font-black leading-tight mt-0.5">₹{grandTotal}</div>
+                <div className="text-[11px] text-slate-400">Your Order Basket</div>
+                <div className="text-sm font-extrabold font-mono text-white leading-tight">₹{grandTotal}</div>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 px-3.5 py-1.5 rounded-xl text-xs font-bold transition">
-              <span>Continue</span>
-              <span>→</span>
+            <div className="flex items-center gap-1.5 bg-amber-500 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold">
+              <span>View Basket</span>
+              <span>&rarr;</span>
             </div>
           </button>
         </div>
@@ -389,3 +364,5 @@ export function CustomerMenu() {
     </div>
   );
 }
+
+export default CustomerMenu;

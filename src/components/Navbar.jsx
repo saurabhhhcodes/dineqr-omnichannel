@@ -1,4 +1,4 @@
-// src/components/Navbar.jsx - Enterprise responsive header with multi-vertical switching & client onboarding
+// src/components/Navbar.jsx - High-End Professional Navigation Suite (Landing, Menu, & Admin)
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -9,16 +9,13 @@ import {
   ReceiptText,
   Settings,
   BookOpen,
-  Building2,
   ChevronDown,
   Bell,
   ExternalLink,
   ShieldCheck,
-  Sparkles,
   Stethoscope,
   Dumbbell,
   PartyPopper,
-  PlusCircle,
   Lock,
   Laptop,
   Download,
@@ -32,7 +29,10 @@ import {
   CreditCard,
   Truck,
   PlayCircle,
-  Wrench
+  Menu as MenuIcon,
+  X as CloseIcon,
+  Store,
+  Compass,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
@@ -41,14 +41,22 @@ import { useToast } from '../context/ToastContext.jsx';
 export function Navbar({ onOpenCart }) {
   const location = useLocation();
   const { itemCount, grandTotal, table } = useCart();
-  const { restaurants, activeRestaurant, setActiveRestaurant } = useRestaurant();
+  const { activeRestaurant } = useRestaurant();
   const { addToast } = useToast();
+
   const [activeOrdersCount, setActiveOrdersCount] = useState(0);
   const [waiterCalled, setWaiterCalled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isOperationsDropdownOpen, setIsOperationsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown on outside click
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsOperationsDropdownOpen(false);
+  }, [location.pathname]);
+
+  // Close operations dropdown on click outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -59,7 +67,7 @@ export function Navbar({ onOpenCart }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Poll for kitchen / clinic queue count for the active restaurant
+  // Poll for kitchen queue count for active restaurant
   useEffect(() => {
     if (!activeRestaurant) return;
 
@@ -84,251 +92,276 @@ export function Navbar({ onOpenCart }) {
     location.pathname === '/home' ||
     location.pathname === '/walkthrough' ||
     location.pathname === '/services' ||
-    location.pathname === '/demo';
+    location.pathname === '/demo' ||
+    location.pathname === '/pricing' ||
+    location.pathname === '/downloads';
+
   const isCustomerView =
     location.pathname.startsWith('/menu') ||
     location.pathname.startsWith('/order/') ||
     location.pathname.startsWith('/invoice/');
 
-  const isClinic = activeRestaurant?.business_type === 'clinic';
-  const isGym = activeRestaurant?.business_type === 'gym';
-  const isEvent = activeRestaurant?.business_type === 'event';
-
-  // Industry Brand Icon
-  const BrandIcon = isClinic
-    ? Stethoscope
-    : isGym
-    ? Dumbbell
-    : isEvent
-    ? PartyPopper
-    : Utensils;
-
-  const brandGradient = isClinic
-    ? 'from-teal-600 to-emerald-500'
-    : isGym
-    ? 'from-blue-600 to-indigo-600'
-    : isEvent
-    ? 'from-purple-600 to-pink-600'
-    : 'from-amber-600 to-orange-500';
-
   const handleCallWaiter = () => {
     setWaiterCalled(true);
-    addToast(
-      isClinic
-        ? 'Reception & Nurse notified! A team member will attend to your room.'
-        : 'Server notified! A team member is on their way.'
-    );
+    addToast('Server notified! A team member is on their way to your table.');
     setTimeout(() => setWaiterCalled(false), 8000);
   };
 
   // ============================================================
-  // 1. LANDING & MARKETING PORTAL HEADER (Universal Hero)
+  // 1. PUBLIC MARKETING & LANDING HEADER (Clean, Sleek & Modern)
   // ============================================================
   if (isLandingView) {
     return (
-      <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-white/10 shadow-lg text-white w-full max-w-full overflow-x-hidden">
+      <header className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 text-white w-full max-w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-slate-950 font-black shadow-md shadow-amber-500/20 group-hover:scale-105 transition">
+            <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 font-black shadow-md shadow-amber-500/10 group-hover:bg-amber-400 transition">
               <Utensils className="w-5 h-5 text-slate-950" />
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-black text-white text-lg tracking-tight">DineQR</span>
-              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-linear-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border border-amber-400/30 hidden sm:inline-block">
-                Enterprise POS
+              <span className="font-extrabold text-white text-lg tracking-tight">DineQR</span>
+              <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-900 text-amber-400 border border-slate-800 hidden sm:inline-block">
+                ₹1,000/mo POS
               </span>
             </div>
           </Link>
 
-          {/* Quick Marketing Nav Links */}
-          <nav className="hidden lg:flex items-center gap-5 text-xs font-bold text-slate-300">
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-300">
             <Link
               to="/walkthrough"
               className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
-                location.pathname === '/walkthrough' ? 'text-amber-400' : ''
+                location.pathname === '/walkthrough' ? 'text-amber-400 font-bold' : ''
               }`}
             >
               <PlayCircle className="w-3.5 h-3.5 text-amber-400" />
-              <span>Walkthrough Video</span>
+              <span>Video Walkthrough</span>
             </Link>
+
+            <Link
+              to="/menu?restaurant=losteria&table=tbl_1"
+              className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
+                location.pathname.startsWith('/menu') ? 'text-amber-400 font-bold' : ''
+              }`}
+            >
+              <QrCode className="w-3.5 h-3.5 text-amber-400" />
+              <span>Table QR Demo</span>
+            </Link>
+
             <Link
               to="/services"
               className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
-                location.pathname === '/services' ? 'text-amber-400' : ''
+                location.pathname === '/services' ? 'text-amber-400 font-bold' : ''
               }`}
             >
-              <Truck className="w-3.5 h-3.5 text-amber-400" />
+              <Truck className="w-3.5 h-3.5 text-sky-400" />
               <span>Trades & Porter Hub</span>
             </Link>
-            <Link to="/menu?restaurant=losteria&table=counter" className="hover:text-amber-400 transition flex items-center gap-1.5">
-              <QrCode className="w-3.5 h-3.5 text-amber-400" />
-              <span>Live Scanner</span>
-            </Link>
-            <Link to="/onboard" className="hover:text-amber-400 transition flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
-              <span>₹1,000/mo Plan</span>
-            </Link>
-            <Link to="/downloads" className="hover:text-sky-300 transition flex items-center gap-1.5">
-              <Laptop className="w-3.5 h-3.5 text-sky-400" />
-              <span>Installers (.exe/.apk)</span>
-            </Link>
-          </nav>
 
-          {/* Right Action CTA Buttons */}
-          <div className="flex items-center gap-2.5 shrink-0">
             <Link
-              to="/walkthrough"
-              className="hidden sm:inline-flex md:hidden items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold transition"
+              to="/pricing"
+              className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
+                location.pathname === '/pricing' ? 'text-amber-400 font-bold' : ''
+              }`}
             >
-              <PlayCircle className="w-3.5 h-3.5 text-amber-400" />
-              <span>Video</span>
+              <Zap className="w-3.5 h-3.5 text-amber-400" />
+              <span>Pricing (₹1k/mo)</span>
             </Link>
 
             <Link
               to="/downloads"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-sky-300 hover:text-white hover:border-sky-500 text-xs font-bold transition"
+              className={`hover:text-sky-300 transition flex items-center gap-1.5 ${
+                location.pathname === '/downloads' ? 'text-sky-400 font-bold' : ''
+              }`}
             >
-              <Download className="w-3.5 h-3.5 text-sky-400" />
-              <span>Downloads</span>
+              <Laptop className="w-3.5 h-3.5 text-slate-400" />
+              <span>Desktop Apps (.exe/.apk)</span>
             </Link>
+          </nav>
 
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-2.5">
             <Link
               to="/admin"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-amber-500 text-amber-300 text-xs font-bold transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold transition"
               title="Staff back-office access with 4-digit PIN"
             >
-              <Lock className="w-3.5 h-3.5" />
+              <Lock className="w-3.5 h-3.5 text-amber-400" />
               <span>Staff Login</span>
             </Link>
 
             <Link
               to="/onboard"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 transition active:scale-95"
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition active:scale-98"
             >
-              <span>Join as Business</span>
+              <span>Get Started</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
+
+            {/* Mobile Hamburger Toggle Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
+              aria-label="Toggle Navigation Menu"
+            >
+              {isMobileMenuOpen ? <CloseIcon className="w-5 h-5 text-amber-400" /> : <MenuIcon className="w-5 h-5" />}
+            </button>
           </div>
         </div>
 
-        {/* Mobile quick-nav pill strip for marketing / portal views */}
-        <div className="lg:hidden bg-slate-900/90 border-t border-white/5 px-3 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap text-xs font-bold">
-          <Link
-            to="/walkthrough"
-            className={`px-3 py-1 rounded-lg transition flex items-center gap-1.5 shrink-0 ${
-              location.pathname === '/walkthrough'
-                ? 'bg-amber-500 text-slate-950 shadow-xs'
-                : 'text-slate-300 bg-slate-800/80 hover:text-white'
-            }`}
-          >
-            <PlayCircle className="w-3 h-3 text-amber-400" />
-            <span>Walkthrough Video</span>
-          </Link>
-          <Link
-            to="/services"
-            className={`px-3 py-1 rounded-lg transition flex items-center gap-1.5 shrink-0 ${
-              location.pathname === '/services'
-                ? 'bg-amber-500 text-slate-950 shadow-xs'
-                : 'text-slate-300 bg-slate-800/80 hover:text-white'
-            }`}
-          >
-            <Truck className="w-3 h-3 text-amber-400" />
-            <span>Trades & Porter</span>
-          </Link>
-          <Link
-            to="/menu?restaurant=losteria&table=tbl_1"
-            className="px-3 py-1 rounded-lg text-slate-300 bg-slate-800/80 hover:text-white transition flex items-center gap-1.5 shrink-0"
-          >
-            <Utensils className="w-3 h-3 text-amber-400" />
-            <span>Table QR Menu</span>
-          </Link>
-          <Link
-            to="/downloads"
-            className="px-3 py-1 rounded-lg text-sky-300 bg-slate-800/80 hover:text-white transition flex items-center gap-1.5 shrink-0"
-          >
-            <Download className="w-3 h-3 text-sky-400" />
-            <span>Installer Apps</span>
-          </Link>
-        </div>
+        {/* Clean Mobile Slide-Down Drawer (Zero AI Clutter, Highly Usable) */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden bg-slate-950 border-b border-slate-800 px-4 py-4 space-y-3 animate-in slide-in-from-top-2 duration-150">
+            <div className="grid grid-cols-1 gap-1 text-sm font-semibold">
+              <Link
+                to="/walkthrough"
+                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-amber-400 transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <PlayCircle className="w-4 h-4 text-amber-400" />
+                  <span>Video Walkthrough (7 Chapters)</span>
+                </div>
+                <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
+              </Link>
+
+              <Link
+                to="/menu?restaurant=losteria&table=tbl_1"
+                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-amber-400 transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <QrCode className="w-4 h-4 text-amber-400" />
+                  <span>Try Customer Table QR Menu</span>
+                </div>
+                <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
+              </Link>
+
+              <Link
+                to="/services"
+                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-sky-400 transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Truck className="w-4 h-4 text-sky-400" />
+                  <span>Apronto Trades & Porter Logistics</span>
+                </div>
+                <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
+              </Link>
+
+              <Link
+                to="/pricing"
+                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-amber-400 transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Zap className="w-4 h-4 text-amber-400" />
+                  <span>Subscription Pricing (₹1,000/mo)</span>
+                </div>
+                <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
+              </Link>
+
+              <Link
+                to="/downloads"
+                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-slate-100 transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Laptop className="w-4 h-4 text-slate-400" />
+                  <span>Windows & Android Offline Apps</span>
+                </div>
+                <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
+              </Link>
+
+              <Link
+                to="/admin"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-amber-300 font-bold transition mt-2"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Lock className="w-4 h-4 text-amber-400" />
+                  <span>Staff Terminal Login (PIN: 1234)</span>
+                </div>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+
+              <Link
+                to="/onboard"
+                className="flex items-center justify-center gap-2 p-3 rounded-xl bg-amber-500 text-slate-950 font-bold text-sm shadow-md mt-2"
+              >
+                <span>Onboard Your Restaurant</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
     );
   }
 
   // ============================================================
-  // 2. CUSTOMER & PATIENT MENU VIEW (Clean & Luxury)
+  // 2. CUSTOMER DIGITAL MENU HEADER (Clean, Luxury & Table-Aware)
   // ============================================================
   if (isCustomerView) {
     return (
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs transition-all w-full max-w-full">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs transition-all w-full max-w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-          {/* Business Brand on Digital Menu */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 sm:flex-initial">
+          {/* Restaurant Brand + Table Number Pill (Always visible on mobile!) */}
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <Link
               to={`/menu?restaurant=${activeRestaurant?.slug || activeRestaurant?.id || 'rest_losteria'}`}
-              className="flex items-center gap-2 group min-w-0"
+              className="flex items-center gap-2.5 min-w-0"
             >
-              <div
-                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr ${brandGradient} flex items-center justify-center text-white shadow-md shadow-slate-900/10 group-hover:scale-105 transition shrink-0`}
-              >
-                <BrandIcon className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
+                <Utensils className="w-4.5 h-4.5 text-amber-400" />
               </div>
               <div className="min-w-0">
-                <div className="font-extrabold text-slate-900 text-xs sm:text-base tracking-tight leading-none group-hover:text-sky-600 transition truncate max-w-[130px] sm:max-w-xs">
-                  {activeRestaurant?.name || "L'Osteria"}
+                <div className="font-extrabold text-slate-900 text-sm sm:text-base tracking-tight leading-tight truncate">
+                  {activeRestaurant?.name || "L'Osteria Bistro"}
                 </div>
-                <p className="text-[10px] text-slate-400 mt-0.5 font-medium hidden sm:block truncate max-w-xs">
-                  {activeRestaurant?.tagline || 'Self-Ordering & Instant Payment Platform'}
-                </p>
+                {/* Active Table Pill */}
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200 truncate">
+                    {table ? table.table_number : 'Table 01'}
+                  </span>
+                  {table?.section && (
+                    <span className="text-[10px] text-slate-400 hidden sm:inline truncate">
+                      · {table.section}
+                    </span>
+                  )}
+                </div>
               </div>
             </Link>
           </div>
 
-          {/* Center Station / Room / Table Indicator - Hidden on narrow mobile to prevent overlap */}
-          <div className="hidden md:flex items-center gap-2">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-900 text-xs font-bold shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>{table ? table.table_number : 'Counter Pickup · Token Order'}</span>
-              {table?.section && (
-                <span className="text-slate-500 font-normal">
-                  · {table.section}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Right Customer Actions */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Call Staff Button */}
+          {/* Right Customer Actions: Call Waiter + Cart Button */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Call Waiter Button */}
             <button
               onClick={handleCallWaiter}
               disabled={waiterCalled}
-              className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition cursor-pointer ${
                 waiterCalled
                   ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
               }`}
-              title={isClinic ? 'Call reception / nurse' : 'Call attendant'}
+              title="Call server to your table"
             >
-              <Bell className={`w-3.5 h-3.5 ${waiterCalled ? 'text-emerald-600' : 'text-amber-600'}`} />
-              <span>{waiterCalled ? 'Attendant Notified' : isClinic ? 'Call Reception' : 'Call Waiter'}</span>
+              <Bell className={`w-3.5 h-3.5 ${waiterCalled ? 'text-emerald-600' : 'text-amber-500'}`} />
+              <span className="hidden sm:inline">{waiterCalled ? 'Waiter Notified' : 'Call Server'}</span>
             </button>
 
-            {/* Shopping / Booking Cart */}
+            {/* Shopping Cart Button */}
             {onOpenCart && (
               <button
                 onClick={onOpenCart}
-                className="relative flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 active:scale-95 text-white text-xs font-black shadow-md shadow-sky-600/25 transition cursor-pointer shrink-0"
+                className="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-white text-xs font-bold shadow-md transition cursor-pointer shrink-0"
               >
-                <ShoppingBag className="w-4 h-4" />
-                <span className="hidden sm:inline">{isClinic ? 'Bookings' : 'Cart'}</span>
-                {itemCount > 0 ? (
-                  <span className="inline-flex items-center justify-center bg-white text-sky-700 font-black text-[11px] rounded-full h-5 min-w-5 px-1.5 shadow-xs animate-bounce">
+                <ShoppingBag className="w-4 h-4 text-amber-400" />
+                <span className="hidden sm:inline">Order</span>
+                {itemCount > 0 && (
+                  <span className="inline-flex items-center justify-center bg-amber-500 text-slate-950 font-extrabold text-[11px] rounded-full h-5 min-w-5 px-1.5">
                     {itemCount}
                   </span>
-                ) : null}
+                )}
                 {grandTotal > 0 && (
-                  <span className="border-l border-white/30 pl-2 text-xs font-black">
+                  <span className="border-l border-slate-700 pl-2 text-xs font-bold font-mono">
                     ₹{grandTotal}
                   </span>
                 )}
@@ -341,49 +374,47 @@ export function Navbar({ onOpenCart }) {
   }
 
   // ============================================================
-  // 3. BUSINESS MANAGEMENT & ADMIN OPERATIONS VIEW
+  // 3. ADMIN BACK-OFFICE HEADER (Clean, Cohesive Enterprise Bar)
   // ============================================================
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs transition-all w-full max-w-full">
+    <header className="sticky top-0 z-40 bg-slate-950 text-white border-b border-slate-800 shadow-md w-full max-w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-        {/* Brand & Organization Identity (Clean Restaurant Name - No multi-vertical demo switcher here) */}
+        {/* Restaurant Identity & Active Station */}
         <div className="flex items-center gap-2.5 shrink-0">
           <Link to="/admin" className="flex items-center gap-2.5 group shrink-0">
-            <div
-              className={`w-9 h-9 rounded-2xl bg-gradient-to-tr ${brandGradient} flex items-center justify-center text-white shadow-md shadow-slate-900/10 group-hover:scale-105 transition`}
-            >
-              <BrandIcon className="w-4.5 h-4.5" />
+            <div className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold shadow-sm group-hover:bg-amber-400 transition">
+              <Utensils className="w-4.5 h-4.5 text-slate-950" />
             </div>
             <div>
-              <div className="font-extrabold text-slate-900 text-sm tracking-tight leading-none flex items-center gap-1.5">
-                <span className="truncate max-w-[130px] sm:max-w-[190px]">
+              <div className="font-bold text-white text-sm tracking-tight leading-none flex items-center gap-1.5">
+                <span className="truncate max-w-[140px] sm:max-w-[200px]">
                   {activeRestaurant?.name || "L'Osteria Bistro"}
                 </span>
-                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 hidden sm:inline-block">
-                  Active POS
+                <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hidden sm:inline-block">
+                  Terminal
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 font-medium mt-0.5 hidden sm:block truncate max-w-[190px]">
-                {activeRestaurant?.tagline || 'Self-Ordering & Instant Payment Platform'}
+              <p className="text-[10px] text-slate-400 mt-0.5 hidden sm:block truncate max-w-[200px]">
+                {activeRestaurant?.tagline || 'Restaurant Operations Suite'}
               </p>
             </div>
           </Link>
         </div>
 
-        {/* Core Operations Tabs (Fits beautifully on all screen resolutions with zero clipping) */}
-        <nav className="hidden lg:flex items-center gap-1 text-xs font-semibold text-slate-600">
+        {/* Desktop Admin Operations Navigation */}
+        <nav className="hidden lg:flex items-center gap-1 text-xs font-medium text-slate-300">
           <Link
             to="/admin/kitchen"
-            className={`whitespace-nowrap px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
               location.pathname.startsWith('/admin/kitchen')
-                ? 'bg-sky-500 text-white font-bold shadow-xs'
-                : 'hover:bg-slate-100 hover:text-slate-900'
+                ? 'bg-amber-500 text-slate-950 font-bold'
+                : 'hover:bg-slate-900 hover:text-white'
             }`}
           >
-            {isClinic ? <Stethoscope className="w-3.5 h-3.5" /> : <ChefHat className="w-3.5 h-3.5 text-amber-500" />}
-            <span className="whitespace-nowrap">{isClinic ? 'Queue' : 'KDS'}</span>
+            <ChefHat className="w-3.5 h-3.5" />
+            <span>Kitchen KDS</span>
             {activeOrdersCount > 0 && (
-              <span className="inline-flex items-center justify-center px-1.5 py-0.2 text-[10px] font-black bg-rose-600 text-white rounded-full animate-pulse">
+              <span className="inline-flex items-center justify-center px-1.5 py-0.2 text-[10px] font-black bg-rose-600 text-white rounded-full">
                 {activeOrdersCount}
               </span>
             )}
@@ -391,373 +422,223 @@ export function Navbar({ onOpenCart }) {
 
           <Link
             to="/admin/floor-plan"
-            className={`whitespace-nowrap px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
               location.pathname.startsWith('/admin/floor-plan')
-                ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
-                : 'hover:bg-slate-100 hover:text-slate-900'
+                ? 'bg-amber-500 text-slate-950 font-bold'
+                : 'hover:bg-slate-900 hover:text-white'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span className="whitespace-nowrap">Floor Plan</span>
+            <span>Floor Plan</span>
           </Link>
 
           <Link
             to="/admin/tables"
-            className={`whitespace-nowrap px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
               location.pathname.startsWith('/admin/tables')
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'hover:bg-slate-100 hover:text-slate-900'
+                ? 'bg-amber-500 text-slate-950 font-bold'
+                : 'hover:bg-slate-900 hover:text-white'
             }`}
           >
             <QrCode className="w-3.5 h-3.5" />
-            <span className="whitespace-nowrap">{isClinic ? 'Rooms' : 'Tables'}</span>
+            <span>Tables & QR Placards</span>
           </Link>
 
           <Link
             to="/admin/menu"
-            className={`whitespace-nowrap px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
               location.pathname.startsWith('/admin/menu')
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'hover:bg-slate-100 hover:text-slate-900'
+                ? 'bg-amber-500 text-slate-950 font-bold'
+                : 'hover:bg-slate-900 hover:text-white'
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span className="whitespace-nowrap">Catalog</span>
+            <span>Menu & Prices</span>
           </Link>
 
           <Link
             to="/admin/orders"
-            className={`whitespace-nowrap px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
               location.pathname.startsWith('/admin/orders')
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'hover:bg-slate-100 hover:text-slate-900'
+                ? 'bg-amber-500 text-slate-950 font-bold'
+                : 'hover:bg-slate-900 hover:text-white'
             }`}
           >
             <ReceiptText className="w-3.5 h-3.5" />
-            <span className="whitespace-nowrap">Orders</span>
+            <span>Bills & Orders</span>
           </Link>
 
           <Link
             to="/admin/staff"
-            className={`whitespace-nowrap px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
               location.pathname.startsWith('/admin/staff')
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'hover:bg-slate-100 hover:text-slate-900'
+                ? 'bg-amber-500 text-slate-950 font-bold'
+                : 'hover:bg-slate-900 hover:text-white'
             }`}
           >
-            <Users className="w-3.5 h-3.5 text-blue-600" />
-            <span className="whitespace-nowrap">Staff Duty</span>
+            <Users className="w-3.5 h-3.5" />
+            <span>Staff Roster</span>
           </Link>
 
-          {/* Grouped Operations Dropdown with high z-index and clear shadow */}
+          {/* Operations Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsOperationsDropdownOpen(!isOperationsDropdownOpen)}
-              className={`whitespace-nowrap px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 cursor-pointer shrink-0 ${
-                location.pathname.includes('/reservations') ||
-                location.pathname.includes('/inventory') ||
-                location.pathname.includes('/purchases') ||
-                location.pathname.includes('/downloads')
-                  ? 'bg-purple-600 text-white font-bold shadow-xs'
-                  : 'hover:bg-slate-100 hover:text-slate-900'
-              }`}
+              className="px-3 py-1.5 rounded-lg transition flex items-center gap-1 hover:bg-slate-900 hover:text-white cursor-pointer"
             >
-              <span className="whitespace-nowrap">Operations</span>
+              <span>More</span>
               <ChevronDown className="w-3 h-3 opacity-70" />
             </button>
 
             {isOperationsDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-[9999] ring-1 ring-black/5 animate-in fade-in zoom-in-95">
+              <div className="absolute top-full right-0 mt-2 w-56 bg-slate-900 rounded-xl shadow-2xl border border-slate-800 py-1.5 z-50 animate-in fade-in zoom-in-95">
                 <Link
                   to="/admin/reservations"
                   onClick={() => setIsOperationsDropdownOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
                 >
-                  <Calendar className="w-4 h-4 text-purple-600" />
-                  <span>Table Bookings</span>
+                  <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Table Reservations</span>
                 </Link>
                 <Link
                   to="/admin/inventory"
                   onClick={() => setIsOperationsDropdownOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
                 >
-                  <Boxes className="w-4 h-4 text-emerald-600" />
-                  <span>Inventory Stocks</span>
+                  <Boxes className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Inventory Tracking</span>
                 </Link>
                 <Link
                   to="/admin/purchases"
                   onClick={() => setIsOperationsDropdownOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
                 >
-                  <FileSpreadsheet className="w-4 h-4 text-indigo-600" />
+                  <FileSpreadsheet className="w-3.5 h-3.5 text-sky-400" />
                   <span>Vendor Purchases</span>
                 </Link>
-                <div className="my-1 border-t border-slate-100" />
                 <Link
-                  to="/admin/downloads"
+                  to="/admin/subscription"
                   onClick={() => setIsOperationsDropdownOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-50 transition"
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-amber-400 hover:bg-slate-800 transition"
                 >
-                  <Laptop className="w-4 h-4 text-amber-600" />
-                  <span>Standalone POS Apps (EXE/APK)</span>
+                  <Zap className="w-3.5 h-3.5 text-amber-400" />
+                  <span>SaaS Plan (₹1k/mo)</span>
                 </Link>
+                <div className="my-1 border-t border-slate-800" />
                 <Link
-                  to="/services"
+                  to="/admin/settings"
                   onClick={() => setIsOperationsDropdownOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
                 >
-                  <Truck className="w-4 h-4 text-amber-600" />
-                  <span>On-Demand Trades & Porter</span>
-                </Link>
-                <Link
-                  to="/walkthrough"
-                  onClick={() => setIsOperationsDropdownOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
-                >
-                  <PlayCircle className="w-4 h-4 text-sky-600" />
-                  <span>Product Video Walkthrough</span>
+                  <Settings className="w-3.5 h-3.5 text-slate-400" />
+                  <span>POS Settings</span>
                 </Link>
               </div>
             )}
           </div>
-
-          <Link
-            to="/admin/subscription"
-            className={`whitespace-nowrap px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shrink-0 ${
-              location.pathname.startsWith('/admin/subscription')
-                ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
-                : 'text-amber-800 bg-amber-50 hover:bg-amber-100 font-bold border border-amber-200/80'
-            }`}
-          >
-            <Zap className="w-3.5 h-3.5 text-amber-600" />
-            <span className="whitespace-nowrap">Plan (₹1k/mo)</span>
-          </Link>
-
-          <Link
-            to="/admin/settings"
-            className={`whitespace-nowrap px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shrink-0 ${
-              location.pathname.startsWith('/admin/settings')
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'hover:bg-slate-100 hover:text-slate-900'
-            }`}
-          >
-            <Settings className="w-3.5 h-3.5" />
-            <span className="whitespace-nowrap">Settings</span>
-          </Link>
-
-          <Link
-            to="/super-admin"
-            className={`whitespace-nowrap px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shrink-0 ${
-              location.pathname === '/super-admin'
-                ? 'bg-purple-600 text-white shadow-xs'
-                : 'text-purple-700 bg-purple-50 hover:bg-purple-100'
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            <span className="whitespace-nowrap">Super Admin</span>
-          </Link>
         </nav>
 
-        {/* Quick Preview Customer Menu Link (Guaranteed never to clip or shrink) */}
+        {/* Quick Customer Live Preview + Mobile Admin Menu Toggle */}
         <div className="flex items-center gap-2 shrink-0">
           <Link
             to={`/menu?restaurant_id=${activeRestaurant?.id || ''}&table=tbl_1`}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-xs shrink-0 whitespace-nowrap"
+            target="_blank"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition shadow-xs"
             title="Preview Customer Live QR Menu"
           >
-            <BrandIcon className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span className="whitespace-nowrap">Live QR View</span>
+            <QrCode className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Live QR Menu</span>
+            <span className="sm:hidden">QR</span>
           </Link>
+
+          {/* Mobile Admin Hamburger Toggle */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
+            aria-label="Admin Menu"
+          >
+            {isMobileMenuOpen ? <CloseIcon className="w-4 h-4 text-amber-400" /> : <MenuIcon className="w-4 h-4" />}
+          </button>
         </div>
       </div>
 
-      {/* Admin Sub-Navigation Pill Bar for Tablets & Mobile (<1024px viewports like 942px, 768px, 390px) */}
-      <div className="lg:hidden bg-slate-900 border-t border-slate-800/90 px-3 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth whitespace-nowrap shadow-inner w-full max-w-full">
-        <Link
-          to="/admin/kitchen"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/kitchen')
-              ? 'bg-sky-500 text-white shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          {isClinic ? <Stethoscope className="w-3.5 h-3.5" /> : <ChefHat className="w-3.5 h-3.5 text-amber-400" />}
-          <span>{isClinic ? 'Queue' : 'KDS'}</span>
-          {activeOrdersCount > 0 && (
-            <span className="inline-flex items-center justify-center px-1.5 py-0.2 text-[10px] font-black bg-rose-600 text-white rounded-full">
-              {activeOrdersCount}
-            </span>
-          )}
-        </Link>
-
-        <Link
-          to="/admin/floor-plan"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/floor-plan')
-              ? 'bg-amber-500 text-slate-950 shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          <Layers className="w-3.5 h-3.5" />
-          <span>Floor Plan</span>
-        </Link>
-
-        <Link
-          to="/admin/tables"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/tables')
-              ? 'bg-amber-400 text-slate-950 shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          <QrCode className="w-3.5 h-3.5" />
-          <span>{isClinic ? 'Rooms' : 'Tables'}</span>
-        </Link>
-
-        <Link
-          to="/admin/menu"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/menu')
-              ? 'bg-slate-800 text-white shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          <BookOpen className="w-3.5 h-3.5" />
-          <span>Catalog</span>
-        </Link>
-
-        <Link
-          to="/admin/orders"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/orders')
-              ? 'bg-slate-800 text-white shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          <ReceiptText className="w-3.5 h-3.5" />
-          <span>Orders</span>
-        </Link>
-
-        <Link
-          to="/admin/staff"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/staff')
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          <Users className="w-3.5 h-3.5" />
-          <span>Staff Duty</span>
-        </Link>
-
-        <Link
-          to="/admin/subscription"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/subscription')
-              ? 'bg-amber-500 text-slate-950 shadow-xs'
-              : 'text-amber-400 hover:bg-slate-800'
-          }`}
-        >
-          <Zap className="w-3.5 h-3.5" />
-          <span>Plan (₹1k)</span>
-        </Link>
-
-        <Link
-          to="/admin/reservations"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/reservations')
-              ? 'bg-purple-600 text-white shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          <Calendar className="w-3.5 h-3.5" />
-          <span>Bookings</span>
-        </Link>
-
-        <Link
-          to="/admin/inventory"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/inventory')
-              ? 'bg-emerald-600 text-white shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          <Boxes className="w-3.5 h-3.5" />
-          <span>Inventory</span>
-        </Link>
-
-        <Link
-          to="/admin/purchases"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/purchases')
-              ? 'bg-indigo-600 text-white shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          <FileSpreadsheet className="w-3.5 h-3.5" />
-          <span>Purchases</span>
-        </Link>
-
-        <Link
-          to="/admin/downloads"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/downloads')
-              ? 'bg-amber-400 text-slate-950 shadow-xs'
-              : 'text-amber-400 hover:bg-slate-800'
-          }`}
-        >
-          <Laptop className="w-3.5 h-3.5" />
-          <span>Apps</span>
-        </Link>
-
-        <Link
-          to="/services"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname === '/services'
-              ? 'bg-amber-500 text-slate-950 shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          <Truck className="w-3.5 h-3.5 text-amber-400" />
-          <span>Trades</span>
-        </Link>
-
-        <Link
-          to="/walkthrough"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname === '/walkthrough'
-              ? 'bg-sky-500 text-white shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          <PlayCircle className="w-3.5 h-3.5 text-sky-400" />
-          <span>Walkthrough</span>
-        </Link>
-
-        <Link
-          to="/admin/settings"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname.startsWith('/admin/settings')
-              ? 'bg-slate-800 text-white shadow-xs'
-              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-          }`}
-        >
-          <Settings className="w-3.5 h-3.5" />
-          <span>Settings</span>
-        </Link>
-
-        <Link
-          to="/super-admin"
-          className={`px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shrink-0 text-xs font-bold ${
-            location.pathname === '/super-admin'
-              ? 'bg-purple-600 text-white shadow-xs'
-              : 'text-purple-400 hover:bg-slate-800'
-          }`}
-        >
-          <Building2 className="w-3.5 h-3.5" />
-          <span>Super Admin</span>
-        </Link>
-      </div>
+      {/* Admin Mobile Slide-Down Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-slate-950 border-t border-slate-800 px-4 py-3 space-y-1 text-xs font-semibold animate-in slide-in-from-top-2">
+          <Link
+            to="/admin"
+            className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
+          >
+            <Utensils className="w-4 h-4 text-amber-400" />
+            <span>Dashboard Overview</span>
+          </Link>
+          <Link
+            to="/admin/kitchen"
+            className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-900 text-slate-200"
+          >
+            <div className="flex items-center gap-2.5">
+              <ChefHat className="w-4 h-4 text-amber-400" />
+              <span>Kitchen Display (KDS)</span>
+            </div>
+            {activeOrdersCount > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full bg-rose-600 text-white font-bold text-[10px]">
+                {activeOrdersCount}
+              </span>
+            )}
+          </Link>
+          <Link
+            to="/admin/floor-plan"
+            className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
+          >
+            <Layers className="w-4 h-4 text-amber-400" />
+            <span>Floor Plan & Layout</span>
+          </Link>
+          <Link
+            to="/admin/tables"
+            className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
+          >
+            <QrCode className="w-4 h-4 text-amber-400" />
+            <span>Tables & QR Code Placards</span>
+          </Link>
+          <Link
+            to="/admin/menu"
+            className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
+          >
+            <BookOpen className="w-4 h-4 text-amber-400" />
+            <span>Menu & Price Changes</span>
+          </Link>
+          <Link
+            to="/admin/orders"
+            className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
+          >
+            <ReceiptText className="w-4 h-4 text-amber-400" />
+            <span>Orders & Invoicing</span>
+          </Link>
+          <Link
+            to="/admin/staff"
+            className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
+          >
+            <Users className="w-4 h-4 text-blue-400" />
+            <span>Staff Roster & Duty</span>
+          </Link>
+          <Link
+            to="/admin/subscription"
+            className="flex items-center gap-2.5 p-2 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20"
+          >
+            <Zap className="w-4 h-4 text-amber-400" />
+            <span>Subscription Plan (₹1,000/mo)</span>
+          </Link>
+          <Link
+            to="/admin/settings"
+            className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
+          >
+            <Settings className="w-4 h-4 text-slate-400" />
+            <span>POS & Printer Settings</span>
+          </Link>
+        </div>
+      )}
     </header>
   );
 }
+
+export default Navbar;

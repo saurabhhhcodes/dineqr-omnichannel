@@ -145,6 +145,29 @@ router.patch('/items/:id/availability', (req, res) => {
   }
 });
 
+// PATCH /api/menu/items/:id/price - Instant quick price update
+router.patch('/items/:id/price', (req, res) => {
+  try {
+    const { price } = req.body;
+    if (price === undefined || isNaN(parseFloat(price))) {
+      return res.status(400).json({ success: false, error: 'Valid price number is required' });
+    }
+
+    const item = queryOne(`SELECT * FROM menu_items WHERE id = ?`, [req.params.id]);
+    if (!item) {
+      return res.status(404).json({ success: false, error: 'Item not found' });
+    }
+
+    const numericPrice = Math.max(0, parseFloat(price));
+    execute(`UPDATE menu_items SET price = ? WHERE id = ?`, [numericPrice, req.params.id]);
+    const updated = queryOne(`SELECT * FROM menu_items WHERE id = ?`, [req.params.id]);
+
+    res.json({ success: true, message: `Price updated to ₹${numericPrice}`, item: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // POST /api/menu/items - Add a new dish to the digital QR menu
 router.post('/items', (req, res) => {
   try {
