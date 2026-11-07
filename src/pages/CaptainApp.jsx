@@ -183,11 +183,27 @@ export function CaptainApp() {
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-500 text-slate-950">
                 Captain KOT App
               </span>
-              <span className="text-xs font-bold text-slate-200">{activeRestaurant?.name}</span>
+              <select
+                value={activeRestaurant?.id || ''}
+                onChange={(e) => {
+                  const target = restaurants.find((r) => r.id === e.target.value);
+                  if (target) {
+                    setActiveRestaurant(target);
+                    addToast(`Switched to ${target.name}`, 'info');
+                  }
+                }}
+                className="text-xs font-bold text-white bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 outline-none focus:border-amber-500 cursor-pointer"
+              >
+                {restaurants.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
@@ -451,6 +467,29 @@ export function CaptainApp() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Sticky Bottom Floating KOT Bar */}
+      {kotCart.length > 0 && (
+        <div className="lg:hidden fixed bottom-3 inset-x-3 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 p-3.5 rounded-2xl shadow-2xl flex items-center justify-between z-40 animate-in slide-in-from-bottom-2">
+          <div>
+            <div className="text-xs font-black uppercase tracking-wider">
+              {selectedTable?.table_number || 'Table'} · {kotCart.reduce((s, i) => s + i.quantity, 0)} Items
+            </div>
+            <div className="text-sm font-mono font-black">
+              Total: ₹{calculateSubtotal()}
+            </div>
+          </div>
+
+          <button
+            onClick={handlePunchKot}
+            disabled={isSubmitting}
+            className="px-4 py-2 rounded-xl bg-slate-950 hover:bg-slate-900 text-amber-400 font-black text-xs flex items-center gap-1.5 shadow-lg active:scale-95 transition"
+          >
+            <Send className="w-3.5 h-3.5" />
+            <span>{isSubmitting ? 'Firing...' : 'Punch KOT Now'}</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

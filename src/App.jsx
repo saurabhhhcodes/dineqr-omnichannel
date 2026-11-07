@@ -31,6 +31,7 @@ import { ProductWalkthrough } from './pages/ProductWalkthrough.jsx';
 import { CaptainApp } from './pages/CaptainApp.jsx';
 import { TokenDisplay } from './pages/TokenDisplay.jsx';
 import { PetpoojaComparison } from './pages/PetpoojaComparison.jsx';
+import { MultiBusinessDashboard } from './pages/MultiBusinessDashboard.jsx';
 import { AdminAuthGate } from './components/AdminAuthGate.jsx';
 
 function AppContent() {
@@ -48,7 +49,10 @@ function AppContent() {
     location.pathname === '/compare/petpooja' ||
     location.pathname === '/captain' ||
     location.pathname === '/tokens' ||
-    location.pathname === '/display/tokens';
+    location.pathname === '/display/tokens' ||
+    location.pathname === '/showcase' ||
+    location.pathname === '/dashboards' ||
+    location.pathname === '/business-dashboard';
   const pageBg = isDarkPage ? 'bg-slate-950' : 'bg-slate-50';
 
   return (
@@ -74,6 +78,11 @@ function AppContent() {
           {/* Interactive Multi-Vertical Product Walkthrough with Subtitles */}
           <Route path="/walkthrough" element={<ProductWalkthrough />} />
           <Route path="/demo" element={<ProductWalkthrough />} />
+
+          {/* Master Multi-Business Vertical Dashboards */}
+          <Route path="/showcase" element={<MultiBusinessDashboard />} />
+          <Route path="/dashboards" element={<MultiBusinessDashboard />} />
+          <Route path="/business-dashboard" element={<MultiBusinessDashboard />} />
 
           {/* Client Self-Onboarding & Join */}
           <Route path="/onboard" element={<ClientOnboarding />} />

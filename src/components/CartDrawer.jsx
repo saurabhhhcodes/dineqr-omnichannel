@@ -310,53 +310,81 @@ export function CartDrawer({ isOpen, onClose }) {
                       </div>
 
                       <div className="grid grid-cols-2 gap-2 pt-0.5">
-                        <input
-                          type="tel"
-                          placeholder="Phone (optional)"
-                          value={customerPhone}
-                          onChange={(e) => setCustomerPhone(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Order note (optional)"
-                          value={tableInstructions}
-                          onChange={(e) => setTableInstructions(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
-                        />
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            placeholder="+91 98765 43210"
+                            value={customerPhone}
+                            onChange={(e) => setCustomerPhone(e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 outline-none shadow-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                            Order Note
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Extra napkins"
+                            value={tableInstructions}
+                            onChange={(e) => setTableInstructions(e.target.value)}
+                            className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 outline-none shadow-sm"
+                          />
+                        </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-2.5">
-                      <div className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                        <span>Dining Details</span>
-                        <span className="text-[10px] text-slate-400 font-normal">For digital invoice</span>
+                    <div className="p-3.5 rounded-2xl bg-slate-100/90 border border-slate-200 space-y-3">
+                      <div className="text-xs font-extrabold text-slate-900 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-amber-500" />
+                          <span>Dining Details & Bill Info</span>
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-medium">Printed on GST invoice</span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                            Your Name (Optional)
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Vikram Malhotra"
+                            value={customerName}
+                            onChange={(e) => setCustomerName(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 outline-none shadow-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            placeholder="+91 98765 43210"
+                            value={customerPhone}
+                            onChange={(e) => setCustomerPhone(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 outline-none shadow-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-800 mb-1">
+                          Cooking Instructions or Allergies
+                        </label>
                         <input
                           type="text"
-                          placeholder="Your Name (Optional)"
-                          value={customerName}
-                          onChange={(e) => setCustomerName(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
-                        />
-                        <input
-                          type="tel"
-                          placeholder="Phone Number"
-                          value={customerPhone}
-                          onChange={(e) => setCustomerPhone(e.target.value)}
-                          className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                          placeholder="e.g. Less spicy, Jain prep, no onion/garlic..."
+                          value={tableInstructions}
+                          onChange={(e) => setTableInstructions(e.target.value)}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 outline-none shadow-sm"
                         />
                       </div>
-
-                      <input
-                        type="text"
-                        placeholder="Special table requests or allergies..."
-                        value={tableInstructions}
-                        onChange={(e) => setTableInstructions(e.target.value)}
-                        className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
-                      />
                     </div>
                   )}
 

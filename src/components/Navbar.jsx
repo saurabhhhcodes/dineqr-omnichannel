@@ -98,7 +98,10 @@ export function Navbar({ onOpenCart }) {
     location.pathname === '/poss' ||
     location.pathname === '/compare/petpooja' ||
     location.pathname === '/captain' ||
-    location.pathname === '/tokens';
+    location.pathname === '/tokens' ||
+    location.pathname === '/showcase' ||
+    location.pathname === '/dashboards' ||
+    location.pathname === '/business-dashboard';
 
   const isCustomerView =
     location.pathname.startsWith('/menu') ||
@@ -133,6 +136,16 @@ export function Navbar({ onOpenCart }) {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-300">
+            <Link
+              to="/showcase"
+              className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
+                location.pathname === '/showcase' ? 'text-amber-400 font-bold' : ''
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5 text-amber-400" />
+              <span>10 Dashboards</span>
+            </Link>
+
             <Link
               to="/poss"
               className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
@@ -228,6 +241,17 @@ export function Navbar({ onOpenCart }) {
         {isMobileMenuOpen && (
           <div className="lg:hidden bg-slate-950 border-b border-slate-800 px-4 py-4 space-y-3 animate-in slide-in-from-top-2 duration-150">
             <div className="grid grid-cols-1 gap-1 text-sm font-semibold">
+              <Link
+                to="/showcase"
+                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-amber-400 transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Layers className="w-4 h-4 text-amber-400" />
+                  <span>Switch 10 Business Dashboards</span>
+                </div>
+                <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
+              </Link>
+
               <Link
                 to="/poss"
                 className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-amber-400 transition"
