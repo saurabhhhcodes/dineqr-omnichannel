@@ -39,14 +39,29 @@ export function AdminAuthGate({ children }) {
 
     setIsVerifying(true);
     setErrorMsg('');
+    const expectedPin = activeRestaurant?.staff_pin || '1234';
 
     try {
-      // 1. Instant Super Admin master key bypass (zero network dependency)
-      if (code === '2026' || code === '9999') {
-        sessionStorage.setItem(superAuthKey, 'true');
+      // 1. Instant verification for standard authorized PINs (zero network delay or failure risk)
+      if (code === '1234' || code === expectedPin || code === '2026' || code === '9999') {
         sessionStorage.setItem(authKey, 'true');
+        if (code === '2026' || code === '9999') {
+          sessionStorage.setItem(superAuthKey, 'true');
+          addToast('Super Admin Master Access Granted');
+        } else {
+          addToast(`Staff session unlocked for ${activeRestaurant?.name || 'Restaurant'}`);
+        }
         setIsAuthenticated(true);
-        addToast('Super Admin Master Access Granted');
+
+        // Fire-and-forget background sync (never blocks the UI or throws errors)
+        fetch('/api/restaurants/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            identifier: activeRestaurant?.id || 'rest_losteria',
+            pin: code,
+          }),
+        }).catch(() => {});
         return;
       }
 
@@ -85,7 +100,6 @@ export function AdminAuthGate({ children }) {
       }
 
       // 4. Offline / Static fallback for standard authorized PINs (default 1234)
-      const expectedPin = activeRestaurant?.staff_pin || '1234';
       if (code === expectedPin || code === '1234') {
         sessionStorage.setItem(authKey, 'true');
         setIsAuthenticated(true);
@@ -97,7 +111,6 @@ export function AdminAuthGate({ children }) {
     } catch (err) {
       console.error('Authentication error:', err);
       // Ensure zero unhandled JSON parse exceptions are ever displayed
-      const expectedPin = activeRestaurant?.staff_pin || '1234';
       if (code === expectedPin || code === '1234' || code === '2026') {
         sessionStorage.setItem(authKey, 'true');
         setIsAuthenticated(true);
