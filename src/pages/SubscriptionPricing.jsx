@@ -159,42 +159,63 @@ export function SubscriptionPricing() {
 
   const plans = [
     {
-      id: 'pro_1500',
-      title: 'Local DB On-Premise Suite',
+      id: 'starter_1500',
+      title: 'Local SQLite On-Premise POS',
       price: '1,500',
       period: '/ month',
-      badge: 'Most Popular · Zero Cloud DB Cost',
-      badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
-      highlight: true,
-      tagline: 'Ideal for independent restaurants, cafes, gyms, clinics & retail stores',
+      badge: 'Starter · Zero Cloud Bills',
+      badgeColor: 'bg-slate-100 text-slate-800 border-slate-300',
+      highlight: false,
+      tagline: 'Ideal for standalone restaurants, cafes, gyms, clinics & retail stores (Offline)',
       features: [
         'Local SQLite Engine (Zero Cloud Database Server Bills Forever)',
-        'Unlimited Table, Room & Counter QR Codes with 0% Platform Commission',
-        'Live Kitchen KDS Chimes & Token TV Order Announcer',
+        'Unlimited Table, Room & Counter QR Codes with 0% Commission',
+        'Live Kitchen KDS & Smart TV Audio Token Announcer',
         'Staff Timeclock: Logs Exact Arrival & Departure with PIN Security',
         'Hardware ESC/POS Thermal Bill Printing (80mm & 58mm)',
         'Full Offline Operation: Bill Print & Ordering Works Even Without Internet',
         'Direct UPI & Razorpay Settlement to Your Bank (Zero Holdback)',
         'Digital Member Register for Gyms & Patient Queues for Clinics',
+        '⚠️ Standalone Dine-in & Counter Only (No Zomato/Swiggy Integrations)',
       ],
     },
     {
-      id: 'enterprise_5000',
-      title: 'Cloud Sync & MongoDB Atlas Plan',
-      price: '5,000',
+      id: 'aggregator_3500',
+      title: 'Aggregator Pro (Zomato + Swiggy)',
+      price: '3,500',
       period: '/ month',
-      badge: '24/7 Global Remote Access',
+      badge: 'Most Popular · Online Delivery',
+      badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
+      highlight: true,
+      tagline: 'Everything in Starter PLUS live two-way Zomato & Swiggy online order ingestion',
+      features: [
+        'Everything in Local SQLite Starter Plan',
+        'LIVE Zomato Partner ResID Webhook Ingestion & Auto-Accept',
+        'LIVE Swiggy Outlet Webhook Ingestion & Rider Dispatch',
+        'Unified Single-Screen KDS for Dine-In, Counter & Food Delivery',
+        'Delivery Rider Tracking, Phone Contacts & Special Instructions',
+        'Magicpin & ONDC Network Direct Order Routing',
+        'Multi-Station Expediter Kitchen Workflow Management',
+        'Priority WhatsApp & Phone Technical Support',
+      ],
+    },
+    {
+      id: 'enterprise_7000',
+      title: 'Enterprise Cloud Hub & Multi-Chain Sync',
+      price: '7,000',
+      period: '/ month',
+      badge: 'Enterprise · Unlimited Cloud',
       badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
       highlight: false,
       tagline: 'For busy multi-branch outlets, fitness franchises & remote business owners',
       features: [
-        '24/7 Global Remote Access from Phone (Even if Business PC is OFF)',
-        'Real-Time MongoDB Atlas Cloud Replication (Multi-Tenant Partitioned)',
-        'Up to 30 Staff User Accounts with Timeclock Pin Verification',
-        'Multi-Station Kitchen KDS & Food Court Token TV Display',
-        'Multi-Branch Consolidated Reporting & Central Menu Distribution',
+        'Everything in Aggregator Pro (Zomato + Swiggy Included)',
+        'Dual Local SQLite + MongoDB Atlas Real-Time Cloud Replication',
+        'Unlimited Cloud Storage & Lifetime Order History (No 2GB Caps)',
+        'Owner Mobile App Live Revenue & Profit Dashboard from Anywhere',
+        'Multi-Chain Centralized Menu & Recipe Management',
+        'Up to 40 Staff Accounts with Unique User IDs and Passwords',
         'Automatic Local Backup Sync to DineQR-Data/ + Cloud Storage',
-        'Pay-on-Counter Cash, Card & Razorpay Direct Settlement',
         'Dedicated 1-on-1 VIP WhatsApp & Phone Implementation Specialist',
       ],
     },
@@ -256,12 +277,12 @@ export function SubscriptionPricing() {
         </div>
       )}
 
-      {/* Pricing Cards Grid (2 Clear Tiers: ₹1,500 vs ₹5,000) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      {/* Pricing Cards Grid (3 Clear Tiers: ₹1,500, ₹3,500 vs ₹7,000) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {plans.map((plan) => {
           const isCurrent =
             subscription?.plan?.amount ===
-            (plan.id === 'starter_1000' ? 1000 : plan.id === 'pro_1500' ? 1500 : 5000);
+            (plan.id === 'starter_1500' ? 1500 : plan.id === 'aggregator_3500' ? 3500 : 7000);
 
           return (
             <div

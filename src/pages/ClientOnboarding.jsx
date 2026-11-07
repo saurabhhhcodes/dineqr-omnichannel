@@ -638,46 +638,72 @@ export function ClientOnboarding() {
               Pick your monthly subscription. All guest QR payments settle directly into your bank account with zero platform commission.
             </p>
 
-            {/* Plan Selector (Only ₹1,500 and ₹5,000) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            {/* Plan Selector (3 Tiers: ₹1,500, ₹3,500, and ₹7,000) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mb-6">
               <div
-                onClick={() => setSelectedPlan('Local DB On-Premise Suite (₹1,500/mo)')}
-                className={`p-4 rounded-2xl border-2 transition cursor-pointer ${
+                onClick={() => setSelectedPlan('Local SQLite On-Premise Suite (₹1,500/mo)')}
+                className={`p-4 rounded-2xl border-2 transition cursor-pointer flex flex-col justify-between ${
                   selectedPlan.includes('1,500')
                     ? 'border-amber-500 bg-amber-950/20 ring-2 ring-amber-500/20'
                     : 'border-slate-700 bg-slate-900/50 hover:border-slate-600'
                 }`}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">
-                    Starter · Most Popular
-                  </span>
-                  <span className="text-base font-black text-white">₹1,500 <span className="text-[11px] text-slate-400 font-normal">/ mo</span></span>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                      Starter
+                    </span>
+                    <span className="text-base font-black text-white">₹1,500 <span className="text-[11px] text-slate-400 font-normal">/ mo</span></span>
+                  </div>
+                  <h4 className="font-extrabold text-xs text-white">Local SQLite On-Premise</h4>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Table QR menus, KDS, thermal billing, staff timeclock, and local SQLite engine with zero cloud bills forever. Offline dine-in & counter only.
+                  </p>
                 </div>
-                <h4 className="font-extrabold text-xs text-white">Local DB On-Premise Suite</h4>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Table QR menus, visual floor plan, KDS, thermal billing, staff timeclock, and local SQLite engine with zero cloud database bills.
-                </p>
               </div>
 
               <div
-                onClick={() => setSelectedPlan('Enterprise Scale & Cloud Hub (₹5,000/mo)')}
-                className={`p-4 rounded-2xl border-2 transition cursor-pointer ${
-                  selectedPlan.includes('5,000')
+                onClick={() => setSelectedPlan('Aggregator Pro - Zomato & Swiggy Direct (₹3,500/mo)')}
+                className={`p-4 rounded-2xl border-2 transition cursor-pointer flex flex-col justify-between ${
+                  selectedPlan.includes('3,500')
+                    ? 'border-amber-500 bg-amber-950/20 ring-2 ring-amber-500/20'
+                    : 'border-slate-700 bg-slate-900/50 hover:border-slate-600'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                      Most Popular
+                    </span>
+                    <span className="text-base font-black text-white">₹3,500 <span className="text-[11px] text-slate-400 font-normal">/ mo</span></span>
+                  </div>
+                  <h4 className="font-extrabold text-xs text-white">Aggregator Pro (Zomato + Swiggy)</h4>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Everything in Starter PLUS live two-way Zomato & Swiggy order ingestion, auto-accept, rider assignment, and unified multi-channel KDS.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                onClick={() => setSelectedPlan('Enterprise Scale & Cloud Hub (₹7,000/mo)')}
+                className={`p-4 rounded-2xl border-2 transition cursor-pointer flex flex-col justify-between ${
+                  selectedPlan.includes('7,000') || selectedPlan.includes('5,000')
                     ? 'border-emerald-500 bg-emerald-950/20 ring-2 ring-emerald-500/20'
                     : 'border-slate-700 bg-slate-900/50 hover:border-slate-600'
                 }`}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                    Enterprise
-                  </span>
-                  <span className="text-base font-black text-white">₹5,000 <span className="text-[11px] text-slate-400 font-normal">/ mo</span></span>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                      Enterprise
+                    </span>
+                    <span className="text-base font-black text-white">₹7,000 <span className="text-[11px] text-slate-400 font-normal">/ mo</span></span>
+                  </div>
+                  <h4 className="font-extrabold text-xs text-white">Cloud Sync & MongoDB Atlas</h4>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Everything in Pro PLUS dual SQLite + MongoDB Atlas replication, Unlimited Cloud Storage (no 2GB caps), 24/7 remote phone analytics, VIP support.
+                  </p>
                 </div>
-                <h4 className="font-extrabold text-xs text-white">Cloud Sync & MongoDB Atlas</h4>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  24/7 remote phone access (even when PC is OFF), real-time MongoDB Atlas multi-tenant replication, multi-branch consolidated reporting, VIP WhatsApp support.
-                </p>
               </div>
             </div>
 

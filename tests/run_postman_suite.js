@@ -278,6 +278,121 @@ async function runPostmanSuite() {
     console.log(`ERROR: ${err.message}`);
   }
 
+  // Bonus 25: Zomato Webhook Live Order Ingestion (Aggregator Pro Tier ₹3,500)
+  totalTests++;
+  process.stdout.write(`[TEST ${totalTests}] 25. Zomato - Webhook Live Order Ingestion & KDS Dispatch ... `);
+  try {
+    const zRes = await fetch(`${BASE_URL}/api/integrations/zomato/webhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order_id: 'ZOM-POSTMAN-8822',
+        customer_name: 'Aditya Kashyap',
+        customer_phone: '+919876543210',
+        total_amount: 580,
+        delivery_rider: 'Zomato Rider (Suresh K.)',
+        rider_phone: '+919845012345',
+        instructions: 'Please pack separate gravy and cutlery.',
+        items: [
+          { name: 'Butter Chicken Masala', unit_price: 380, quantity: 1 },
+          { name: 'Garlic Butter Naan', unit_price: 100, quantity: 2 },
+        ],
+      }),
+    });
+    const zData = await zRes.json();
+    if (zRes.status === 201 && zData.success === true && zData.order_code) {
+      passedTests++;
+      console.log(`PASSED (Order Code: ${zData.order_code}, KDS ID: ${zData.order_id})`);
+    } else {
+      failedTests++;
+      console.log(`FAILED: ${JSON.stringify(zData)}`);
+      failureDetails.push({ name: 'Zomato Webhook', details: zData });
+    }
+  } catch (err) {
+    failedTests++;
+    console.log(`ERROR: ${err.message}`);
+  }
+
+  // Bonus 26: Swiggy Webhook Live Order Ingestion (Aggregator Pro Tier ₹3,500)
+  totalTests++;
+  process.stdout.write(`[TEST ${totalTests}] 26. Swiggy - Webhook Live Order Ingestion & KDS Dispatch ... `);
+  try {
+    const swgRes = await fetch(`${BASE_URL}/api/integrations/swiggy/webhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order_id: 'SWG-POSTMAN-9933',
+        customer_name: 'Pooja Hegde',
+        customer_phone: '+919876599887',
+        total_amount: 640,
+        delivery_rider: 'Swiggy Executive (Manoj D.)',
+        rider_phone: '+919741054321',
+        instructions: 'Deliver to 4th Floor, leave at reception.',
+        items: [
+          { name: 'Artisan Wood-Fired Margherita Pizza', unit_price: 450, quantity: 1 },
+          { name: 'Iced Vanilla Cold Brew', unit_price: 190, quantity: 1 },
+        ],
+      }),
+    });
+    const swgData = await swgRes.json();
+    if (swgRes.status === 201 && swgData.success === true && swgData.order_code) {
+      passedTests++;
+      console.log(`PASSED (Order Code: ${swgData.order_code}, KDS ID: ${swgData.order_id})`);
+    } else {
+      failedTests++;
+      console.log(`FAILED: ${JSON.stringify(swgData)}`);
+      failureDetails.push({ name: 'Swiggy Webhook', details: swgData });
+    }
+  } catch (err) {
+    failedTests++;
+    console.log(`ERROR: ${err.message}`);
+  }
+
+  // Bonus 27: Aggregators - Partner Credential Validation
+  totalTests++;
+  process.stdout.write(`[TEST ${totalTests}] 27. Aggregators - Verify Zomato ResID & Swiggy Outlet ID ... `);
+  try {
+    const vRes = await fetch(`${BASE_URL}/api/integrations/test-partner`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        platform: 'zomato',
+        partner_id: '18923412',
+      }),
+    });
+    const vData = await vRes.json();
+    if (vRes.status === 200 && vData.success === true && vData.valid === true) {
+      passedTests++;
+      console.log(`PASSED (Verified: ${vData.message})`);
+    } else {
+      failedTests++;
+      console.log(`FAILED: ${JSON.stringify(vData)}`);
+      failureDetails.push({ name: 'Partner Validation', details: vData });
+    }
+  } catch (err) {
+    failedTests++;
+    console.log(`ERROR: ${err.message}`);
+  }
+
+  // Bonus 28: Aggregators - Integration Status & Multi-Channel Volume
+  totalTests++;
+  process.stdout.write(`[TEST ${totalTests}] 28. Aggregators - Live Status & Multi-Channel Volume ... `);
+  try {
+    const stRes = await fetch(`${BASE_URL}/api/integrations/status?restaurant_id=rest_losteria`);
+    const stData = await stRes.json();
+    if (stRes.status === 200 && stData.success === true && stData.integrations?.zomato && stData.integrations?.swiggy) {
+      passedTests++;
+      console.log(`PASSED (Zomato & Swiggy connected endpoints verified)`);
+    } else {
+      failedTests++;
+      console.log(`FAILED: ${JSON.stringify(stData)}`);
+      failureDetails.push({ name: 'Aggregator Status', details: stData });
+    }
+  } catch (err) {
+    failedTests++;
+    console.log(`ERROR: ${err.message}`);
+  }
+
   console.log(`\n=============================================================`);
   console.log(` POSTMAN RUN SUMMARY:`);
   console.log(` Total Tests Executed: ${totalTests}`);

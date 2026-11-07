@@ -181,25 +181,6 @@ function BusinessSwitcher({ activeRestaurant, setActiveRestaurant, addToast, isD
               );
             })}
           </div>
-
-          <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2 px-1">
-            <Link
-              to="/gym-register"
-              onClick={() => setIsOpen(false)}
-              className="flex-1 text-center py-1.5 px-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-bold text-[11px] border border-emerald-500/30 transition flex items-center justify-center gap-1.5"
-            >
-              <Dumbbell className="w-3.5 h-3.5" />
-              <span>Gym Register</span>
-            </Link>
-            <Link
-              to="/onboard"
-              onClick={() => setIsOpen(false)}
-              className="flex-1 text-center py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold text-[11px] border border-slate-800 transition flex items-center justify-center gap-1.5"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>+ New Client</span>
-            </Link>
-          </div>
         </div>
       )}
     </div>
@@ -628,88 +609,252 @@ export function Navbar({ onOpenCart }) {
 
         {/* Desktop Admin Operations Navigation */}
         <nav className="hidden lg:flex items-center gap-1 text-xs font-medium text-slate-300">
-          <Link
-            to="/admin/kitchen"
-            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              location.pathname.startsWith('/admin/kitchen')
-                ? 'bg-amber-500 text-slate-950 font-bold'
-                : 'hover:bg-slate-900 hover:text-white'
-            }`}
-          >
-            <ChefHat className="w-3.5 h-3.5" />
-            <span>Kitchen KDS</span>
-            {activeOrdersCount > 0 && (
-              <span className="inline-flex items-center justify-center px-1.5 py-0.2 text-[10px] font-black bg-rose-600 text-white rounded-full">
-                {activeOrdersCount}
-              </span>
-            )}
-          </Link>
-
-          <Link
-            to="/admin/floor-plan"
-            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              location.pathname.startsWith('/admin/floor-plan')
-                ? 'bg-amber-500 text-slate-950 font-bold'
-                : 'hover:bg-slate-900 hover:text-white'
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>Floor Plan</span>
-          </Link>
-
-          <Link
-            to="/admin/tables"
-            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              location.pathname.startsWith('/admin/tables')
-                ? 'bg-amber-500 text-slate-950 font-bold'
-                : 'hover:bg-slate-900 hover:text-white'
-            }`}
-          >
-            <QrCode className="w-3.5 h-3.5" />
-            <span>Tables & QR Placards</span>
-          </Link>
-
-          <Link
-            to="/admin/menu"
-            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              location.pathname.startsWith('/admin/menu')
-                ? 'bg-amber-500 text-slate-950 font-bold'
-                : 'hover:bg-slate-900 hover:text-white'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Menu & Prices</span>
-          </Link>
-
-          <Link
-            to="/admin/orders"
-            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              location.pathname.startsWith('/admin/orders')
-                ? 'bg-amber-500 text-slate-950 font-bold'
-                : 'hover:bg-slate-900 hover:text-white'
-            }`}
-          >
-            <ReceiptText className="w-3.5 h-3.5" />
-            <span>Bills & Orders</span>
-          </Link>
-
-          <Link
-            to="/admin/staff"
-            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              location.pathname.startsWith('/admin/staff')
-                ? 'bg-amber-500 text-slate-950 font-bold'
-                : 'hover:bg-slate-900 hover:text-white'
-            }`}
-          >
-            <Users className="w-3.5 h-3.5" />
-            <span>Staff Roster</span>
-          </Link>
+          {activeRestaurant?.business_type === 'gym' ? (
+            <>
+              <Link
+                to="/gym-register"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/gym-register')
+                    ? 'bg-emerald-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <Dumbbell className="w-3.5 h-3.5" />
+                <span>Member Attendance</span>
+              </Link>
+              <Link
+                to="/admin/tables"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/tables')
+                    ? 'bg-emerald-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <QrCode className="w-3.5 h-3.5" />
+                <span>Bays & Lockers</span>
+              </Link>
+              <Link
+                to="/admin/menu"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/menu')
+                    ? 'bg-emerald-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Shakes & Passes</span>
+              </Link>
+              <Link
+                to="/admin/inventory"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/inventory')
+                    ? 'bg-emerald-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <Boxes className="w-3.5 h-3.5" />
+                <span>Supplements Stock</span>
+              </Link>
+              <Link
+                to="/admin/purchases"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/purchases')
+                    ? 'bg-emerald-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>Purchases (RfQ)</span>
+              </Link>
+              <Link
+                to="/admin/orders"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/orders')
+                    ? 'bg-emerald-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <ReceiptText className="w-3.5 h-3.5" />
+                <span>Fees & Bills</span>
+              </Link>
+              <Link
+                to="/admin/staff"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/staff')
+                    ? 'bg-emerald-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>Trainers Roster</span>
+              </Link>
+            </>
+          ) : activeRestaurant?.business_type === 'clinic' ? (
+            <>
+              <Link
+                to="/admin/kitchen"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/kitchen')
+                    ? 'bg-sky-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <Stethoscope className="w-3.5 h-3.5" />
+                <span>OPD Token Queue</span>
+                {activeOrdersCount > 0 && (
+                  <span className="inline-flex items-center justify-center px-1.5 py-0.2 text-[10px] font-black bg-rose-600 text-white rounded-full">
+                    {activeOrdersCount}
+                  </span>
+                )}
+              </Link>
+              <Link
+                to="/admin/tables"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/tables')
+                    ? 'bg-sky-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <QrCode className="w-3.5 h-3.5" />
+                <span>Chambers & Kiosks</span>
+              </Link>
+              <Link
+                to="/admin/menu"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/menu')
+                    ? 'bg-sky-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Services & Tests</span>
+              </Link>
+              <Link
+                to="/admin/inventory"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/inventory')
+                    ? 'bg-sky-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <Boxes className="w-3.5 h-3.5" />
+                <span>Pharmacy Stock</span>
+              </Link>
+              <Link
+                to="/admin/purchases"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/purchases')
+                    ? 'bg-sky-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>Purchases (RfQ)</span>
+              </Link>
+              <Link
+                to="/admin/orders"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/orders')
+                    ? 'bg-sky-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <ReceiptText className="w-3.5 h-3.5" />
+                <span>Patient Bills</span>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/admin/kitchen"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/kitchen')
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <ChefHat className="w-3.5 h-3.5" />
+                <span>Kitchen KDS</span>
+                {activeOrdersCount > 0 && (
+                  <span className="inline-flex items-center justify-center px-1.5 py-0.2 text-[10px] font-black bg-rose-600 text-white rounded-full">
+                    {activeOrdersCount}
+                  </span>
+                )}
+              </Link>
+              <Link
+                to="/admin/tables"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/tables')
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <QrCode className="w-3.5 h-3.5" />
+                <span>Tables & QR</span>
+              </Link>
+              <Link
+                to="/admin/menu"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/menu')
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Menu & Prices</span>
+              </Link>
+              <Link
+                to="/admin/inventory"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/inventory')
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <Boxes className="w-3.5 h-3.5" />
+                <span>Inventory</span>
+              </Link>
+              <Link
+                to="/admin/purchases"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/purchases')
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>Purchases (RfQ)</span>
+              </Link>
+              <Link
+                to="/admin/orders"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/orders')
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <ReceiptText className="w-3.5 h-3.5" />
+                <span>Bills & Orders</span>
+              </Link>
+              <Link
+                to="/admin/staff"
+                className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+                  location.pathname.startsWith('/admin/staff')
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'hover:bg-slate-900 hover:text-white'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>Staff</span>
+              </Link>
+            </>
+          )}
 
           {/* Operations Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsOperationsDropdownOpen(!isOperationsDropdownOpen)}
-              className="px-3 py-1.5 rounded-lg transition flex items-center gap-1 hover:bg-slate-900 hover:text-white cursor-pointer"
+              className="px-2.5 py-1.5 rounded-lg transition flex items-center gap-1 hover:bg-slate-900 hover:text-white cursor-pointer"
             >
               <span>More</span>
               <ChevronDown className="w-3 h-3 opacity-70" />
@@ -717,6 +862,22 @@ export function Navbar({ onOpenCart }) {
 
             {isOperationsDropdownOpen && (
               <div className="absolute top-full right-0 mt-2 w-56 bg-slate-900 rounded-xl shadow-2xl border border-slate-800 py-1.5 z-50 animate-in fade-in zoom-in-95">
+                <Link
+                  to="/admin/floor-plan"
+                  onClick={() => setIsOperationsDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
+                >
+                  <Layers className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Floor Plan (Odoo Parity)</span>
+                </Link>
+                <Link
+                  to="/admin/reservations"
+                  onClick={() => setIsOperationsDropdownOpen(false)}
+                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Table Reservations</span>
+                </Link>
                 <Link
                   to="/captain"
                   onClick={() => setIsOperationsDropdownOpen(false)}
@@ -735,53 +896,20 @@ export function Navbar({ onOpenCart }) {
                 </Link>
                 <div className="my-1 border-t border-slate-800" />
                 <Link
-                  to="/admin/reservations"
-                  onClick={() => setIsOperationsDropdownOpen(false)}
-                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
-                >
-                  <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Table Reservations</span>
-                </Link>
-                <Link
-                  to="/admin/inventory"
-                  onClick={() => setIsOperationsDropdownOpen(false)}
-                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
-                >
-                  <Boxes className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Inventory Tracking</span>
-                </Link>
-                <Link
-                  to="/admin/purchases"
-                  onClick={() => setIsOperationsDropdownOpen(false)}
-                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
-                >
-                  <FileSpreadsheet className="w-3.5 h-3.5 text-sky-400" />
-                  <span>Vendor Purchases</span>
-                </Link>
-                <Link
-                  to="/gym-register"
-                  onClick={() => setIsOperationsDropdownOpen(false)}
-                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-emerald-400 hover:bg-slate-800 transition"
-                >
-                  <Dumbbell className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Gym Member Register</span>
-                </Link>
-                <Link
                   to="/admin/subscription"
                   onClick={() => setIsOperationsDropdownOpen(false)}
                   className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-amber-400 hover:bg-slate-800 transition"
                 >
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  <span>SaaS Plan (₹1,500/mo)</span>
+                  <span>SaaS Plans (₹1.5k / ₹3.5k / ₹7k)</span>
                 </Link>
-                <div className="my-1 border-t border-slate-800" />
                 <Link
                   to="/admin/settings"
                   onClick={() => setIsOperationsDropdownOpen(false)}
                   className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
                 >
                   <Settings className="w-3.5 h-3.5 text-slate-400" />
-                  <span>POS Settings</span>
+                  <span>POS Settings & Aggregators</span>
                 </Link>
               </div>
             )}
@@ -879,18 +1007,46 @@ export function Navbar({ onOpenCart }) {
             <span>Staff Roster & Duty</span>
           </Link>
           <Link
+            to="/admin/inventory"
+            className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
+          >
+            <Boxes className="w-4 h-4 text-emerald-400" />
+            <span>Inventory Tracking</span>
+          </Link>
+          <Link
+            to="/admin/purchases"
+            className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-sky-400" />
+            <span>Vendor Purchases (RfQ)</span>
+          </Link>
+          <Link
+            to="/admin/reservations"
+            className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
+          >
+            <Calendar className="w-4 h-4 text-amber-400" />
+            <span>Table Reservations</span>
+          </Link>
+          <Link
+            to="/gym-register"
+            className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-emerald-300"
+          >
+            <Dumbbell className="w-4 h-4 text-emerald-400" />
+            <span>Gym Member Attendance</span>
+          </Link>
+          <Link
             to="/admin/subscription"
             className="flex items-center gap-2.5 p-2 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20"
           >
             <Zap className="w-4 h-4 text-amber-400" />
-            <span>Subscription Plan (₹1,500/mo)</span>
+            <span>Subscription Plans (₹1,500 / ₹3,500 / ₹7,000)</span>
           </Link>
           <Link
             to="/admin/settings"
             className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
           >
             <Settings className="w-4 h-4 text-slate-400" />
-            <span>POS & Printer Settings</span>
+            <span>POS & Aggregator Settings</span>
           </Link>
         </div>
       )}

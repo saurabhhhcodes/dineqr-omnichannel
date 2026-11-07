@@ -7,62 +7,64 @@ import { queryOne, execute } from '../db.js';
 const router = express.Router();
 
 const PLANS = {
-  starter_1000: {
-    id: 'starter_1000',
-    name: 'Essential Restaurant Suite',
-    amount: 1000,
-    amount_paise: 100000,
-    billing_period: 'monthly',
-    badge: 'Popular',
-    description: 'Complete QR self-ordering, visual floor plan, kitchen KDS, local SQLite database & thermal billing.',
-    features: [
-      'Unlimited Table & Counter QR Codes',
-      'Interactive Drag & Drop Floor Plan (Odoo Parity)',
-      'Live Kitchen Display System (KDS) & Audio Chimes',
-      'Local On-Premise SQLite Database (Zero Cloud Cost)',
-      'ESC/POS Thermal Network Invoice Printing',
-      'Staff Shift Scheduling & Live Duty Clock-In',
-      'Perpetual Local Data Ownership (Export Anytime)',
-    ],
-  },
-  pro_1500: {
-    id: 'pro_1500',
-    name: 'Omnichannel Pro Delivery Suite',
+  starter_1500: {
+    id: 'starter_1500',
+    name: 'Local SQLite On-Premise POS',
     amount: 1500,
     amount_paise: 150000,
     billing_period: 'monthly',
-    badge: 'Enterprise',
-    staff_limit: 12,
-    description: 'Everything in Essential plus real-time Zomato, Swiggy & ONDC webhook aggregator order streaming.',
+    badge: 'Starter (Offline)',
+    staff_limit: 8,
+    description: '100% On-Premise Local SQLite Billing & KDS without cloud dependencies. Offline dine-in & counter only; no Zomato/Swiggy aggregators.',
     features: [
-      'Everything in Essential Restaurant Suite',
-      'Zomato Partner ResId Auto-Accept & Ingestion',
-      'Swiggy Partner Outlet Webhook Ingestion',
-      'ONDC Network & Magicpin Delivery Hub',
-      'Unified Single-Screen KDS for Dine-In & Delivery',
-      'Multi-Terminal Standalone Apps (EXE, APK, DMG, DEB)',
-      'Up to 12 Staff User Accounts with Role Permissions',
-      'Priority 24/7 Phone & WhatsApp Support',
+      '100% Offline SQLite On-Premise Engine (Zero Cloud Costs)',
+      'Dynamic QR Digital Menus & Table Ordering',
+      'Live Kitchen Display System (KDS) & Elapsed Timer',
+      'Smart TV Token Announcer with Audio Chimes',
+      'Local ESC/POS Thermal Printing & PDF Bills',
+      'Up to 8 Staff Members with Role Authorization',
+      'Local Inventory & Daily Expense Register',
+      'Zero Third-Party Cut (100% Direct Merchant Settlements)',
     ],
   },
-  enterprise_5000: {
-    id: 'enterprise_5000',
-    name: 'Enterprise Scale & Unlimited Staff Hub',
-    amount: 5000,
-    amount_paise: 500000,
+  aggregator_3500: {
+    id: 'aggregator_3500',
+    name: 'Aggregator Pro (Zomato + Swiggy Direct)',
+    amount: 3500,
+    amount_paise: 350000,
     billing_period: 'monthly',
-    badge: 'Scale & Chains',
-    staff_limit: 30,
-    description: 'High-volume dining chains, multi-counter food courts, and franchises needing advanced staff limits, timeclock tracking, and dedicated folder archives.',
+    badge: 'Most Popular',
+    staff_limit: 18,
+    description: 'Everything in Starter PLUS direct two-way Zomato & Swiggy online order ingestion, rider dispatch, and auto-accept.',
     features: [
-      'Up to 30 Staff Accounts with Unique User IDs and Passwords',
-      'Live Staff Arrival & Departure Timeclock Attendance Log',
-      'Multi-Screen Kitchen KDS with Expediter Stations',
-      'Dedicated On-Premise Folders (/bills, /inventory, /staff)',
-      'Pay-on-Counter Cash & UPI Split Tender Verification',
-      'Real-Time Food Cost, Margin & Daily P&L Engine',
-      'Multi-Branch Consolidated Reporting & Analytics',
-      'Direct Razorpay Merchant Settlement with 0% Cut',
+      'Everything in Starter Local POS',
+      'LIVE Zomato Partner ResID Ingestion & Auto-Accept',
+      'LIVE Swiggy Outlet Webhook Ingestion & Dispatch',
+      'Unified Single-Screen KDS for Dine-In + Online Orders',
+      'Rider Arrival & Handover Notification Management',
+      'Magicpin & ONDC Food Delivery Integration',
+      'Up to 18 Staff User Accounts & Clock-In/Clock-Out',
+      'Priority WhatsApp & Phone Technical Support',
+    ],
+  },
+  enterprise_7000: {
+    id: 'enterprise_7000',
+    name: 'Enterprise Cloud Hub & Multi-Chain Sync',
+    amount: 7000,
+    amount_paise: 700000,
+    billing_period: 'monthly',
+    badge: 'Enterprise Cloud',
+    staff_limit: 40,
+    description: 'Multi-outlet dining chains, gym networks, and high-volume restaurants requiring dual SQLite + MongoDB Atlas Cloud Sync with Unlimited Cloud Storage.',
+    features: [
+      'Everything in Aggregator Pro (Zomato + Swiggy Included)',
+      'Dual Local SQLite + MongoDB Atlas Real-Time Cloud Replication',
+      'Unlimited Cloud Storage (No 2GB Storage Limit Caps)',
+      'Owner Mobile App Live Revenue & Profit Dashboard from Anywhere',
+      'Multi-Chain Centralized Menu & Recipe Management',
+      'Up to 40 Staff Accounts with Unique User IDs and Passwords',
+      'Dedicated Remote Backup & Automated Disaster Recovery',
+      'Dedicated Account Manager & 24/7 Enterprise SLA',
     ],
   },
 };
@@ -78,12 +80,12 @@ router.get('/status', (req, res) => {
     }
 
     const planStr = (rest.subscription_plan || '').toLowerCase();
-    const currentPlanId = planStr.includes('5000') || planStr.includes('enterprise')
-      ? 'enterprise_5000'
-      : planStr.includes('1500') || planStr.includes('pro')
-      ? 'pro_1500'
-      : 'starter_1000';
-    const plan = PLANS[currentPlanId] || PLANS.starter_1000;
+    const currentPlanId = planStr.includes('7000') || planStr.includes('enterprise') || planStr.includes('5000')
+      ? 'enterprise_7000'
+      : planStr.includes('3500') || planStr.includes('aggregator')
+      ? 'aggregator_3500'
+      : 'starter_1500';
+    const plan = PLANS[currentPlanId] || PLANS.starter_1500;
 
     // Calculate expiry (default 30 days from now if not explicitly set)
     let expiresAt = rest.subscription_expires_at;
