@@ -173,7 +173,7 @@ router.post('/create-order', async (req, res) => {
       razorpay_order: rzpOrder,
       key_id,
       preferred_payment_method: selectedMethod,
-      is_mock: !isConfigured,
+      is_mock: Boolean(!isConfigured || rzpOrder.mock),
       is_direct_restaurant_payout: isCustom,
       restaurant_name: restaurantName,
       order: {

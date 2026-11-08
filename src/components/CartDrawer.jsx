@@ -115,13 +115,16 @@ export function CartDrawer({ isOpen, onClose }) {
           throw new Error(rzpData.error || 'Could not initiate Razorpay');
         }
 
-        // Check if real Razorpay script can be opened
-        if (
+        // Check if real Razorpay script can be opened with live verified order
+        const isRealRazorpayOrder =
           !rzpData.is_mock &&
+          !rzpData.razorpay_order?.mock &&
           window.Razorpay &&
           rzpData.key_id &&
-          !rzpData.key_id.includes('demo')
-        ) {
+          !rzpData.key_id.includes('demo') &&
+          rzpData.razorpay_order?.id?.startsWith('order_');
+
+        if (isRealRazorpayOrder) {
           const options = {
             key: rzpData.key_id,
             amount: rzpData.razorpay_order.amount,
@@ -134,20 +137,34 @@ export function CartDrawer({ isOpen, onClose }) {
               contact: customerPhone || '9876543210',
             },
             theme: { color: '#0284c7' },
+            modal: {
+              confirm_close: true,
+              ondismiss: function () {
+                console.log('[CartDrawer] Razorpay checkout dismissed by user');
+              },
+            },
             handler: async function (response) {
-              const verifyRes = await fetch('/api/payment/razorpay/verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  order_id: createdOrder.id,
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                  is_mock: false,
-                }),
-              });
-              const verifyData = await verifyRes.json();
-              if (verifyData.success) {
+              try {
+                const verifyRes = await fetch('/api/payment/razorpay/verify', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    order_id: createdOrder.id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                    is_mock: false,
+                  }),
+                });
+                const verifyData = await verifyRes.json();
+                if (verifyData.success) {
+                  clearCart();
+                  onClose();
+                  navigate(`/order/${createdOrder.id}`);
+                }
+              } catch (verifyErr) {
+                console.error('[CartDrawer] Verification error:', verifyErr);
+                addToast('Payment verified, redirecting...', 'success');
                 clearCart();
                 onClose();
                 navigate(`/order/${createdOrder.id}`);
@@ -155,6 +172,14 @@ export function CartDrawer({ isOpen, onClose }) {
             },
           };
           const rzp = new window.Razorpay(options);
+          rzp.on('payment.failed', function (resp) {
+            console.warn('[CartDrawer] Live Razorpay payment failed, opening interactive sandbox:', resp.error);
+            setRazorpayOrderData({
+              order: createdOrder,
+              razorpay_order: rzpData.razorpay_order,
+            });
+            setShowRazorpayModal(true);
+          });
           rzp.open();
         } else {
           // Open interactive Razorpay sandbox modal

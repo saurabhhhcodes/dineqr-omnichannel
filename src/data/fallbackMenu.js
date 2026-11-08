@@ -16,7 +16,7 @@ export const FALLBACK_RESTAURANTS = [
     cgst_pct: 2.5,
     sgst_pct: 2.5,
     service_charge_pct: 0.0,
-    razorpay_key_id: 'rzp_test_TK088i9wgJLbAg',
+    razorpay_key_id: 'rzp_test_TxIAxSWbhZU5bk',
     upi_id: 'losteria@okhdfcbank',
   },
   {
@@ -33,7 +33,7 @@ export const FALLBACK_RESTAURANTS = [
     cgst_pct: 2.5,
     sgst_pct: 2.5,
     service_charge_pct: 0.0,
-    razorpay_key_id: 'rzp_test_TK088i9wgJLbAg',
+    razorpay_key_id: 'rzp_test_TxIAxSWbhZU5bk',
     upi_id: 'roastery@icici',
   },
   {
@@ -50,7 +50,7 @@ export const FALLBACK_RESTAURANTS = [
     cgst_pct: 0.0,
     sgst_pct: 0.0,
     service_charge_pct: 0.0,
-    razorpay_key_id: 'rzp_test_TK088i9wgJLbAg',
+    razorpay_key_id: 'rzp_test_TxIAxSWbhZU5bk',
     upi_id: 'apexclinic@sbi',
   },
   {
@@ -67,7 +67,7 @@ export const FALLBACK_RESTAURANTS = [
     cgst_pct: 9.0,
     sgst_pct: 9.0,
     service_charge_pct: 0.0,
-    razorpay_key_id: 'rzp_test_TK088i9wgJLbAg',
+    razorpay_key_id: 'rzp_test_TxIAxSWbhZU5bk',
     upi_id: 'ironpulse@axisbank',
   },
   {
@@ -84,7 +84,7 @@ export const FALLBACK_RESTAURANTS = [
     cgst_pct: 9.0,
     sgst_pct: 9.0,
     service_charge_pct: 0.0,
-    razorpay_key_id: 'rzp_test_TK088i9wgJLbAg',
+    razorpay_key_id: 'rzp_test_TxIAxSWbhZU5bk',
     upi_id: 'glamour@paytm',
   },
 ];

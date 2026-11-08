@@ -126,8 +126,8 @@ router.post('/create-order', async (req, res) => {
     const plan = PLANS[plan_id] || PLANS.starter_1500;
 
     const rest = queryOne(`SELECT * FROM restaurants WHERE id = ?`, [restaurant_id]);
-    const rzpKeyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_TK088i9wgJLbAg';
-    const rzpSecret = process.env.RAZORPAY_KEY_SECRET || 'DyRucfn1FimHG6vcWs6CyePr';
+    const rzpKeyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_TxIAxSWbhZU5bk';
+    const rzpSecret = process.env.RAZORPAY_KEY_SECRET || '3c5JGUBSPS7S8GuBggFSHpw1';
 
     const rzp = new Razorpay({
       key_id: rzpKeyId,
@@ -170,7 +170,7 @@ router.post('/create-order', async (req, res) => {
       amount: plan.amount,
       amount_paise: plan.amount_paise,
       currency: 'INR',
-      key_id: 'rzp_test_TK088i9wgJLbAg',
+      key_id: 'rzp_test_TxIAxSWbhZU5bk',
       plan_id: plan.id,
       plan_name: plan.name,
       simulated: true,
@@ -190,7 +190,7 @@ router.post('/verify', (req, res) => {
     } = req.body;
 
     const plan = PLANS[plan_id] || PLANS.starter_1500;
-    const rzpSecret = process.env.RAZORPAY_KEY_SECRET || 'DyRucfn1FimHG6vcWs6CyePr';
+    const rzpSecret = process.env.RAZORPAY_KEY_SECRET || '3c5JGUBSPS7S8GuBggFSHpw1';
 
     // Verify signature if supplied and not a simulated order
     if (razorpay_order_id && razorpay_payment_id && razorpay_signature && !razorpay_order_id.includes('mock')) {
