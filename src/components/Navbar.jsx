@@ -439,17 +439,14 @@ export function Navbar({ onOpenCart }) {
                   </Link>
 
                   <Link
-                    to="/cctv-demo"
+                    to="/walkthrough"
                     onClick={() => setIsDemosDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-rose-300 hover:bg-slate-800 hover:text-white transition"
+                    className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
                   >
-                    <Camera className="w-3.5 h-3.5 text-rose-400" />
+                    <PlayCircle className="w-3.5 h-3.5 text-amber-400" />
                     <div>
-                      <div className="font-bold text-white flex items-center gap-1.5">
-                        <span>AI CCTV &amp; Alert Bell</span>
-                        <span className="text-[9px] bg-rose-500 text-white font-black px-1 rounded uppercase">NEW</span>
-                      </div>
-                      <div className="text-[10px] text-slate-400">Table Vision &amp; Dwell Alert</div>
+                      <div className="font-bold text-white">Video Walkthroughs</div>
+                      <div className="text-[10px] text-slate-400">Step-by-step role guides</div>
                     </div>
                   </Link>
                 </div>
@@ -590,17 +587,6 @@ export function Navbar({ onOpenCart }) {
                 <div className="flex items-center gap-2.5">
                   <Laptop className="w-4 h-4 text-orange-400" />
                   <span>Captain Waiter POS App</span>
-                </div>
-                <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
-              </Link>
-
-              <Link
-                to="/cctv-demo"
-                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-rose-300 hover:text-rose-200 transition"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Camera className="w-4 h-4 text-rose-400" />
-                  <span>AI CCTV Vision &amp; Service Bell</span>
                 </div>
                 <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
               </Link>
@@ -1098,17 +1084,6 @@ export function Navbar({ onOpenCart }) {
                   <Laptop className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Token TV Display</span>
                 </Link>
-                <Link
-                  to="/admin/order-risk"
-                  onClick={() => setIsOperationsDropdownOpen(false)}
-                  className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-rose-300 hover:bg-slate-800 hover:text-white transition"
-                >
-                  <Camera className="w-3.5 h-3.5 text-rose-400" />
-                  <div className="flex items-center gap-1.5">
-                    <span>AI CCTV Table Risk &amp; Bell</span>
-                    <span className="text-[9px] bg-rose-500 text-white font-black px-1 rounded uppercase">NEW</span>
-                  </div>
-                </Link>
                 <div className="my-1 border-t border-slate-800" />
                 <Link
                   to="/admin/subscription"
@@ -1116,7 +1091,7 @@ export function Navbar({ onOpenCart }) {
                   className="flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-amber-400 hover:bg-slate-800 transition"
                 >
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  <span>SaaS Plans (₹1.5k / ₹3.5k / ₹7k)</span>
+                  <span>SaaS Plans (₹1.5k / ₹3.5k / ₹5k)</span>
                 </Link>
                 <Link
                   to="/admin/settings"
@@ -1246,13 +1221,6 @@ export function Navbar({ onOpenCart }) {
             <span>Vendor Purchases (RfQ)</span>
           </Link>
           <Link
-            to="/admin/order-risk"
-            className="flex items-center gap-2.5 p-2 rounded-lg bg-rose-950/40 text-rose-300 border border-rose-800/40 font-bold"
-          >
-            <Camera className="w-4 h-4 text-rose-400" />
-            <span>AI CCTV Table Risk &amp; Alert Bell</span>
-          </Link>
-          <Link
             to="/admin/reservations"
             className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-900 text-slate-200"
           >
@@ -1271,7 +1239,7 @@ export function Navbar({ onOpenCart }) {
             className="flex items-center gap-2.5 p-2 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20"
           >
             <Zap className="w-4 h-4 text-amber-400" />
-            <span>Subscription Plans (₹1,500 / ₹3,500 / ₹7,000)</span>
+            <span>Subscription Plans (₹1,500 / ₹3,500 / ₹5,000)</span>
           </Link>
           <Link
             to="/admin/settings"

@@ -9,11 +9,13 @@
     "server": "node server/index.js",
     "build": "vite build",
     "preview": "vite preview",
+    "db:setup": "node scripts/setup_local_db.js",
     "electron:start": "electron electron/main.cjs",
     "electron:dev": "concurrently \"node server/index.js\" \"vite\" \"electron electron/main.cjs\"",
     "test": "node tests/postman-runner.js && node tests/full-system.test.js",
     "test:system": "node tests/full-system.test.js",
     "test:postman": "node tests/postman-runner.js",
+    "test:payment": "node tests/test_onboarding_payment.js",
     "test:pentest": "node tests/pen_test_load_suite.js",
     "code-review": "node scripts/code_review_bot.cjs",
     "review": "node scripts/code_review_bot.cjs"

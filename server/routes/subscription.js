@@ -7,17 +7,6 @@ import { queryOne, execute } from '../db.js';
 const router = express.Router();
 
 const PLANS = {
-  starter_1000: {
-    id: 'starter_1000',
-    name: 'Legacy Starter Plan',
-    amount: 1000,
-    amount_paise: 100000,
-    billing_period: 'monthly',
-    badge: 'Legacy',
-    staff_limit: 8,
-    description: 'Legacy tier for backward compatibility.',
-    features: ['Offline SQLite Engine', 'QR Menu', 'Kitchen KDS'],
-  },
   starter_1500: {
     id: 'starter_1500',
     name: 'Local SQLite On-Premise POS',
@@ -28,14 +17,14 @@ const PLANS = {
     staff_limit: 8,
     description: '100% On-Premise Local SQLite Billing & KDS without cloud dependencies. Offline dine-in & counter only; no Zomato/Swiggy aggregators.',
     features: [
-      '100% Offline SQLite On-Premise Engine (Zero Cloud Costs)',
-      'Dynamic QR Digital Menus & Table Ordering',
-      'Live Kitchen Display System (KDS) & Elapsed Timer',
+      '100% Offline SQLite On-Premise Engine (Zero Cloud Database Costs)',
+      'Dynamic QR Digital Menus & Table Ordering with 0% Commission',
+      'Live Kitchen Display System (KDS) & Elapsed Prep Timer',
       'Smart TV Token Announcer with Audio Chimes',
-      'Local ESC/POS Thermal Printing & PDF Bills',
-      'Up to 8 Staff Members with Role Authorization',
+      'Hardware ESC/POS Thermal Printing & Printable Invoices',
+      'Up to 8 Staff Members with Role Authorization & Shift Clock-In',
       'Local Inventory & Daily Expense Register',
-      'Zero Third-Party Cut (100% Direct Merchant Settlements)',
+      'Direct Merchant Bank Settlements via Razorpay & UPI',
     ],
   },
   aggregator_3500: {
@@ -46,36 +35,35 @@ const PLANS = {
     billing_period: 'monthly',
     badge: 'Most Popular',
     staff_limit: 18,
-    description: 'Everything in Starter PLUS direct two-way Zomato & Swiggy online order ingestion, rider dispatch, and auto-accept.',
+    description: 'Everything in Starter POS PLUS direct two-way Zomato & Swiggy online order ingestion, rider dispatch, and auto-accept.',
     features: [
       'Everything in Starter Local POS',
-      'LIVE Zomato Partner ResID Ingestion & Auto-Accept',
-      'LIVE Swiggy Outlet Webhook Ingestion & Dispatch',
-      'Unified Single-Screen KDS for Dine-In + Online Orders',
+      'LIVE Zomato Partner ResID Webhook Ingestion & Auto-Accept',
+      'LIVE Swiggy Outlet Webhook Ingestion & Rider Dispatch',
+      'Unified Single-Screen KDS for Dine-In, Counter & Food Delivery',
       'Rider Arrival & Handover Notification Management',
       'Magicpin & ONDC Food Delivery Integration',
       'Up to 18 Staff User Accounts & Clock-In/Clock-Out',
       'Priority WhatsApp & Phone Technical Support',
     ],
   },
-  enterprise_7000: {
-    id: 'enterprise_7000',
-    name: 'Enterprise Cloud Hub & Multi-Chain Sync',
-    amount: 7000,
-    amount_paise: 700000,
+  cloud_5000: {
+    id: 'cloud_5000',
+    name: 'Cloud Sync Hub & Multi-Branch (2GB Storage)',
+    amount: 5000,
+    amount_paise: 500000,
     billing_period: 'monthly',
-    badge: 'Enterprise Cloud',
-    staff_limit: 40,
-    description: 'Multi-outlet dining chains, gym networks, and high-volume restaurants requiring dual SQLite + MongoDB Atlas Cloud Sync with Unlimited Cloud Storage.',
+    badge: 'Cloud Sync (2GB)',
+    staff_limit: 30,
+    description: 'Local SQLite on-premise billing + 2GB Managed Cloud Storage for live remote owner reporting, P&L analytics from anywhere, and multi-branch sync.',
     features: [
       'Everything in Aggregator Pro (Zomato + Swiggy Included)',
-      'Dual Local SQLite + MongoDB Atlas Real-Time Cloud Replication',
-      'Unlimited Cloud Storage (No 2GB Storage Limit Caps)',
+      'Dual Local SQLite + 2GB Managed Cloud Storage Sync',
       'Owner Mobile App Live Revenue & Profit Dashboard from Anywhere',
-      'Multi-Chain Centralized Menu & Recipe Management',
-      'Up to 40 Staff Accounts with Unique User IDs and Passwords',
-      'Dedicated Remote Backup & Automated Disaster Recovery',
-      'Dedicated Account Manager & 24/7 Enterprise SLA',
+      'Multi-Branch Centralized Menu & Recipe Management',
+      'Up to 30 Staff Accounts with Unique User IDs and Passwords',
+      'Automated 30-Day Cloud Compliance Snapshot & Disaster Recovery',
+      'Dedicated 1-on-1 Implementation Specialist & Priority 24/7 SLA',
     ],
   },
 };
@@ -91,8 +79,8 @@ router.get('/status', (req, res) => {
     }
 
     const planStr = (rest.subscription_plan || '').toLowerCase();
-    const currentPlanId = planStr.includes('7000') || planStr.includes('enterprise') || planStr.includes('5000')
-      ? 'enterprise_7000'
+    const currentPlanId = planStr.includes('5000') || planStr.includes('cloud') || planStr.includes('7000') || planStr.includes('enterprise')
+      ? 'cloud_5000'
       : planStr.includes('3500') || planStr.includes('aggregator')
       ? 'aggregator_3500'
       : 'starter_1500';

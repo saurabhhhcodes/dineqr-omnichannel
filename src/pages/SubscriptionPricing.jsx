@@ -200,23 +200,22 @@ export function SubscriptionPricing() {
       ],
     },
     {
-      id: 'enterprise_7000',
-      title: 'Enterprise Cloud Hub & Multi-Chain Sync',
-      price: '7,000',
+      id: 'cloud_5000',
+      title: 'Cloud Sync Hub & Multi-Branch',
+      price: '5,000',
       period: '/ month',
-      badge: 'Enterprise · Unlimited Cloud',
+      badge: 'Cloud Sync · 2GB Storage',
       badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
       highlight: false,
-      tagline: 'For busy multi-branch outlets, fitness franchises & remote business owners',
+      tagline: 'Dual local SQLite + 2GB cloud storage for remote live reporting & multi-branch sync',
       features: [
         'Everything in Aggregator Pro (Zomato + Swiggy Included)',
-        'Dual Local SQLite + MongoDB Atlas Real-Time Cloud Replication',
-        'Unlimited Cloud Storage & Lifetime Order History (No 2GB Caps)',
+        'Dual Local SQLite + 2GB Managed Cloud Storage Sync',
         'Owner Mobile App Live Revenue & Profit Dashboard from Anywhere',
-        'Multi-Chain Centralized Menu & Recipe Management',
-        'Up to 40 Staff Accounts with Unique User IDs and Passwords',
-        'Automatic Local Backup Sync to DineQR-Data/ + Cloud Storage',
-        'Dedicated 1-on-1 VIP WhatsApp & Phone Implementation Specialist',
+        'Multi-Branch Centralized Menu & Recipe Management',
+        'Up to 30 Staff Accounts with Unique User IDs and Passwords',
+        'Automatic 30-Day Cloud Compliance Snapshot & Disaster Recovery',
+        'Priority Phone & Dedicated WhatsApp Technical Support',
       ],
     },
   ];
@@ -277,7 +276,7 @@ export function SubscriptionPricing() {
         </div>
       )}
 
-      {/* Pricing Cards Grid (3 Clear Tiers: ₹1,500, ₹3,500 vs ₹7,000) */}
+      {/* Pricing Cards Grid (3 Clear Tiers: ₹1,500, ₹3,500 vs ₹5,000) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {plans.map((plan) => {
           const isCurrent =

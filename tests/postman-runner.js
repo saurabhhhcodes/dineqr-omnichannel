@@ -774,7 +774,7 @@ async function runPostmanTestSuite() {
   });
 
   // 40. Monthly Subscription Status
-  await step('GET /api/subscription/status -> Check monthly ₹1,000 / ₹1,500 plans', async () => {
+  await step('GET /api/subscription/status -> Check monthly ₹1,500 / ₹3,500 / ₹5,000 plans', async () => {
     const res = await fetch(`${BASE_URL}/api/subscription/status?restaurant_id=rest_losteria`);
     assert.equal(res.status, 200);
     const data = await res.json();
@@ -790,13 +790,13 @@ async function runPostmanTestSuite() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         restaurant_id: 'rest_losteria',
-        plan_id: 'starter_1000',
+        plan_id: 'starter_1500',
       }),
     });
     assert.equal(res.status, 200);
     const data = await res.json();
     assert.equal(data.success, true);
-    assert.equal(data.amount, 1000);
+    assert.equal(data.amount, 1500);
     subOrderId = data.order_id;
   });
 
@@ -807,7 +807,7 @@ async function runPostmanTestSuite() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         restaurant_id: 'rest_losteria',
-        plan_id: 'starter_1000',
+        plan_id: 'starter_1500',
         razorpay_order_id: subOrderId,
         razorpay_payment_id: 'pay_pm_sub_valid_123',
       }),
