@@ -316,6 +316,16 @@ export function Navbar({ onOpenCart }) {
     setTimeout(() => setWaiterCalled(false), 8000);
   };
 
+  // Suppress top navbar when embedded inside iframes or device simulator chassis
+  const searchParams = new URLSearchParams(location.search);
+  const isEmbedded =
+    searchParams.get('embed') === 'true' ||
+    (typeof window !== 'undefined' && window.self !== window.top);
+
+  if (isEmbedded) {
+    return null;
+  }
+
   // ============================================================
   // 1. PUBLIC MARKETING & LANDING HEADER (Compact, Sleek & Modern)
   // ============================================================

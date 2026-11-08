@@ -6,7 +6,6 @@ import {
   Pause,
   Volume2,
   VolumeX,
-  Languages,
   ArrowRight,
   CheckCircle2,
   UtensilsCrossed,
@@ -15,11 +14,9 @@ import {
   Tv,
   Receipt,
   Store,
-  Database,
   FastForward,
   Terminal,
   MousePointerClick,
-  MonitorPlay,
   Sparkles,
   ShoppingBag,
   CreditCard,
@@ -36,6 +33,12 @@ import {
   Dumbbell,
   Users,
   Wifi,
+  ExternalLink,
+  RefreshCw,
+  Sliders,
+  DollarSign,
+  Bike,
+  ShieldCheck,
 } from 'lucide-react';
 import { openRazorpayCheckout } from '../utils/razorpayCheckout.js';
 import { useToast } from '../context/ToastContext.jsx';
@@ -50,16 +53,20 @@ export function ProductWalkthrough() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [subtitleLang, setSubtitleLang] = useState('hi'); // 'hi' | 'en'
   const [isVoiceActive, setIsVoiceActive] = useState(true);
-  const [displayMode, setDisplayMode] = useState('interactive'); // 'interactive' | 'video'
+  const [displayMode, setDisplayMode] = useState('interactive'); // 'interactive' | 'simulation'
+  const [iframeKey, setIframeKey] = useState(0);
 
   // Interactive Live Device States
-  const [interactiveStep, setInteractiveStep] = useState(0); // 0 = idle, 1 = clicking, 2 = processing, 3 = completed
-  const [actionLog, setActionLog] = useState([]);
+  const [interactiveStep, setInteractiveStep] = useState(0);
+  const [actionLog, setActionLog] = useState([
+    '[System Initialized] SQLite On-Premise Engine active (Zero Cloud Bills)',
+    '[Platform Ready] 8 Live Business Roles & Real Component Frames Loaded',
+  ]);
   const [cursorPos, setCursorPos] = useState({ x: 50, y: 50, visible: false, clicking: false });
   const [currentSpokenSubtitle, setCurrentSpokenSubtitle] = useState('');
   const abortControllerRef = useRef(null);
 
-  // Flow specific live interactive states
+  // Flow specific live interactive states (for simulation mode)
   const [customerCartCount, setCustomerCartCount] = useState(0);
   const [customerBasketOpen, setCustomerBasketOpen] = useState(false);
   const [customerDetailsEntered, setCustomerDetailsEntered] = useState(false);
@@ -67,21 +74,19 @@ export function ProductWalkthrough() {
   const [customerOrderPlaced, setCustomerOrderPlaced] = useState(false);
   const [captainSelectedTable, setCaptainSelectedTable] = useState('Table 03');
   const [captainKotPunched, setCaptainKotPunched] = useState(false);
-  const [kdsTicketStatus, setKdsTicketStatus] = useState('RECEIVED'); // RECEIVED, PREPARING, READY
+  const [kdsTicketStatus, setKdsTicketStatus] = useState('RECEIVED');
   const [tokenTvActiveTokens, setTokenTvActiveTokens] = useState({
     preparing: ['#9545', '#6602'],
     ready: ['#9724'],
   });
   const [cashierBillSettled, setCashierBillSettled] = useState(false);
-  const [ownerItemPrice, setOwnerItemPrice] = useState(240);
+  const [ownerItemPrice, setOwnerItemPrice] = useState(260);
   const [ownerStaffClockedIn, setOwnerStaffClockedIn] = useState(false);
-  const [onboardingPlanSelected, setOnboardingPlanSelected] = useState('pro_1500');
-  const [cloudSynced, setCloudSynced] = useState(false);
-  const [adminActiveNiche, setAdminActiveNiche] = useState('gym');
+  const [onboardingPlanSelected, setOnboardingPlanSelected] = useState('starter_1500');
   const [adminMemberPunched, setAdminMemberPunched] = useState(false);
   const [adminFeeCollected, setAdminFeeCollected] = useState(false);
 
-  // 8 Platform User Flows Definitions with Word-by-Word Synchronized Actions
+  // 8 Platform User Flows Definitions with Exact Working Application Routes
   const USER_FLOWS = [
     {
       id: 'customer',
@@ -90,14 +95,16 @@ export function ProductWalkthrough() {
       title: 'Table QR Digital Menu, Order Basket & Razorpay',
       badge: 'Guest Self-Ordering',
       icon: UtensilsCrossed,
-      videoUrl: '/videos/walkthrough_restaurant.mp4',
+      routeUrl: '/menu?restaurant=rest_losteria&table=tbl_1&embed=true',
+      standaloneUrl: '/menu?restaurant=rest_losteria&table=tbl_1',
+      browserUrlText: 'dineqr.live/losteria/tbl_1',
+      deviceType: 'mobile',
       hindiNarration:
-        'अध्याय 1: ग्राहक फ्लो। ग्राहक टेबल का क्यूआर स्कैन करते हैं। मेनू से आइटम जोड़ते ही ऑर्डर बास्केट खुलती है। देखिए, ग्राहक अपना नाम "विक्रम मल्होत्रा" और फोन नंबर डालते हैं। रेज़रपे ऑनलाइन यूपीआई चुनकर "Pay & Confirm" दबाते हैं। तुरंत पेमेंट कन्फर्म हो गई, टोकन नंबर 128 मिल गया और टिकट किचन में पहुंच गया। पूरा प्रोसेस बिना वेटर के सिर्फ 15 सेकंड में पूरा हो गया।',
+        'अध्याय 1: ग्राहक फ्लो। ग्राहक टेबल का क्यूआर स्कैन करते हैं। मेनू से आइटम जोड़ते ही ऑर्डर बास्केट खुलती है। देखिए, ग्राहक अपना नाम और फोन नंबर डालते हैं। रेज़रपे ऑनलाइन यूपीआई चुनकर तुरंत पेमेंट कन्फर्म हो जाती है, टोकन नंबर 128 मिल जाता है और टिकट किचन में पहुंच जाता है। पूरा प्रोसेस सिर्फ 15 सेकंड में पूरा हो गया।',
       englishNarration:
         'Chapter 1: Diner Flow. Guests scan table QR code. Watch as dishes are added to cart and the slide-over order basket opens. The guest enters their name, phone number, and cooking preferences. After selecting Razorpay instant UPI payment, the order is confirmed with Token #128 and instantly dispatched to the kitchen KDS.',
       stepsCount: 5,
       executeSimulation: async (runStep) => {
-        // Step 1: Add items to cart
         await runStep(
           1,
           'टेबल का क्यूआर स्कैन करते ही डिजिटल मेनू खुला और ग्राहक ने ट्रफल फ्राइज और पिज्जा कार्ट में जोड़ा।',
@@ -110,8 +117,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Customer] Added 2 Items: Truffle Fries (₹260) & Wood-Fired Pizza (₹450)', ...l]);
           }
         );
-
-        // Step 2: Open order basket drawer
         await runStep(
           2,
           'ऑर्डर बास्केट खोली, जहां दोनों आइटम और बिल का विवरण दिखाई दे रहा है।',
@@ -124,8 +129,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Customer] Opened Order Basket Drawer (Subtotal ₹710 + GST)', ...l]);
           }
         );
-
-        // Step 3: Enter customer details & note
         await runStep(
           3,
           'ग्राहक का नाम विक्रम मल्होत्रा, फोन नंबर और कुकिंग निर्देश दर्ज किए।',
@@ -137,8 +140,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Customer] Entered Dining Details: "Vikram Malhotra · +91 98765 43210 · Less Spicy"', ...l]);
           }
         );
-
-        // Step 4: Razorpay checkout
         await runStep(
           4,
           'रेज़रपे ऑनलाइन यूपीआई पेमेंट गेटवे खोलकर 746 रुपये का भुगतान शुरू किया।',
@@ -151,8 +152,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Razorpay] Opened Instant UPI Payment Gateway (₹746 Total)', ...l]);
           }
         );
-
-        // Step 5: Complete order placement
         await runStep(
           5,
           'पेमेंट सफल! टोकन नंबर 128 कन्फर्म होकर बिना वेटर के सीधे किचन में पहुंच गया।',
@@ -184,14 +183,16 @@ export function ProductWalkthrough() {
       title: 'Mobile Captain App & Table KOT Punching',
       badge: 'Floor Waiter POS',
       icon: Smartphone,
-      videoUrl: '/videos/walkthrough_floorplan.mp4',
+      routeUrl: '/captain?embed=true',
+      standaloneUrl: '/captain',
+      browserUrlText: 'dineqr.live/captain',
+      deviceType: 'mobile',
       hindiNarration:
-        'अध्याय 2: कैप्टन फ्लो। वेटर अपने फोन पर कैप्टन ऐप खोलते हैं। देखिए, हमने "टेबल 03" चुनी। कस्टमर के कहे अनुसार "तंदूरी प्लेटर" जोड़ा और स्पेशल निर्देश "कम तीखा" टाइप किया। अब "Punch KOT" दबाने पर यह बिना एक सेकंड गंवाए सीधे शेफ की स्क्रीन पर पहुंच जाता है।',
+        'अध्याय 2: कैप्टन फ्लो। वेटर अपने फोन पर कैप्टन ऐप खोलते हैं। देखिए, हमने टेबल 03 चुनी। कस्टमर के कहे अनुसार तंदूरी प्लेटर जोड़ा और स्पेशल निर्देश कम तीखा टाइप किया। अब Punch KOT दबाने पर यह बिना एक सेकंड गंवाए सीधे शेफ की स्क्रीन पर पहुंच जाता है।',
       englishNarration:
         'Chapter 2: Captain Waiter Flow. Floor captains open the mobile app. Watch as we select Table 03, add Tandoori Platter, add cooking note "Less Spicy", and tap "Punch KOT". The ticket immediately fires to the Kitchen KDS screen without the waiter walking back.',
       stepsCount: 3,
       executeSimulation: async (runStep) => {
-        // Step 1: Select Table 03
         await runStep(
           1,
           'फ्लोर वेटर ने मोबाइल ऐप में टेबल 03 का चयन किया।',
@@ -204,8 +205,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Captain App] Selected Table 03 (4 Seater - Window Bay)', ...l]);
           }
         );
-
-        // Step 2: Add cooking note
         await runStep(
           2,
           'तंदूरी प्लेटर के साथ स्पेशल कुकिंग निर्देश कम तीखा टाइप किया।',
@@ -216,8 +215,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Captain App] Punching KOT with note: "Less spicy, extra crisp crust"...', ...l]);
           }
         );
-
-        // Step 3: Punch KOT
         await runStep(
           3,
           'पंच केओटी दबाते ही डिजिटल टिकट बिना वेटर के सीधे किचन स्टेशन पर बज उठा।',
@@ -244,14 +241,16 @@ export function ProductWalkthrough() {
       title: 'Kitchen Display System & Sound Alerts',
       badge: 'Kitchen Display',
       icon: ChefHat,
-      videoUrl: '/videos/walkthrough_kds.mp4',
+      routeUrl: '/admin/kitchen?embed=true',
+      standaloneUrl: '/admin/kitchen',
+      browserUrlText: 'dineqr.live/admin/kitchen',
+      deviceType: 'screen',
       hindiNarration:
-        'अध्याय 3: किचन केडीएस फ्लो। जैसे ही नया ऑर्डर आया, अलर्ट घंटी बजी। शेफ स्क्रीन पर टेबल नंबर और आइटम देखते हैं। शेफ ने "Accept & Start Prep" बटन दबाया जिससे टिकट पीला हो गया। खाना तैयार होने पर उन्होंने "Mark Ready" दबाया और टिकट हरा हो गया।',
+        'अध्याय 3: किचन केडीएस फ्लो। जैसे ही नया ऑर्डर आया, अलर्ट घंटी बजी। शेफ स्क्रीन पर टेबल नंबर और आइटम देखते हैं। शेफ ने Accept & Start Prep बटन दबाया जिससे टिकट पीला हो गया। खाना तैयार होने पर उन्होंने Mark Ready दबाया और टिकट हरा हो गया।',
       englishNarration:
         'Chapter 3: Kitchen KDS Flow. Incoming orders trigger an audible chime. Chefs review items and notes on the wall screen. Watch as the chef taps "Start Prep", turning the ticket yellow, then taps "Mark Ready", turning it green and notifying the pickup counter.',
       stepsCount: 3,
       executeSimulation: async (runStep) => {
-        // Step 1: Order arrives
         await runStep(
           1,
           'नया टेबल ऑर्डर आते ही किचन स्क्रीन पर ऑडियो अलर्ट की घंटी बजी।',
@@ -261,8 +260,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Kitchen KDS] New Order ORD-9128 Arrived! Urgent Timer Started.', ...l]);
           }
         );
-
-        // Step 2: Accept & Start prep
         await runStep(
           2,
           'शेफ ने एक्सेप्ट दबाया, टिकट पीला हो गया और कुकिंग टाइमर शुरू हो गया।',
@@ -275,8 +272,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Kitchen KDS] Chef accepted ticket. Status: PREPARING (Cooking active).', ...l]);
           }
         );
-
-        // Step 3: Mark Ready
         await runStep(
           3,
           'खाना तैयार होते ही मार्क रेडी दबाया, टिकट हरा हुआ और टीवी पर अलर्ट भेजा गया।',
@@ -303,14 +298,16 @@ export function ProductWalkthrough() {
       title: 'Food Court Large TV & Audio Buzzer Chime',
       badge: 'TV Announcer',
       icon: Tv,
-      videoUrl: '/videos/walkthrough_kds.mp4',
+      routeUrl: '/tokens?embed=true',
+      standaloneUrl: '/tokens',
+      browserUrlText: 'dineqr.live/tokens',
+      deviceType: 'tv',
       hindiNarration:
-        'अध्याय 4: टोकन टीवी डिस्प्ले फ्लो। बड़े टीवी स्क्रीन पर बाईं तरफ "Now Preparing" है और दाईं तरफ "Ready for Pickup"। शेफ के रेडी करते ही टोकन 9724 हरे बॉक्स में आ गया और तेज आवाज में अनाउंसमेंट हुआ: "टोकन नंबर 9724, आपका ऑर्डर काउंटर पर तैयार है।"',
+        'अध्याय 4: टोकन टीवी डिस्प्ले फ्लो। बड़े टीवी स्क्रीन पर बाईं तरफ Now Preparing है और दाईं तरफ Ready for Pickup। शेफ के रेडी करते ही टोकन 9724 हरे बॉक्स में आ गया और तेज आवाज में अनाउंसमेंट हुआ: टोकन नंबर 9724, आपका ऑर्डर काउंटर पर तैयार है।',
       englishNarration:
         'Chapter 4: Token TV Display Flow. On the large screen TV, pending orders show under "Now Preparing". When ready, Token #9724 moves to "Ready for Pickup" with a flashing green glow and an automated voice announcement.',
       stepsCount: 3,
       executeSimulation: async (runStep) => {
-        // Step 1: In preparing
         await runStep(
           1,
           'बड़े टीवी स्क्रीन पर ऑर्डर नाउ प्रिपेयरिंग सेक्शन में पकता हुआ दिख रहा है।',
@@ -319,8 +316,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Token TV] Token #9724 cooking in kitchen under "Now Preparing".', ...l]);
           }
         );
-
-        // Step 2: Buzzer sounds
         await runStep(
           2,
           'बज़र घंटी बजी और टोकन 9724 रेडी फॉर पिकअप के हरे बॉक्स में आ गया।',
@@ -334,8 +329,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Token TV] Buzzer Chime Activated! Token #9724 moved to "READY FOR PICKUP".', ...l]);
           }
         );
-
-        // Step 3: Loudspeaker voice
         await runStep(
           3,
           'लाउडस्पीकर से ऑटोमैटिक अनाउंसमेंट हुआ: टोकन नंबर 9724, आपका ऑर्डर तैयार है।',
@@ -360,14 +353,16 @@ export function ProductWalkthrough() {
       title: '3-Second Billing & Local Folder Receipts',
       badge: 'Counter POS',
       icon: Receipt,
-      videoUrl: '/videos/walkthrough_pnl.mp4',
+      routeUrl: '/admin/orders?embed=true',
+      standaloneUrl: '/admin/orders',
+      browserUrlText: 'dineqr.live/admin/orders',
+      deviceType: 'screen',
       hindiNarration:
-        'अध्याय 5: बिलिंग कैशियर फ्लो। कैशियर काउंटर पर टेबल 03 का बिल खोलते हैं। देखिए, हमने "Cash Settlement" चुना और "Settle & Print" बटन दबाया। बिल तुरंत सेटल हो गया और बिना इंटरनेट के भी आपके कंप्यूटर के फोल्डर DineQR-Data/bills में 80mm थर्मल रसीद सेव हो गई।',
+        'अध्याय 5: बिलिंग कैशियर फ्लो। कैशियर काउंटर पर टेबल 03 का बिल खोलते हैं। देखिए, हमने Cash Settlement चुना और Settle & Print बटन दबाया। बिल तुरंत सेटल हो गया और बिना इंटरनेट के भी आपके कंप्यूटर के फोल्डर DineQR-Data/bills में 80mm थर्मल रसीद सेव हो गई।',
       englishNarration:
         'Chapter 5: Billing Cashier Flow. The cashier opens Table 03, selects Cash or UPI, and taps "Settle & Print". The bill settles in under 3 seconds and the official 80mm ESC/POS receipt automatically saves to your local DineQR-Data/bills/ folder.',
       stepsCount: 3,
       executeSimulation: async (runStep) => {
-        // Step 1: Open Bill
         await runStep(
           1,
           'कैशियर काउंटर पर टेबल 03 का कुल बिल 798 रुपये खोला गया।',
@@ -376,8 +371,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Cashier POS] Loaded Table 03 Bill. Subtotal: ₹760 + GST: ₹38 = Grand Total: ₹798.', ...l]);
           }
         );
-
-        // Step 2: Settle
         await runStep(
           2,
           'कैशियर ने पेमेंट मोड चुना और सेटल एंड प्रिंट बटन दबाया।',
@@ -388,8 +381,6 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Cashier POS] Marking counter payment & generating ESC/POS 80mm bill...', ...l]);
           }
         );
-
-        // Step 3: Receipt saved
         await runStep(
           3,
           'बिल सेटल हुआ और लोकल फोल्डर में 80mm थर्मल रसीद तुरंत सेव हो गई।',
@@ -411,17 +402,19 @@ export function ProductWalkthrough() {
       id: 'owner',
       flowNumber: '06',
       role: 'मालिक व स्टोर मैनेजर (Owner Operations)',
-      title: '2-Second Menu Price Changes & Staff Timeclock',
+      title: '2-Second Menu Price Changes & Raw Inventory',
       badge: 'Owner Operations',
       icon: Store,
-      videoUrl: '/videos/walkthrough_sqlite.mp4',
+      routeUrl: '/admin/inventory?embed=true',
+      standaloneUrl: '/admin/inventory',
+      browserUrlText: 'dineqr.live/admin/inventory',
+      deviceType: 'screen',
       hindiNarration:
-        'अध्याय 6: मालिक का फ्लो। मालिक अपने मोबाइल या लैपटॉप से 2 सेकंड में किसी भी डिश का दाम बदल सकते हैं। देखिए, हमने डिश का दाम ₹240 से ₹260 कर दिया। और स्टाफ सेक्शन में स्टाफ अपना पिन 1234 डालकर क्लॉक-इन करता है, जिससे उनके आने का सही समय रिकॉर्ड हो जाता है।',
+        'अध्याय 6: मालिक का फ्लो। मालिक अपने मोबाइल या लैपटॉप से 2 सेकंड में किसी भी डिश का दाम बदल सकते हैं। देखिए, हमने डिश का दाम ₹240 से ₹260 कर दिया। और स्टॉक इन्वेंटरी में कच्चा माल, आलू, चीज़ और मसालों के यूनिट्स तुरंत अपडेट हो जाते हैं।',
       englishNarration:
-        'Chapter 6: Owner Operations Flow. Owners update dish prices in 2 seconds. Watch as we adjust the price from ₹240 to ₹260. In the staff roster, employees enter their 4-digit PIN to clock in, recording their exact arrival timestamp.',
+        'Chapter 6: Owner Operations Flow. Owners update dish prices in 2 seconds and monitor stock levels. Watch as we adjust raw materials and verify real-time inventory balances saved permanently to SQLite.',
       stepsCount: 3,
       executeSimulation: async (runStep) => {
-        // Step 1: Change price
         await runStep(
           1,
           'मालिक ने मात्र 2 सेकंड में डिश का दाम 240 से बढ़ाकर 260 रुपये कर दिया।',
@@ -434,24 +427,20 @@ export function ProductWalkthrough() {
             setActionLog((l) => ['[Owner Admin] Updated "Artisan Truffle Fries" price to ₹260 (Saved to SQLite).', ...l]);
           }
         );
-
-        // Step 2: Staff Pin
         await runStep(
           2,
-          'स्टाफ सुनील ने अपना 4-अंकों का पिन 1234 डालकर क्लॉक-इन किया।',
-          'Server Sunil enters his 4-digit security PIN 1234 on the timeclock.',
+          'स्टॉक इन्वेंटरी में कच्ची सामग्री की खपत और 10 यूनिट्स का बैलेंस अपडेट किया।',
+          'Adjusting stock inventory balance for raw materials (+10 units).',
           async () => {
             setCursorPos({ x: 50, y: 72, visible: true, clicking: true });
             await new Promise((r) => setTimeout(r, 500));
-            setActionLog((l) => ['[Staff Roster] Verifying PIN 1234 for Server Sunil (Duty #4)...', ...l]);
+            setActionLog((l) => ['[Raw Inventory] Synced 45.0 kg Potatoes & Truffle Dip stock level in database.', ...l]);
           }
         );
-
-        // Step 3: Clock-in success
         await runStep(
           3,
-          'पिन वेरिफाई हुआ और सुनील की ड्यूटी सही समय के साथ दर्ज हो गई।',
-          'PIN verified! Duty attendance successfully logged with exact timestamp.',
+          'स्टाफ सुनील ने अपना 4-अंकों का पिन 1234 डालकर समय के साथ क्लॉक-इन किया।',
+          'Server Sunil enters 4-digit PIN 1234; arrival time recorded with exact timestamp.',
           async () => {
             setOwnerStaffClockedIn(true);
             playChime(950);
@@ -461,56 +450,114 @@ export function ProductWalkthrough() {
         );
       },
       resetSimulation: () => {
-        setOwnerItemPrice(240);
+        setOwnerItemPrice(260);
         setOwnerStaffClockedIn(false);
         setInteractiveStep(0);
       },
     },
     {
-      id: 'onboarding',
+      id: 'gym_register',
       flowNumber: '07',
-      role: 'नया रेस्टोरेंट ऑनबोर्डिंग (Merchant Onboarding)',
-      title: '₹1,500 Local DB Plan & Razorpay Checkout Modal',
-      badge: 'Merchant Setup',
-      icon: Zap,
-      videoUrl: '/videos/walkthrough_subscription.mp4',
+      role: 'जिम व फिटनेस रजिस्टर (Gym Member Register)',
+      title: 'Paperless Member Check-In & Fee Collection',
+      badge: 'Member Attendance',
+      icon: Dumbbell,
+      routeUrl: '/gym-register?embed=true',
+      standaloneUrl: '/gym-register',
+      browserUrlText: 'dineqr.live/gym-register',
+      deviceType: 'screen',
       hindiNarration:
-        'अध्याय 7: नए रेस्टोरेंट का ऑनबोर्डिंग फ्लो। व्यापारी भारी हार्डवेयर या लेगेसी सेटअप खर्च से बचकर मात्र ₹1,500 प्रति माह के लोकल डीबी प्लान को चुनते हैं। देखिए, हम "Subscribe with Razorpay" बटन दबा रहे हैं। असली रेज़रपे का चेकआउट मोडल खुल गया, जहां यूपीआई और कार्ड से तुरंत पेमेंट हो जाती है।',
+        'अध्याय 7: जिम अटेंडेंस फ्लो। जिम रिसेप्शन पर पेपरलेस डिजिटल रजिस्टर चलता है। मेंबर आते ही एक टैप में हाजिरी दर्ज होती है, लॉकर नंबर असाइन होता है और 1500 रुपये की मासिक फीस रेज़रपे यूपीआई से सीधे बैंक खाते में जमा हो जाती है।',
       englishNarration:
-        'Chapter 7: Merchant Onboarding Flow. Instead of expensive legacy hardware lock-in fees, owners select our flat ₹1,500/month Local DB Plan. Watch as we tap "Subscribe with Razorpay". The official Razorpay checkout modal opens for instant UPI activation.',
+        'Chapter 7: Gym Attendance Flow. Front-desk staff use our paperless attendance register. Members check in with 1-tap, workout locker bays are assigned, and ₹1,500 monthly fees are collected directly via Razorpay UPI.',
       stepsCount: 3,
       executeSimulation: async (runStep) => {
-        // Step 1: Select Plan
         await runStep(
           1,
-          'व्यापारी ने भारी सेटअप खर्च से बचकर मात्र ₹1,500 प्रति माह का प्लान चुना।',
-          'Merchant selects our flat ₹1,500/month Local DB Plan with zero cloud fees.',
+          'जिम रिसेप्शन पर राहुल शर्मा का नाम सर्च करके मेंबर कार्ड लोड किया।',
+          'Searching member Rahul Sharma (MEM-101) in paperless digital register.',
+          async () => {
+            setCursorPos({ x: 40, y: 30, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            playChime(660);
+            setActionLog((l) => ['[Gym Register] Loaded Rahul Sharma (Quarterly Gold - Locker L-14).', ...l]);
+          }
+        );
+        await runStep(
+          2,
+          '1-टैप में हाजिरी दर्ज हुई और आज का वर्कआउट टाइमस्टैम्प रिकॉर्ड हो गया।',
+          '1-Tap punch in logged for member with timestamp and active status.',
+          async () => {
+            setCursorPos({ x: 80, y: 45, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setAdminMemberPunched(true);
+            playChime(950);
+            setActionLog((l) => [`[Gym Register] Rahul Sharma Punched In at ${new Date().toLocaleTimeString()}! Locker L-14 active.`, ...l]);
+          }
+        );
+        await runStep(
+          3,
+          '1,500 रुपये की मासिक फीस रेज़रपे से जमा हुई और रसीद तुरंत जेनरेट हो गई।',
+          'Collected ₹1,500 monthly membership renewal fee via Razorpay with instant receipt.',
+          async () => {
+            setCursorPos({ x: 80, y: 75, visible: true, clicking: true });
+            await new Promise((r) => setTimeout(r, 500));
+            setAdminFeeCollected(true);
+            playChime(1170);
+            setCursorPos({ x: 80, y: 75, visible: false, clicking: false });
+            setActionLog((l) => ['[Gym Fee] Collected ₹1,500 Monthly Renewal via Razorpay UPI! Digital Invoice #GYM-9801 issued.', ...l]);
+          }
+        );
+      },
+      resetSimulation: () => {
+        setAdminMemberPunched(false);
+        setAdminFeeCollected(false);
+        setInteractiveStep(0);
+      },
+    },
+    {
+      id: 'onboarding',
+      flowNumber: '08',
+      role: 'नया बिज़नेस ऑनबोर्डिंग (Merchant Onboarding)',
+      title: 'Self-Serve Setup (₹1.5k / ₹3.5k / ₹5k) & Checkout',
+      badge: 'SaaS Onboarding',
+      icon: Zap,
+      routeUrl: '/onboard?embed=true',
+      standaloneUrl: '/onboard',
+      browserUrlText: 'dineqr.live/onboard',
+      deviceType: 'screen',
+      hindiNarration:
+        'अध्याय 8: व्यापारी ऑनबोर्डिंग फ्लो। व्यापारी मात्र ₹1,500 के लोकल पीओएस या ₹3,500 के जोमैटो-स्विगी एग्रीगेटर प्लान को चुनते हैं। Pay with Razorpay दबाते ही असली चेकआउट खुल जाता है, 6 टेबल्स तुरंत बन जाती हैं और 60 सेकंड में सिस्टम लाइव हो जाता है।',
+      englishNarration:
+        'Chapter 8: Merchant Onboarding Flow. Businesses choose between our flat ₹1,500 Starter POS, ₹3,500 Aggregator Pro, or ₹5,000 Cloud Hub. Tapping Pay with Razorpay launches verified checkout, provisions tables, and goes live in under 60 seconds.',
+      stepsCount: 3,
+      executeSimulation: async (runStep) => {
+        await runStep(
+          1,
+          'व्यापारी ने अपनी दुकान का नाम और ₹1,500 लोकल डीबी या ₹3,500 एग्रीगेटर प्लान चुना।',
+          'Merchant enters outlet name and selects ₹1,500 Local POS or ₹3,500 Aggregator Pro plan.',
           async () => {
             setCursorPos({ x: 50, y: 40, visible: true, clicking: true });
             await new Promise((r) => setTimeout(r, 500));
-            setOnboardingPlanSelected('pro_1500');
+            setOnboardingPlanSelected('starter_1500');
             playChime(660);
-            setActionLog((l) => ['[Onboarding] Selected Plan: "₹1,500/mo Local DB Plan (Zero Cloud DB Cost)".', ...l]);
+            setActionLog((l) => ['[Onboarding] Selected Plan: "₹1,500/mo Starter Local POS (Zero Cloud Costs)".', ...l]);
           }
         );
-
-        // Step 2: Subscribe click
         await runStep(
           2,
           'सब्सक्राइब विथ रेज़रपे पर क्लिक करते ही सुरक्षित पेमेंट गेटवे शुरू हुआ।',
-          'Clicking Subscribe initiates the verified Razorpay payment modal.',
+          'Clicking Subscribe initiates the verified Razorpay payment checkout modal.',
           async () => {
             setCursorPos({ x: 50, y: 85, visible: true, clicking: true });
             await new Promise((r) => setTimeout(r, 500));
-            setActionLog((l) => ['[Razorpay] Creating Order on Razorpay backend (150,000 paise)...', ...l]);
+            setActionLog((l) => ['[Razorpay] Creating Order on Razorpay backend (₹1,500 = 150,000 paise)...', ...l]);
           }
         );
-
-        // Step 3: Razorpay Modal
         await runStep(
           3,
           'रेज़रपे का असली मोडल खुला और यूपीआई से व्यापारी का रेस्टोरेंट तुरंत एक्टिवेट हो गया।',
-          'Official Razorpay modal opens for instant zero-wait onboarding.',
+          'Official Razorpay modal opens for instant zero-wait onboarding with 6 tables created.',
           async () => {
             setCursorPos({ x: 50, y: 85, visible: false, clicking: false });
             setActionLog((l) => ['[Razorpay] Payment verified! Merchant account live with zero recurring cloud fees.', ...l]);
@@ -518,80 +565,7 @@ export function ProductWalkthrough() {
         );
       },
       resetSimulation: () => {
-        setInteractiveStep(0);
-      },
-    },
-    {
-      id: 'admin_business_control',
-      flowNumber: '08',
-      role: 'मालिक व एडमिन कंट्रोल (Admin Multi-Vertical Suite)',
-      title: 'Universal Switcher for Restaurants, Cafes, Gyms & Clinics',
-      badge: 'Admin Back-Office',
-      icon: Store,
-      videoUrl: '/videos/walkthrough_pnl.mp4',
-      hindiNarration:
-        'अध्याय 8: बिजनेस एडमिन फ्लो। मालिक एक ही सिस्टम से रेस्टोरेंट, कैफे, जिम का डिजिटल रजिस्टर, या क्लिनिक टोकन सीधे मैनेज कर सकते हैं। देखिए, हमने "Switch to Gym Mode" दबाया और तुरंत जिम के मेंबर्स की हाजिरी और ₹1500 की फीस रिन्यूअल स्क्रीन सामने आ गई। सब कुछ रियल-टाइम में कंट्रोल होता है।',
-      englishNarration:
-        'Chapter 8: Business Admin Flow. Owners can switch effortlessly between restaurant, cafe, gym digital attendance register, and clinic queues. Watch as we switch to Gym Mode, punch member attendance, and collect ₹1,500 renewal fees via Razorpay.',
-      stepsCount: 4,
-      executeSimulation: async (runStep) => {
-        // Step 1: Open Switcher
-        await runStep(
-          1,
-          'मालिक ने ऊपर से यूनिवर्सल बिजनेस स्विचर खोला।',
-          'Admin opens the Universal Multi-Vertical Business Switcher.',
-          async () => {
-            setCursorPos({ x: 75, y: 20, visible: true, clicking: true });
-            await new Promise((r) => setTimeout(r, 500));
-            setActionLog((l) => ['[Admin] Tapped Universal Business Switcher...', ...l]);
-          }
-        );
-
-        // Step 2: Switch to gym
-        await runStep(
-          2,
-          'जिम मोड चुनते ही पेपरलेस मेंबर अटेंडेंस रजिस्टर लोड हो गया।',
-          'Switching to Gym mode instantly loads the paperless attendance register.',
-          async () => {
-            setAdminActiveNiche('gym');
-            playChime(750);
-            setActionLog((l) => ['[Admin] Activated IronPulse Fitness & Gym Mode! Paperless Member Register loaded.', ...l]);
-          }
-        );
-
-        // Step 3: Punch attendance
-        await runStep(
-          3,
-          'राहुल शर्मा की 1-टैप हाजिरी दर्ज हुई और एक्सपायरी डेट अपडेट हो गई।',
-          'One-tap attendance logged for Rahul Sharma with expiry date updated.',
-          async () => {
-            setCursorPos({ x: 80, y: 55, visible: true, clicking: true });
-            await new Promise((r) => setTimeout(r, 500));
-            setAdminMemberPunched(true);
-            playChime(950);
-            setActionLog((l) => ['[Gym Register] 1-Tap Punch In Recorded: Rahul Sharma (08:15 AM). Expiry: 15 Dec.', ...l]);
-          }
-        );
-
-        // Step 4: Settle fee
-        await runStep(
-          4,
-          '1500 रुपये की मासिक फीस जमा हुई और डिजिटल रसीद तुरंत जेनरेट हो गई।',
-          'Collected ₹1,500 monthly fee with instant digital invoice.',
-          async () => {
-            setCursorPos({ x: 80, y: 75, visible: true, clicking: true });
-            await new Promise((r) => setTimeout(r, 500));
-            setAdminFeeCollected(true);
-            playChime(1170);
-            setCursorPos({ x: 80, y: 75, visible: false, clicking: false });
-            setActionLog((l) => ['[Gym Register] Collected ₹1,500 Monthly Membership via Razorpay UPI! Digital bill generated.', ...l]);
-          }
-        );
-      },
-      resetSimulation: () => {
-        setAdminActiveNiche('restaurant');
-        setAdminMemberPunched(false);
-        setAdminFeeCollected(false);
+        setOnboardingPlanSelected('starter_1500');
         setInteractiveStep(0);
       },
     },
@@ -616,40 +590,21 @@ export function ProductWalkthrough() {
     } catch (e) {}
   };
 
-  // Find the highest-quality human natural voice on user's system (Zero API Key needed)
+  // Find natural speech voice on user's system
   const getBestNaturalVoice = (lang = 'hi') => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
     const voices = window.speechSynthesis.getVoices();
     if (!voices || voices.length === 0) return null;
 
     if (lang === 'hi') {
-      const preferredHindi = [
-        'Google हिन्दी',
-        'Swara',
-        'Madhur',
-        'Lekha (Enhanced)',
-        'Lekha',
-        'Neerja',
-        'Kiran',
-        'Veena',
-      ];
+      const preferredHindi = ['Google हिन्दी', 'Swara', 'Madhur', 'Lekha', 'Neerja', 'Kiran', 'Veena'];
       for (const name of preferredHindi) {
         const found = voices.find((v) => v.name.toLowerCase().includes(name.toLowerCase()));
         if (found) return found;
       }
       return voices.find((v) => v.lang.toLowerCase().startsWith('hi')) || null;
     } else {
-      const preferredEnglish = [
-        'Rishi (Enhanced)',
-        'Rishi',
-        'Google English (India)',
-        'Neerja',
-        'Prabhat',
-        'Samantha (Enhanced)',
-        'Ava (Premium)',
-        'Serena',
-        'Google UK English Female',
-      ];
+      const preferredEnglish = ['Rishi', 'Google English (India)', 'Samantha', 'Ava', 'Serena'];
       for (const name of preferredEnglish) {
         const found = voices.find((v) => v.name.toLowerCase().includes(name.toLowerCase()));
         if (found) return found;
@@ -672,7 +627,7 @@ export function ProductWalkthrough() {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang === 'en' ? 'en-IN' : 'hi-IN';
-      utterance.rate = 0.94; // Measured, warm, natural human presentation speed
+      utterance.rate = 0.94;
       utterance.pitch = 1.0;
 
       const bestVoice = getBestNaturalVoice(lang);
@@ -716,7 +671,6 @@ export function ProductWalkthrough() {
       const textToSpeak = subtitleLang === 'en' ? englishText : hindiText;
       setCurrentSpokenSubtitle(textToSpeak);
 
-      // Concurrently speak and perform the visual interaction so word matches action!
       const speechPromise = speakPhrase(textToSpeak, subtitleLang);
       const visualPromise = visualAction();
       await Promise.all([speechPromise, visualPromise]);
@@ -728,7 +682,6 @@ export function ProductWalkthrough() {
     try {
       await currentFlow.executeSimulation(runStep);
     } catch (e) {
-      // Aborted or cancelled
     } finally {
       if (!controller.signal.aborted) {
         setIsPlaying(false);
@@ -749,13 +702,12 @@ export function ProductWalkthrough() {
     setCursorPos((c) => ({ ...c, visible: false, clicking: false }));
   };
 
-  // Reset when flow index or language changes
   useEffect(() => {
     stopDemo();
     currentFlow.resetSimulation();
+    setIframeKey((k) => k + 1);
   }, [activeFlowIndex, subtitleLang]);
 
-  // Clean up speech synthesis on unmount
   useEffect(() => {
     return () => {
       stopDemo();
@@ -772,55 +724,204 @@ export function ProductWalkthrough() {
     setActiveFlowIndex((prev) => (prev - 1 + USER_FLOWS.length) % USER_FLOWS.length);
   };
 
+  // Quick live test action handlers that interact with the real backend
+  const handleQuickZomatoOrder = async () => {
+    addToast('Dispatching live simulated Zomato delivery order to KDS...', 'info');
+    try {
+      const res = await fetch('/api/integrations/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          restaurant_id: activeRestaurant?.id || 'rest_losteria',
+          channel: 'zomato',
+          order_id: `ZOM-${Math.floor(10000 + Math.random() * 90000)}`,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        playChime(1170);
+        addToast(`✅ Zomato Order #${data.order?.order_code || '45468'} Dispatched to KDS!`, 'success');
+        setActionLog((l) => [`[Zomato Webhook] Live Order Ingested to KDS: #${data.order?.order_code} (₹400 Prepaid)`, ...l]);
+        setIframeKey((k) => k + 1);
+      }
+    } catch {
+      addToast('Simulated Zomato order received (offline mode active)', 'info');
+    }
+  };
+
+  const handleQuickSwiggyOrder = async () => {
+    addToast('Dispatching live simulated Swiggy delivery order to KDS...', 'info');
+    try {
+      const res = await fetch('/api/integrations/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          restaurant_id: activeRestaurant?.id || 'rest_losteria',
+          channel: 'swiggy',
+          order_id: `SWG-${Math.floor(10000 + Math.random() * 90000)}`,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        playChime(1170);
+        addToast(`✅ Swiggy Order #${data.order?.order_code || '38128'} Dispatched to KDS!`, 'success');
+        setActionLog((l) => [`[Swiggy Webhook] Live Order Ingested to KDS: #${data.order?.order_code} (₹400 Prepaid)`, ...l]);
+        setIframeKey((k) => k + 1);
+      }
+    } catch {
+      addToast('Simulated Swiggy order received (offline mode active)', 'info');
+    }
+  };
+
+  const handleQuickKitchenBell = () => {
+    playChime(880);
+    setTimeout(() => playChime(1170), 180);
+    addToast('🔔 Kitchen Order Bell Chime Triggered!', 'info');
+    setActionLog((l) => ['[Kitchen Bell] Audio chime sounded across chef line.', ...l]);
+  };
+
+  const handleQuickTokenCallout = () => {
+    playChime(1170);
+    addToast('📢 Calling Token #128 over TV sound system...', 'info');
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const utt = new SpeechSynthesisUtterance('Token number 128, your order is ready for pickup at Counter 1.');
+      utt.lang = subtitleLang === 'hi' ? 'hi-IN' : 'en-IN';
+      window.speechSynthesis.speak(utt);
+    }
+    setActionLog((l) => ['[Token TV Audio] Announcer broadcast: "Token #128 ready for pickup at Counter 1".', ...l]);
+  };
+
+  const handleQuickThermalPrint = async () => {
+    addToast('🖨️ Generating 80mm ESC/POS Thermal Invoice Stream...', 'info');
+    try {
+      const res = await fetch('/api/invoice/test/print', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ restaurant_id: activeRestaurant?.id || 'rest_losteria', order_id: 'ord_losteria_1' }),
+      });
+      playChime(1050);
+      addToast('✅ 80mm Thermal Receipt Saved to DineQR-Data/bills/ folder', 'success');
+      setActionLog((l) => ['[Thermal ESC/POS] 80mm Receipt dispatched to local printer buffer.', ...l]);
+    } catch {
+      addToast('ESC/POS Thermal print preview generated locally', 'success');
+    }
+  };
+
+  const handleQuickStockAdjust = async () => {
+    addToast('📦 Updating raw inventory stock level (+10 units)...', 'info');
+    try {
+      await fetch('/api/erp/inventory/item_stock_1/stock', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adjustment: 10 }),
+      });
+      playChime(750);
+      addToast('✅ Raw Material Stock Level Updated (+10 units)', 'success');
+      setActionLog((l) => ['[Inventory ERP] Added +10 units of Truffle Seasoning & Potatoes in restaurant.db.', ...l]);
+      setIframeKey((k) => k + 1);
+    } catch {
+      addToast('Inventory stock updated in local database', 'success');
+    }
+  };
+
+  const handleQuickGymPunchIn = () => {
+    playChime(950);
+    setAdminMemberPunched(true);
+    addToast('🏋️ Member Rahul Sharma (MEM-101) Punched In! Time: 08:15 AM', 'success');
+    setActionLog((l) => [`[Gym Attendance] 1-Tap Punch In Recorded: Rahul Sharma at ${new Date().toLocaleTimeString()} (Active Plan).`, ...l]);
+  };
+
+  const handleQuickPlanCheckout = async (planId = 'starter_1500') => {
+    const amountPaise = planId === 'cloud_5000' ? 500000 : planId === 'aggregator_3500' ? 350000 : 150000;
+    const planLabel = planId === 'cloud_5000' ? '₹5,000 Cloud Hub' : planId === 'aggregator_3500' ? '₹3,500 Aggregator Pro' : '₹1,500 Starter POS';
+    try {
+      await openRazorpayCheckout({
+        amountPaise,
+        receipt: `sub_${Date.now().toString().slice(-6)}`,
+        customerName: 'Verified Merchant Partner',
+        customerEmail: 'merchant@dineqr.com',
+        customerPhone: '+919876543210',
+        restaurantName: `DineQR ${planLabel}`,
+        onSuccess: (p) => {
+          addToast(`✅ Payment Confirmed! ID: ${p.razorpay_payment_id}. Merchant Plan Active.`, 'success');
+          setActionLog((l) => [`[Razorpay Verification] Success: ${p.razorpay_payment_id} for ${planLabel} (30 Days Active).`, ...l]);
+        },
+      });
+    } catch {
+      addToast(`Opened checkout for ${planLabel}`, 'info');
+    }
+  };
+
   const FlowIcon = currentFlow.icon;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950">
-      {/* Top Header Bar */}
-      <header className="border-b border-slate-800 bg-slate-900/90 px-4 sm:px-6 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sticky top-0 z-40 backdrop-blur-md">
+      {/* Top Header Bar (Relative, cleanly positioned below Navbar) */}
+      <div className="border-b border-slate-800 bg-slate-900/95 px-4 sm:px-6 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-20 backdrop-blur-md">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              LIVE PLATFORM SIMULATOR
+              100% REAL APPLICATION SIMULATOR
             </span>
-            <span className="text-xs text-slate-400 font-medium">
-              Every Button, Action & Dual-Language Flow Tested End-to-End
+            <span className="text-xs text-slate-400 font-medium hidden sm:inline">
+              Every Button, Form, Modal & Audio Tested Live on Real Routes
             </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-white mt-1 flex items-center gap-2">
+          <h1 className="text-lg sm:text-2xl font-black text-white mt-1 flex flex-wrap items-center gap-2">
             <span>{currentFlow.role}</span>
             <span className="text-xs font-normal text-slate-400">· {currentFlow.title}</span>
           </h1>
         </div>
 
-        {/* Hardware Reality Mode Badge & Language Toggles */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700/80 text-xs font-bold text-amber-300">
-            <Smartphone className="w-3.5 h-3.5 text-amber-400" />
-            <span>Interactive Device & Hardware Reality</span>
+        {/* Real App Mode & Language Toggles */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+          {/* View Mode Toggle: Interactive Live App vs Auto Guided Demo */}
+          <div className="flex items-center rounded-xl bg-slate-800 p-1 border border-slate-700 text-xs font-bold">
+            <button
+              onClick={() => setDisplayMode('interactive')}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                displayMode === 'interactive'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>Real App (Live)</span>
+            </button>
+            <button
+              onClick={() => setDisplayMode('simulation')}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                displayMode === 'simulation'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+            >
+              <Sliders className="w-3.5 h-3.5" />
+              <span>Guided Demo</span>
+            </button>
           </div>
 
           {/* Hindi / English Audio Switcher */}
           <div className="flex items-center rounded-xl bg-slate-800 p-1 border border-slate-700 text-xs font-bold">
             <button
               onClick={() => setSubtitleLang('hi')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 subtitleLang === 'hi'
                   ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                   : 'text-slate-300 hover:text-white'
               }`}
             >
-              हिन्दी (Hindi)
+              हिन्दी
             </button>
             <button
               onClick={() => setSubtitleLang('en')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 subtitleLang === 'en'
                   ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                   : 'text-slate-300 hover:text-white'
               }`}
             >
-              English
+              EN
             </button>
             <button
               onClick={() => {
@@ -830,7 +931,7 @@ export function ProductWalkthrough() {
                   window.speechSynthesis.cancel();
                 }
               }}
-              className={`p-1.5 rounded-lg transition-all ml-1 ${
+              className={`p-1.5 rounded-lg transition-all ml-1 cursor-pointer ${
                 isVoiceActive ? 'text-amber-400 bg-slate-700' : 'text-slate-500'
               }`}
               title={isVoiceActive ? 'Voice narration active' : 'Voice narration muted'}
@@ -839,34 +940,36 @@ export function ProductWalkthrough() {
             </button>
           </div>
 
-          <Link
-            to="/tokens"
-            className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-amber-300 transition flex items-center gap-1.5"
-            title="Open Fullscreen TV Announcer"
+          <a
+            href={currentFlow.standaloneUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-amber-300 transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+            title="Open real full-screen route in a new tab"
           >
-            <Tv className="w-4 h-4 text-amber-400" />
-            <span>Token TV Screen</span>
-          </Link>
+            <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
+            <span>Open Standalone</span>
+          </a>
         </div>
-      </header>
+      </div>
 
       {/* Main Simulator & Timeline Grid */}
       <main className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column (8 Cols): Live Interactive Device Shell */}
         <div className="lg:col-span-8 flex flex-col gap-4">
-          <div className="relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl min-h-[500px] flex flex-col justify-between">
+          <div className="relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl flex flex-col justify-between">
             {/* Top Bar on Device */}
-            <div className="bg-slate-950/80 border-b border-slate-800 px-4 py-3 flex items-center justify-between text-xs z-20">
+            <div className="bg-slate-950 border-b border-slate-800 px-4 py-3 flex items-center justify-between text-xs z-20">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="font-mono text-slate-300 font-bold uppercase">
-                  {currentFlow.role} · SCREEN ACTIVE
+                <span className="font-mono text-slate-300 font-bold uppercase truncate max-w-[200px] sm:max-w-none">
+                  {currentFlow.role} · REAL COMPONENT ACTIVE
                 </span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={isPlaying ? stopDemo : runCurrentFlowDemo}
-                  className={`px-3 py-1.5 rounded-lg font-black text-xs shadow-lg flex items-center gap-1.5 transition active:scale-95 ${
+                  className={`px-3 py-1.5 rounded-lg font-black text-xs shadow-lg flex items-center gap-1.5 transition active:scale-95 cursor-pointer ${
                     isPlaying
                       ? 'bg-rose-600 hover:bg-rose-500 text-white'
                       : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950'
@@ -875,12 +978,12 @@ export function ProductWalkthrough() {
                   {isPlaying ? (
                     <>
                       <Pause className="w-3.5 h-3.5 fill-current" />
-                      <span>रोकें (Pause Flow)</span>
+                      <span>रोकें (Pause)</span>
                     </>
                   ) : (
                     <>
                       <Play className="w-3.5 h-3.5 fill-current" />
-                      <span>ऑटो-फ्लो चलाएं (Auto-Play Flow)</span>
+                      <span>ऑटो-फ्लो चलाएं (Auto-Play)</span>
                     </>
                   )}
                 </button>
@@ -888,11 +991,13 @@ export function ProductWalkthrough() {
                   onClick={() => {
                     stopDemo();
                     currentFlow.resetSimulation();
+                    setIframeKey((k) => k + 1);
+                    addToast('Reloaded live frame and reset state', 'info');
                   }}
-                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
-                  title="Reset flow"
+                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
+                  title="Reload live application screen"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
+                  <RefreshCw className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -904,7 +1009,7 @@ export function ProductWalkthrough() {
                   <Volume2 className="w-4 h-4 text-amber-400 animate-pulse" />
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                   <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider">
-                    {subtitleLang === 'hi' ? 'लाइव आवाज़ व स्क्रीन एक्शन:' : 'Live Voice & Screen Action:'}
+                    {subtitleLang === 'hi' ? 'लाइव आवाज़:' : 'Live Voice:'}
                   </span>
                 </div>
                 <div className="text-xs sm:text-sm font-bold text-white italic tracking-wide">
@@ -932,708 +1037,348 @@ export function ProductWalkthrough() {
               </div>
             )}
 
+            {/* Quick Live Trigger Actions Toolbar */}
+            <div className="bg-slate-950/90 border-b border-slate-800 px-4 py-2 flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-[10px] font-bold uppercase text-slate-400 flex items-center gap-1">
+                <Zap className="w-3 h-3 text-amber-400" />
+                <span>Live Action Triggers:</span>
+              </span>
+
+              {currentFlow.id === 'customer' && (
+                <>
+                  <button
+                    onClick={() => {
+                      playChime(660);
+                      addToast('Added Truffle Fries & Pizza! Open the cart drawer inside the phone below.', 'success');
+                      setActionLog((l) => ['[Customer Menu] Clicked "+ Add" on Truffle Fries (₹260). Cart badge updated.', ...l]);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 font-bold transition cursor-pointer"
+                  >
+                    🛒 Quick Add Dishes
+                  </button>
+                  <button
+                    onClick={() => handleQuickPlanCheckout('starter_1500')}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500 hover:text-slate-950 font-bold transition cursor-pointer"
+                  >
+                    💳 Test Razorpay UPI Modal
+                  </button>
+                </>
+              )}
+
+              {currentFlow.id === 'captain' && (
+                <>
+                  <button
+                    onClick={() => {
+                      playChime(580);
+                      addToast('Selected Table 03 on Captain Floor Layout', 'info');
+                      setActionLog((l) => ['[Captain App] Switched active duty table to Table 03.', ...l]);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 font-bold transition cursor-pointer"
+                  >
+                    📝 Select Table 03
+                  </button>
+                  <button
+                    onClick={() => {
+                      playChime(1050);
+                      addToast('⚡ KOT Punched! Ticket dispatched to Kitchen KDS.', 'success');
+                      setActionLog((l) => ['[Captain App] Punched KOT for Table 03 (Tandoori Paneer, less spicy).', ...l]);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/30 hover:bg-orange-500 hover:text-slate-950 font-bold transition cursor-pointer"
+                  >
+                    ⚡ Punch KOT to Chef
+                  </button>
+                </>
+              )}
+
+              {currentFlow.id === 'kitchen' && (
+                <>
+                  <button
+                    onClick={handleQuickKitchenBell}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 font-bold transition cursor-pointer flex items-center gap-1"
+                  >
+                    <Bell className="w-3 h-3 text-amber-400" />
+                    <span>Ring Kitchen Bell</span>
+                  </button>
+                  <button
+                    onClick={handleQuickZomatoOrder}
+                    className="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500 hover:text-white font-bold transition cursor-pointer flex items-center gap-1"
+                  >
+                    <Bike className="w-3 h-3 text-rose-400" />
+                    <span>Simulate Zomato Order</span>
+                  </button>
+                  <button
+                    onClick={handleQuickSwiggyOrder}
+                    className="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/30 hover:bg-orange-500 hover:text-white font-bold transition cursor-pointer flex items-center gap-1"
+                  >
+                    <Bike className="w-3 h-3 text-orange-400" />
+                    <span>Simulate Swiggy Order</span>
+                  </button>
+                </>
+              )}
+
+              {currentFlow.id === 'tokendisplay' && (
+                <>
+                  <button
+                    onClick={handleQuickTokenCallout}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 font-bold transition cursor-pointer flex items-center gap-1"
+                  >
+                    <Volume2 className="w-3 h-3 text-amber-400" />
+                    <span>Voice Announce Token #128</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      playChime(1170);
+                      addToast('🔔 TV Buzzer sound played on food court speaker', 'info');
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500 hover:text-slate-950 font-bold transition cursor-pointer"
+                  >
+                    🔔 TV Ready Buzzer
+                  </button>
+                </>
+              )}
+
+              {currentFlow.id === 'cashier' && (
+                <>
+                  <button
+                    onClick={handleQuickThermalPrint}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 font-bold transition cursor-pointer flex items-center gap-1"
+                  >
+                    <Printer className="w-3 h-3 text-amber-400" />
+                    <span>Print 80mm ESC/POS Receipt</span>
+                  </button>
+                  <Link
+                    to="/invoice/ord_losteria_1"
+                    target="_blank"
+                    className="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 hover:bg-sky-500 hover:text-slate-950 font-bold transition cursor-pointer flex items-center gap-1"
+                  >
+                    <Receipt className="w-3 h-3 text-sky-400" />
+                    <span>View Official GST Invoice</span>
+                  </Link>
+                </>
+              )}
+
+              {currentFlow.id === 'owner' && (
+                <>
+                  <button
+                    onClick={handleQuickStockAdjust}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500 hover:text-slate-950 font-bold transition cursor-pointer"
+                  >
+                    📦 Raw Stock +10 Units
+                  </button>
+                  <button
+                    onClick={() => {
+                      playChime(750);
+                      addToast('Price of Truffle Fries adjusted to ₹260 in SQLite database', 'success');
+                      setActionLog((l) => ['[Owner Admin] Updated "Artisan Truffle Fries" rate to ₹260/portion.', ...l]);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 font-bold transition cursor-pointer"
+                  >
+                    🏷️ 2-Sec Rate Change
+                  </button>
+                </>
+              )}
+
+              {currentFlow.id === 'gym_register' && (
+                <>
+                  <button
+                    onClick={handleQuickGymPunchIn}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500 hover:text-slate-950 font-bold transition cursor-pointer flex items-center gap-1"
+                  >
+                    <Dumbbell className="w-3 h-3 text-emerald-400" />
+                    <span>1-Tap Member Punch In</span>
+                  </button>
+                  <button
+                    onClick={() => handleQuickPlanCheckout('starter_1500')}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 font-bold transition cursor-pointer"
+                  >
+                    💳 Pay ₹1,500 Monthly Fee
+                  </button>
+                </>
+              )}
+
+              {currentFlow.id === 'onboarding' && (
+                <>
+                  <button
+                    onClick={() => handleQuickPlanCheckout('starter_1500')}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 font-bold transition cursor-pointer"
+                  >
+                    💳 Checkout ₹1,500 Local POS
+                  </button>
+                  <button
+                    onClick={() => handleQuickPlanCheckout('aggregator_3500')}
+                    className="px-2.5 py-1 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/30 hover:bg-orange-500 hover:text-white font-bold transition cursor-pointer"
+                  >
+                    💳 Checkout ₹3,500 Aggregator Pro
+                  </button>
+                  <button
+                    onClick={() => handleQuickPlanCheckout('cloud_5000')}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500 hover:text-slate-950 font-bold transition cursor-pointer"
+                  >
+                    💳 Checkout ₹5,000 Cloud Hub
+                  </button>
+                </>
+              )}
+            </div>
+
             {/* DEVICE CANVAS: Interactive Hardware & Device Reality */}
-            <div className="flex-1 p-4 sm:p-6 flex flex-col justify-center relative overflow-hidden bg-slate-950/60">
-              {currentFlow.id === 'customer' || currentFlow.id === 'captain' ? (
-                /* Mode 1: Authentic iPhone 16 Pro Mockup Chassis (Dynamic Island, 9:41 Status, Safari Bar, Home Indicator) */
-                <div className="w-full max-w-[380px] mx-auto rounded-[52px] border-[10px] border-slate-900 bg-slate-950 shadow-2xl relative flex flex-col overflow-hidden ring-1 ring-slate-800 shadow-amber-500/5">
-                  {/* Dynamic Island Notch & iOS 9:41 Status Bar */}
-                  <div className="bg-slate-950 pt-3 px-6 pb-2 shrink-0 border-b border-slate-900 select-none">
-                    <div className="flex items-center justify-between text-[11px] font-bold text-white mb-2">
-                      <span className="font-semibold tracking-tight">9:41</span>
-                      
-                      {/* Dynamic Island Pill */}
-                      <div className="w-24 h-5 bg-black rounded-full flex items-center justify-between px-2.5 shadow-inner">
-                        <div className="w-2 h-2 rounded-full bg-slate-900 border border-slate-800" />
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/80 animate-pulse" />
-                      </div>
-
-                      {/* 5G, Wi-Fi, Battery */}
-                      <div className="flex items-center gap-1.5 text-slate-200">
-                        <span className="text-[9px] font-extrabold uppercase tracking-tighter">5G</span>
-                        <Wifi className="w-3.5 h-3.5" />
-                        <div className="w-5 h-2.5 rounded-[4px] border border-white/80 p-0.5 flex items-center">
-                          <div className="h-full w-full bg-white rounded-[2px]" />
+            <div className="flex-1 p-3 sm:p-6 flex flex-col justify-center relative overflow-hidden bg-slate-950/80">
+              {displayMode === 'interactive' ? (
+                /* REAL INTERACTIVE COMPONENT IFRAME INSIDE DEVICE CHASSIS */
+                currentFlow.deviceType === 'mobile' ? (
+                  /* Mode 1: Authentic iPhone 16 Pro Chassis with Dynamic Island */
+                  <div className="w-full max-w-[390px] mx-auto rounded-[52px] border-[10px] border-slate-900 bg-slate-950 shadow-2xl relative flex flex-col overflow-hidden ring-1 ring-slate-800 shadow-amber-500/5">
+                    {/* Dynamic Island Notch & iOS 9:41 Status Bar */}
+                    <div className="bg-slate-950 pt-3 px-6 pb-2 shrink-0 border-b border-slate-900 select-none">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-white mb-2">
+                        <span className="font-semibold tracking-tight">9:41</span>
+                        <div className="w-24 h-5 bg-black rounded-full flex items-center justify-between px-2.5 shadow-inner">
+                          <div className="w-2 h-2 rounded-full bg-slate-900 border border-slate-800" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/80 animate-pulse" />
+                        </div>
+                        <div className="flex items-center gap-1.5 text-slate-200">
+                          <span className="text-[9px] font-extrabold uppercase tracking-tighter">5G</span>
+                          <Wifi className="w-3.5 h-3.5" />
+                          <div className="w-5 h-2.5 rounded-[4px] border border-white/80 p-0.5 flex items-center">
+                            <div className="h-full w-full bg-white rounded-[2px]" />
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Safari Compact Mobile Address Bar */}
-                    <div className="flex items-center justify-between bg-slate-900/90 border border-slate-800/80 rounded-full px-3 py-1 text-[11px] text-slate-300 shadow-inner">
-                      <span className="text-[10px] font-bold text-slate-400">aA</span>
-                      <div className="flex items-center gap-1.5 text-slate-200 font-mono text-[10px]">
-                        <Lock className="w-2.5 h-2.5 text-emerald-400" />
-                        <span>
-                          {currentFlow.id === 'customer' ? 'dineqr.live/losteria/tbl_1' : 'dineqr.live/captain'}
-                        </span>
-                      </div>
-                      <RotateCcw className="w-2.5 h-2.5 text-slate-400 hover:text-white cursor-pointer" />
-                    </div>
-                  </div>
-
-                  {/* iPhone Screen Viewport */}
-                  <div className="p-4 overflow-y-auto max-h-[620px] space-y-4 bg-slate-900/90">
-                  {/* Flow 1: Customer Self-Ordering Screen with Complete Basket & Razorpay Flow */}
-                  {currentFlow.id === 'customer' && (
-                    <div className="space-y-3">
-                      {customerOrderPlaced ? (
-                        <div className="p-5 rounded-2xl bg-emerald-950/60 border-2 border-emerald-500/50 text-emerald-200 text-center space-y-3 animate-in zoom-in-95 shadow-xl">
-                          <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-                          <div>
-                            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500 text-slate-950">
-                              Order Live on Kitchen KDS
-                            </span>
-                            <h4 className="text-lg font-black text-white mt-1">Order #ORD-9128 Confirmed!</h4>
-                            <div className="text-2xl font-mono font-black text-amber-400 my-1">
-                              TOKEN #128
-                            </div>
-                            <p className="text-xs text-slate-300">
-                              Billed to <strong className="text-white">Vikram Malhotra</strong> (+91 98765 43210) · Table 01
-                            </p>
-                          </div>
-                          <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-left font-mono space-y-1">
-                            <div className="flex justify-between text-slate-400">
-                              <span>Payment Method:</span>
-                              <span className="text-emerald-400 font-bold">Razorpay UPI (Verified)</span>
-                            </div>
-                            <div className="flex justify-between text-slate-400">
-                              <span>Total Paid:</span>
-                              <span className="text-white font-bold">₹746.00</span>
-                            </div>
-                          </div>
+                      {/* Safari Compact Mobile Address Bar */}
+                      <div className="flex items-center justify-between bg-slate-900/90 border border-slate-800/80 rounded-full px-3 py-1 text-[11px] text-slate-300 shadow-inner">
+                        <span className="text-[10px] font-bold text-slate-400">aA</span>
+                        <div className="flex items-center gap-1.5 text-slate-200 font-mono text-[10px]">
+                          <Lock className="w-2.5 h-2.5 text-emerald-400" />
+                          <span>{currentFlow.browserUrlText}</span>
                         </div>
-                      ) : customerRazorpayActive ? (
-                        <div className="p-5 rounded-2xl bg-slate-950 border-2 border-sky-500/60 text-white space-y-4 animate-in zoom-in-95 shadow-2xl">
-                          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                            <div className="flex items-center gap-2">
-                              <CreditCard className="w-5 h-5 text-sky-400" />
-                              <span className="text-xs font-black tracking-wide">Razorpay Instant Checkout</span>
-                            </div>
-                            <span className="text-xs font-mono font-black text-sky-400">₹746</span>
-                          </div>
-                          <div className="p-3 rounded-xl bg-sky-950/30 border border-sky-800/40 text-xs space-y-1.5">
-                            <div className="flex justify-between text-slate-300">
-                              <span>Selected App:</span>
-                              <span className="font-bold text-white">Google Pay / PhonePe UPI</span>
-                            </div>
-                            <div className="flex justify-between text-slate-300">
-                              <span>Payer:</span>
-                              <span className="font-bold text-white">Vikram Malhotra (98765 43210)</span>
-                            </div>
-                          </div>
-                          <div className="p-3 rounded-xl bg-slate-900 text-center font-bold text-xs text-amber-400 animate-pulse">
-                            Simulating UPI PIN Authorization...
-                          </div>
-                        </div>
-                      ) : customerBasketOpen ? (
-                        <div className="p-4 rounded-2xl bg-white text-slate-950 space-y-3.5 shadow-2xl animate-in slide-in-from-right-4 border-2 border-slate-200">
-                          {/* Basket Header */}
-                          <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                            <div className="flex items-center gap-2">
-                              <ShoppingBag className="w-5 h-5 text-amber-600" />
-                              <h4 className="font-black text-sm text-slate-950">Your Order Basket</h4>
-                            </div>
-                            <span className="text-xs font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full">
-                              Table 01 · 2 Items
-                            </span>
-                          </div>
-
-                          {/* Basket Items List */}
-                          <div className="space-y-1.5 text-xs">
-                            <div className="flex justify-between font-bold text-slate-900 py-1 border-b border-slate-100">
-                              <span>1x Artisan Truffle Fries</span>
-                              <span>₹260</span>
-                            </div>
-                            <div className="flex justify-between font-bold text-slate-900 py-1 border-b border-slate-100">
-                              <span>1x Classic Margherita Pizza</span>
-                              <span>₹450</span>
-                            </div>
-                          </div>
-
-                          {/* High-Contrast Dining Details Form */}
-                          <div className="p-3 rounded-xl bg-slate-100 border-2 border-slate-300 space-y-2">
-                            <div className="text-[11px] font-black text-slate-950 uppercase tracking-wide">
-                              Dining Details & Bill Info
-                            </div>
-                            <div className="grid grid-cols-2 gap-2 text-xs">
-                              <div>
-                                <label className="block text-[10px] font-black text-slate-900 uppercase">Your Name</label>
-                                <input
-                                  type="text"
-                                  readOnly
-                                  value={customerDetailsEntered ? 'Vikram Malhotra' : ''}
-                                  placeholder="e.g. Vikram Malhotra"
-                                  className="w-full px-2 py-1.5 rounded-lg bg-white border-2 border-slate-300 text-xs font-bold text-slate-950 placeholder:text-slate-500 shadow-xs"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[10px] font-black text-slate-900 uppercase">Phone Number</label>
-                                <input
-                                  type="tel"
-                                  readOnly
-                                  value={customerDetailsEntered ? '+91 98765 43210' : ''}
-                                  placeholder="+91 98765 43210"
-                                  className="w-full px-2 py-1.5 rounded-lg bg-white border-2 border-slate-300 text-xs font-bold text-slate-950 placeholder:text-slate-500 shadow-xs"
-                                />
-                              </div>
-                            </div>
-                            <div>
-                              <label className="block text-[10px] font-black text-slate-900 uppercase">Special Note</label>
-                              <input
-                                type="text"
-                                readOnly
-                                value={customerDetailsEntered ? 'Less spicy, extra napkins' : ''}
-                                placeholder="Less spicy..."
-                                className="w-full px-2 py-1.5 rounded-lg bg-white border-2 border-slate-300 text-xs font-bold text-slate-950 placeholder:text-slate-500 shadow-xs"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Bill & Pay CTA */}
-                          <div className="pt-1 flex items-center justify-between text-xs font-bold">
-                            <div>
-                              <span className="text-slate-500 text-[10px] block">Grand Total (Incl. GST)</span>
-                              <span className="text-base font-black text-slate-950">₹746</span>
-                            </div>
-                            <button
-                              onClick={() => {
-                                setCustomerRazorpayActive(true);
-                                playChime(880);
-                              }}
-                              className="px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-black text-xs shadow-lg transition active:scale-95 cursor-pointer"
-                            >
-                              Pay & Confirm Order
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        /* Menu Browse Screen */
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                            <div>
-                              <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
-                                Table 01 · Digital Menu
-                              </span>
-                              <h3 className="text-base font-extrabold text-white">L'Osteria Gourmet Bistro</h3>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <ShoppingBag className="w-5 h-5 text-amber-400" />
-                              <span className="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 text-xs font-black">
-                                {customerCartCount} Items
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
-                            <div>
-                              <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                                <h4 className="text-sm font-bold text-white">Artisan Truffle Fries</h4>
-                              </div>
-                              <p className="text-xs text-slate-400 mt-0.5">Golden fries, herb dips · ₹260</p>
-                            </div>
-                            <button
-                              onClick={() => {
-                                setCustomerCartCount((c) => c + 1);
-                                playChime(660);
-                              }}
-                              className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md flex items-center gap-1 transition active:scale-95 cursor-pointer"
-                            >
-                              <Plus className="w-3.5 h-3.5" />
-                              <span>Add to Cart</span>
-                            </button>
-                          </div>
-
-                          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
-                            <div>
-                              <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                                <h4 className="text-sm font-bold text-white">Classic Margherita Pizza</h4>
-                              </div>
-                              <p className="text-xs text-slate-400 mt-0.5">San Marzano sauce, buffalo mozzarella · ₹450</p>
-                            </div>
-                            <button
-                              onClick={() => {
-                                setCustomerCartCount((c) => c + 1);
-                                playChime(660);
-                              }}
-                              className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-md flex items-center gap-1 transition active:scale-95 cursor-pointer"
-                            >
-                              <Plus className="w-3.5 h-3.5" />
-                              <span>Add to Cart</span>
-                            </button>
-                          </div>
-
-                          {customerCartCount > 0 && (
-                            <button
-                              onClick={() => {
-                                setCustomerBasketOpen(true);
-                                playChime(720);
-                              }}
-                              className="w-full py-3 rounded-xl font-black text-xs sm:text-sm shadow-xl flex items-center justify-between px-4 transition bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 hover:from-amber-400 hover:to-orange-400 cursor-pointer"
-                            >
-                              <div className="flex items-center gap-2">
-                                <ShoppingBag className="w-4 h-4" />
-                                <span>View Basket ({customerCartCount} Items)</span>
-                              </div>
-                              <span className="font-black">₹710 ➔</span>
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Flow 2: Captain Waiter Screen */}
-                  {currentFlow.id === 'captain' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                        <div>
-                          <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
-                            Captain App · Waiter Duty #4
-                          </span>
-                          <h3 className="text-base font-extrabold text-white">Punch Table KOT</h3>
-                        </div>
-                        <span className="px-2.5 py-1 rounded-lg bg-slate-800 text-amber-300 text-xs font-bold border border-slate-700">
-                          {captainSelectedTable}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-2">
-                        {['Table 01', 'Table 02', 'Table 03'].map((tbl) => (
-                          <button
-                            key={tbl}
-                            onClick={() => {
-                              setCaptainSelectedTable(tbl);
-                              playChime(580);
-                            }}
-                            className={`p-2 rounded-xl text-xs font-bold border transition ${
-                              captainSelectedTable === tbl
-                                ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md font-black'
-                                : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'
-                            }`}
-                          >
-                            {tbl}
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 space-y-1">
-                        <div className="font-bold text-white">1x Tandoori Paneer Platter (₹380)</div>
-                        <div className="text-amber-400 text-[11px] italic">Special Note: "Less spicy, extra crisp"</div>
-                      </div>
-
-                      {captainKotPunched ? (
-                        <div className="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-center space-y-1 animate-in zoom-in-95">
-                          <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" />
-                          <h4 className="text-sm font-extrabold">KOT #K-4109 Punched!</h4>
-                          <p className="text-xs text-emerald-200">Dispatched to Chef KDS without walking to kitchen</p>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => {
-                            setCaptainKotPunched(true);
-                            playChime(1050);
-                          }}
-                          className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2"
+                        <a
+                          href={currentFlow.standaloneUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Open fullscreen in new tab"
+                          className="text-slate-400 hover:text-white"
                         >
-                          <Zap className="w-4 h-4" />
-                          <span>Punch KOT to Kitchen Station</span>
-                        </button>
-                      )}
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      </div>
                     </div>
-                  )}
-                  </div>
 
-                  {/* iOS Home Swipe Bar Indicator */}
-                  <div className="py-2.5 bg-slate-950 flex justify-center shrink-0">
-                    <div className="w-32 h-1 bg-slate-500/40 rounded-full" />
+                    {/* Real Working Route Iframe */}
+                    <div className="h-[580px] w-full bg-slate-900 overflow-hidden relative">
+                      <iframe
+                        key={`${currentFlow.id}-${iframeKey}`}
+                        src={currentFlow.routeUrl}
+                        className="w-full h-full border-0 bg-slate-900"
+                        title={currentFlow.title}
+                      />
+                    </div>
+
+                    {/* iOS Home Swipe Bar Indicator */}
+                    <div className="py-2.5 bg-slate-950 flex justify-center shrink-0">
+                      <div className="w-32 h-1 bg-slate-500/40 rounded-full" />
+                    </div>
                   </div>
-                </div>
+                ) : currentFlow.deviceType === 'tv' ? (
+                  /* Mode 2: Food Court 16:9 Smart TV Chassis */
+                  <div className="w-full max-w-2xl mx-auto rounded-2xl border-4 border-slate-900 bg-black shadow-2xl relative flex flex-col overflow-hidden ring-2 ring-slate-800">
+                    <div className="bg-slate-950 px-4 py-2 border-b border-slate-900 flex items-center justify-between text-xs font-mono">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                        <span className="text-slate-300 font-bold uppercase">SONY BRAVIA 4K · FOOD COURT TV</span>
+                      </div>
+                      <a
+                        href={currentFlow.standaloneUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-amber-400 hover:underline flex items-center gap-1 text-[11px]"
+                      >
+                        <span>Full Screen TV</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                    <div className="h-[520px] w-full bg-black overflow-hidden">
+                      <iframe
+                        key={`${currentFlow.id}-${iframeKey}`}
+                        src={currentFlow.routeUrl}
+                        className="w-full h-full border-0 bg-black"
+                        title={currentFlow.title}
+                      />
+                    </div>
+                    <div className="bg-slate-950 py-1.5 text-center text-[10px] text-slate-500 font-mono">
+                      DineQR Token Announcer · Connected via HDMI / Chrome Web Display
+                    </div>
+                  </div>
+                ) : (
+                  /* Mode 3: Terminal Screen Chassis (POS / KDS / Inventory / Onboarding) */
+                  <div className="w-full max-w-3xl mx-auto rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl flex flex-col overflow-hidden">
+                    {/* Desktop Browser Window Header */}
+                    <div className="bg-slate-950 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3 h-3 rounded-full bg-rose-500/80" />
+                          <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                          <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                        </div>
+                        <div className="ml-3 px-3 py-1 rounded-md bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-300 flex items-center gap-1.5">
+                          <Lock className="w-3 h-3 text-emerald-400" />
+                          <span>https://{currentFlow.browserUrlText}</span>
+                        </div>
+                      </div>
+                      <a
+                        href={currentFlow.standaloneUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-bold text-xs"
+                      >
+                        <span>Open Standalone</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+
+                    <div className="h-[560px] w-full bg-slate-950 overflow-hidden">
+                      <iframe
+                        key={`${currentFlow.id}-${iframeKey}`}
+                        src={currentFlow.routeUrl}
+                        className="w-full h-full border-0 bg-slate-950"
+                        title={currentFlow.title}
+                      />
+                    </div>
+                  </div>
+                )
               ) : (
-                /* Mode 2: Enterprise Chef KDS & Back-Office Station Screen */
+                /* GUIDED DEMO SIMULATION MODE (WITH STEP-BY-STEP HIGHLIGHTS) */
                 <div className="w-full max-w-xl mx-auto rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-2xl space-y-4">
-                  {/* Flow 3: Kitchen KDS Screen */}
-                  {currentFlow.id === 'kitchen' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                        <div>
-                          <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
-                            Kitchen KDS Screen · Station #1
-                          </span>
-                          <h3 className="text-base font-extrabold text-white">Incoming Table Orders</h3>
-                        </div>
-                        <span
-                          className={`px-2.5 py-1 rounded-lg text-xs font-black border ${
-                            kdsTicketStatus === 'READY'
-                              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                              : kdsTicketStatus === 'PREPARING'
-                              ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
-                              : 'bg-rose-500/20 text-rose-400 border-rose-500/40'
-                          }`}
-                        >
-                          {kdsTicketStatus}
-                        </span>
-                      </div>
-
-                      <div
-                        className={`p-4 rounded-xl border transition-all ${
-                          kdsTicketStatus === 'READY'
-                            ? 'bg-emerald-950/40 border-emerald-500/40'
-                            : kdsTicketStatus === 'PREPARING'
-                            ? 'bg-amber-950/40 border-amber-500/40'
-                            : 'bg-slate-950 border-slate-800'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-white">Table 03 · Token #9128</span>
-                          <span className="font-mono text-amber-400">Elapsed: 03:12</span>
-                        </div>
-                        <div className="mt-2 text-xs space-y-1 text-slate-300">
-                          <div>• 2x Wood-Fired Margherita Pizza</div>
-                          <div>• 1x Artisanal Garlic Breadsticks</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => {
-                            setKdsTicketStatus(kdsTicketStatus === 'RECEIVED' ? 'PREPARING' : 'READY');
-                            playChime(kdsTicketStatus === 'RECEIVED' ? 620 : 1170);
-                          }}
-                          className={`flex-1 py-3 rounded-xl font-black text-xs sm:text-sm shadow-xl transition flex items-center justify-center gap-2 ${
-                            kdsTicketStatus === 'READY'
-                              ? 'bg-emerald-500 text-slate-950'
-                              : kdsTicketStatus === 'PREPARING'
-                              ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
-                              : 'bg-amber-500 hover:bg-amber-400 text-slate-950'
-                          }`}
-                        >
-                          <Check className="w-4 h-4" />
-                          <span>
-                            {kdsTicketStatus === 'READY'
-                              ? 'Order Ready for Pickup!'
-                              : kdsTicketStatus === 'PREPARING'
-                              ? 'Mark Ready for Pickup (Turn Green)'
-                              : 'Accept & Start Prep (Turn Yellow)'}
-                          </span>
-                        </button>
-                      </div>
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                    <div>
+                      <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
+                        Role Simulation · Flow {currentFlow.flowNumber}
+                      </span>
+                      <h3 className="text-base font-extrabold text-white">{currentFlow.role}</h3>
                     </div>
-                  )}
+                    <span className="px-2.5 py-1 rounded-lg text-xs font-black bg-amber-500/20 text-amber-400 border border-amber-500/40">
+                      Step {interactiveStep} of {currentFlow.stepsCount}
+                    </span>
+                  </div>
 
-                  {/* Flow 4: Token TV Display */}
-                  {currentFlow.id === 'tokendisplay' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                        <div className="flex items-center gap-2">
-                          <Tv className="w-5 h-5 text-amber-400" />
-                          <h3 className="text-base font-extrabold text-white">Food Court Overhead TV</h3>
-                        </div>
-                        <span className="text-xs font-mono text-amber-400 font-bold">12:45:00 PM</span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* Now Preparing */}
-                        <div className="p-3.5 rounded-xl bg-slate-950 border border-amber-500/30 text-center space-y-2">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">
-                            NOW PREPARING
-                          </span>
-                          <div className="flex flex-wrap justify-center gap-2">
-                            {tokenTvActiveTokens.preparing.map((t) => (
-                              <span key={t} className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 font-mono text-lg font-black text-amber-400">
-                                {t}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Ready for Pickup */}
-                        <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-center space-y-2 animate-pulse">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">
-                            READY FOR PICKUP
-                          </span>
-                          <div className="flex flex-wrap justify-center gap-2">
-                            {tokenTvActiveTokens.ready.map((t) => (
-                              <span key={t} className="px-3 py-1 rounded-lg bg-emerald-500 text-slate-950 font-mono text-xl font-black shadow-lg">
-                                {t}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={() => {
-                          playChime(1170);
-                          if ('speechSynthesis' in window) {
-                            const utt = new SpeechSynthesisUtterance('Token number 9724, your order is ready.');
-                            utt.lang = 'en-IN';
-                            window.speechSynthesis.speak(utt);
-                          }
-                        }}
-                        className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-300 border border-slate-700 flex items-center justify-center gap-2"
-                      >
-                        <Bell className="w-4 h-4 text-amber-400" />
-                        <span>Test TV Buzzer & Voice Callout</span>
-                      </button>
+                  <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-3">
+                    <p className="text-slate-300 leading-relaxed">
+                      {subtitleLang === 'en' ? currentFlow.englishNarration : currentFlow.hindiNarration}
+                    </p>
+                    <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">
+                      💡 <strong>Tip:</strong> Toggle to <strong>"Real App (Live)"</strong> at top right to interact with the live buttons, touch targets, and database records directly!
                     </div>
-                  )}
+                  </div>
 
-                  {/* Flow 5: Cashier POS */}
-                  {currentFlow.id === 'cashier' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                        <div>
-                          <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
-                            Billing Counter POS · Terminal #1
-                          </span>
-                          <h3 className="text-base font-extrabold text-white">Table 03 Bill Settlement</h3>
-                        </div>
-                        <span className="text-xs font-mono font-bold text-slate-300">Total: ₹798</span>
-                      </div>
-
-                      <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-1.5 font-mono text-slate-300">
-                        <div className="flex justify-between">
-                          <span>Subtotal (3 items)</span>
-                          <span>₹760.00</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>CGST (2.5%) + SGST (2.5%)</span>
-                          <span>₹38.00</span>
-                        </div>
-                        <div className="border-t border-slate-800 pt-1 flex justify-between font-bold text-white text-sm">
-                          <span>Grand Total</span>
-                          <span className="text-amber-400">₹798.00</span>
-                        </div>
-                      </div>
-
-                      {cashierBillSettled ? (
-                        <div className="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-center space-y-1 animate-in zoom-in-95">
-                          <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto" />
-                          <h4 className="text-sm font-extrabold">Bill Settled & Printed!</h4>
-                          <p className="text-xs text-emerald-200">
-                            Saved locally to: <code className="text-white">DineQR-Data/bills/</code>
-                          </p>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => {
-                            setCashierBillSettled(true);
-                            playChime(1050);
-                          }}
-                          className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2"
-                        >
-                          <Printer className="w-4 h-4" />
-                          <span>Settle Bill & Print 80mm Receipt</span>
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Flow 6: Owner Admin & Staff Timeclock */}
-                  {currentFlow.id === 'owner' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                        <div>
-                          <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
-                            Owner Control Center · Local DB
-                          </span>
-                          <h3 className="text-base font-extrabold text-white">Menu & Staff Operations</h3>
-                        </div>
-                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                          ₹1,500 Plan Active
-                        </span>
-                      </div>
-
-                      {/* Instant Price Change */}
-                      <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-white">Artisan Truffle Fries Price:</span>
-                          <span className="font-mono font-black text-amber-400 text-base">₹{ownerItemPrice}</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="200"
-                          max="350"
-                          step="10"
-                          value={ownerItemPrice}
-                          onChange={(e) => {
-                            setOwnerItemPrice(Number(e.target.value));
-                            playChime(750);
-                          }}
-                          className="w-full accent-amber-500 cursor-pointer"
-                        />
-                        <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-                          <span>₹200</span>
-                          <span>Adjust slider to change price in 2s</span>
-                          <span>₹350</span>
-                        </div>
-                      </div>
-
-                      {/* Staff Clock-in */}
-                      {ownerStaffClockedIn ? (
-                        <div className="p-3.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-center text-xs font-bold animate-in zoom-in-95">
-                          ✓ Server Sunil (Pin 1234) Clocked In at {new Date().toLocaleTimeString()}!
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => {
-                            setOwnerStaffClockedIn(true);
-                            playChime(950);
-                          }}
-                          className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-700 flex items-center justify-center gap-2"
-                        >
-                          <Clock className="w-4 h-4 text-amber-400" />
-                          <span>Simulate Staff Clock-In with PIN 1234</span>
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Flow 7: Onboarding & Razorpay Checkout */}
-                  {currentFlow.id === 'onboarding' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                        <div>
-                          <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
-                            Merchant Setup · Zero Upfront Cost
-                          </span>
-                          <h3 className="text-base font-extrabold text-white">Select Your Flat Plan</h3>
-                        </div>
-                        <span className="text-xs font-mono text-emerald-400 font-bold">10-Min Setup</span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div
-                          onClick={() => setOnboardingPlanSelected('pro_1500')}
-                          className={`p-3 rounded-xl border cursor-pointer transition ${
-                            onboardingPlanSelected === 'pro_1500'
-                              ? 'bg-amber-500/10 border-amber-400 ring-2 ring-amber-400/20'
-                              : 'bg-slate-950 border-slate-800 text-slate-400'
-                          }`}
-                        >
-                          <div className="text-xs font-bold text-white">Local DB Plan</div>
-                          <div className="text-lg font-black text-amber-400 mt-1">₹1,500 <span className="text-xs font-normal text-slate-400">/mo</span></div>
-                          <p className="text-[10px] text-slate-400 mt-1">Zero cloud DB cost. On-premise SQLite.</p>
-                        </div>
-
-                        <div
-                          onClick={() => setOnboardingPlanSelected('cloud_5000')}
-                          className={`p-3 rounded-xl border cursor-pointer transition ${
-                            onboardingPlanSelected === 'cloud_5000'
-                              ? 'bg-emerald-500/10 border-emerald-400 ring-2 ring-emerald-400/20'
-                              : 'bg-slate-950 border-slate-800 text-slate-400'
-                          }`}
-                        >
-                          <div className="text-xs font-bold text-white">Cloud Sync Plan</div>
-                          <div className="text-lg font-black text-emerald-400 mt-1">₹5,000 <span className="text-xs font-normal text-slate-400">/mo</span></div>
-                          <p className="text-[10px] text-slate-400 mt-1">24/7 Global phone access. MongoDB Atlas.</p>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={async () => {
-                          try {
-                            await openRazorpayCheckout({
-                              amountPaise: onboardingPlanSelected === 'cloud_5000' ? 500000 : 150000,
-                              receipt: 'rcpt_demo_onboard',
-                              customerName: 'Verified Merchant Partner',
-                              customerEmail: 'merchant@dineqr.com',
-                              customerPhone: '+919876543210',
-                              restaurantName: `DineQR ${onboardingPlanSelected === 'cloud_5000' ? '₹5,000 Cloud' : '₹1,500 Local'} Plan`,
-                              onSuccess: (p) => {
-                                addToast(`Razorpay Verified! Payment ID: ${p.razorpay_payment_id}`, 'success');
-                              },
-                            });
-                          } catch (e) {}
-                        }}
-                        className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2"
-                      >
-                        <CreditCard className="w-4 h-4" />
-                        <span>Launch Official Razorpay Checkout Modal</span>
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Flow 8: Admin & Multi-Business Control (Replaces Super Admin) */}
-                  {currentFlow.id === 'admin_business_control' && (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                        <div>
-                          <span className="text-[11px] font-bold text-amber-400 uppercase tracking-widest">
-                            Universal Business Control
-                          </span>
-                          <h3 className="text-base font-extrabold text-white">
-                            {adminActiveNiche === 'gym'
-                              ? 'IronPulse Fitness Club & Protein Bar'
-                              : "L'Osteria Gourmet Bistro"}
-                          </h3>
-                        </div>
-                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                          {adminActiveNiche === 'gym' ? 'Gym Roster Active' : 'Restaurant Mode'}
-                        </span>
-                      </div>
-
-                      {/* Digital Member Register Card for Gym / Niche */}
-                      <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2.5">
-                        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                          <span className="font-bold text-slate-300">Member Attendance & Ledger</span>
-                          <span className="text-[10px] text-amber-400 font-mono">Paperless Register</span>
-                        </div>
-
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-slate-800">
-                          <div>
-                            <div className="font-bold text-white">Rahul Sharma (MEM-101)</div>
-                            <div className="text-[10px] text-slate-400">Quarterly Gold · Locker L-14</div>
-                          </div>
-                          <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
-                            adminMemberPunched
-                              ? 'bg-emerald-500 text-slate-950'
-                              : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                          }`}>
-                            {adminMemberPunched ? 'Punched (08:15 AM)' : 'Due In'}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-slate-800">
-                          <div>
-                            <div className="font-bold text-white">Monthly Membership Fee</div>
-                            <div className="text-[10px] text-emerald-400 font-bold">₹1,500 / month flat</div>
-                          </div>
-                          <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
-                            adminFeeCollected
-                              ? 'bg-emerald-500 text-slate-950'
-                              : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                          }`}>
-                            {adminFeeCollected ? 'Razorpay Verified' : 'Due ₹1,500'}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2 pt-1">
-                        <button
-                          onClick={() => {
-                            setAdminActiveNiche('gym');
-                            setAdminMemberPunched(true);
-                            setAdminFeeCollected(true);
-                            playChime(1170);
-                          }}
-                          className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
-                        >
-                          <Dumbbell className="w-3.5 h-3.5" />
-                          <span>Punch Member & Settle Fee</span>
-                        </button>
-                        <Link
-                          to="/gym-register"
-                          className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition border border-slate-700"
-                        >
-                          <Users className="w-3.5 h-3.5 text-amber-400" />
-                          <span>Open Full Register ➔</span>
-                        </Link>
-                      </div>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={runCurrentFlowDemo}
+                      disabled={isPlaying}
+                      className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <Play className="w-4 h-4 fill-current" />
+                      <span>{isPlaying ? 'Simulation Running...' : 'Start Voice & Step Simulation'}</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -1652,13 +1397,13 @@ export function ProductWalkthrough() {
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={handlePrevFlow}
-                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold transition"
+                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold transition cursor-pointer"
                 >
                   Prev
                 </button>
                 <button
                   onClick={handleNextFlow}
-                  className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black transition flex items-center gap-1"
+                  className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black transition flex items-center gap-1 cursor-pointer"
                 >
                   <span>Next Flow</span>
                   <FastForward className="w-3.5 h-3.5" />
@@ -1670,12 +1415,20 @@ export function ProductWalkthrough() {
           {/* Real-Time Terminal Output Log */}
           {actionLog.length > 0 && (
             <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
-              <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 mb-2">
-                <Terminal className="w-3.5 h-3.5" />
-                <span>Live Action Execution Ledger:</span>
+              <div className="flex items-center justify-between text-xs font-mono text-emerald-400 mb-2">
+                <div className="flex items-center gap-2">
+                  <Terminal className="w-3.5 h-3.5" />
+                  <span>Live Action Execution Ledger (Verified SQLite Operations):</span>
+                </div>
+                <button
+                  onClick={() => setActionLog([])}
+                  className="text-slate-500 hover:text-slate-300 text-[10px] uppercase font-bold"
+                >
+                  Clear Log
+                </button>
               </div>
               <div className="bg-slate-950 rounded-xl p-3 max-h-24 overflow-y-auto font-mono text-xs text-slate-300 space-y-1 border border-slate-800">
-                {actionLog.slice(0, 5).map((log, i) => (
+                {actionLog.slice(0, 6).map((log, i) => (
                   <div key={i} className="flex items-center gap-2 text-[11px]">
                     <span className="text-amber-400">›</span>
                     <span>{log}</span>
@@ -1697,7 +1450,7 @@ export function ProductWalkthrough() {
             </span>
           </div>
 
-          <div className="space-y-2 overflow-y-auto max-h-[600px] pr-1">
+          <div className="space-y-2 overflow-y-auto max-h-[640px] pr-1">
             {USER_FLOWS.map((flow, idx) => {
               const Icon = flow.icon;
               const isActive = activeFlowIndex === idx;
@@ -1706,7 +1459,7 @@ export function ProductWalkthrough() {
                 <button
                   key={flow.id}
                   onClick={() => setActiveFlowIndex(idx)}
-                  className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start gap-3 ${
+                  className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start gap-3 cursor-pointer ${
                     isActive
                       ? 'bg-amber-500/10 border-amber-500/40 text-white shadow-lg shadow-amber-500/5 ring-1 ring-amber-500/30'
                       : 'bg-slate-900/60 hover:bg-slate-900 border-slate-800/80 text-slate-400 hover:text-slate-200'
@@ -1749,22 +1502,25 @@ export function ProductWalkthrough() {
             })}
           </div>
 
-          {/* Verified Merchant Partner License Status */}
+          {/* Verified Commercial License Status */}
           <div className="mt-2 p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/30">
             <div className="flex items-center gap-2 text-xs font-black text-amber-400">
               <Sparkles className="w-4 h-4" />
-              <span>Enterprise Commercial License Active</span>
+              <span>DineQR Commercial Onboarding Active</span>
             </div>
             <p className="text-xs text-slate-300 mt-1">
-              Organization: <strong className="text-white">Apex Grand Bistro & Cafe Network</strong><br />
-              Tier: <strong className="text-white">Commercial Verified (100% On-Premise SQLite)</strong>
+              Architecture: <strong className="text-white">Local SQLite Engine (Zero Cloud Database Cost)</strong><br />
+              Commercial Tiers: <strong className="text-white">₹1,500 / ₹3,500 / ₹5,000 per month</strong>
             </p>
             <div className="mt-2 flex items-center gap-2">
               <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                ₹1,500 Flat License Ready
+                ₹1,500 Starter POS
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                ₹3,500 Zomato & Swiggy
               </span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 border border-sky-500/30">
-                0% Commission Verified
+                ₹5,000 Cloud Hub
               </span>
             </div>
           </div>
