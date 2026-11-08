@@ -1188,4 +1188,270 @@ router.post('/storage/sync', (req, res) => {
   }
 });
 
+// ============================================================
+// 12. AI CCTV VISION & ORDER RISK GUARD (Table Occupancy & Waiter Bell)
+// ============================================================
+
+const cctvRiskState = {
+  alertThresholdSeconds: 120, // 2 minutes SLA
+  autoBellEnabled: true,
+  cameras: [
+    {
+      id: 'cam_01',
+      name: 'Cam 01 · Main Dining Hall',
+      location: 'Ground Floor Dining Area',
+      fps: 24.5,
+      resolution: '1080p 60FPS',
+      streamType: 'RTSP / H.264',
+      status: 'ONLINE',
+      monitoredTables: ['Table 01', 'Table 02', 'Table 03', 'Table 04'],
+    },
+    {
+      id: 'cam_02',
+      name: 'Cam 02 · Garden Patio',
+      location: 'Outdoor Seating Deck',
+      fps: 24.0,
+      resolution: '1080p 30FPS',
+      streamType: 'RTSP / H.264',
+      status: 'ONLINE',
+      monitoredTables: ['Table 05', 'Table 06'],
+    },
+    {
+      id: 'cam_03',
+      name: 'Cam 03 · VIP Lounge & Booths',
+      location: 'First Floor Mezzanine',
+      fps: 30.0,
+      resolution: '4K Ultra-HD',
+      streamType: 'WebRTC Low-Latency',
+      status: 'ONLINE',
+      monitoredTables: ['Table 07', 'Table 08'],
+    },
+  ],
+  tables: [
+    {
+      table_number: 'Table 01',
+      section: 'Main Dining',
+      status: 'OCCUPIED',
+      guests_detected: 2,
+      seated_seconds: 410,
+      waiter_assigned: 'Sunil Verma',
+      waiter_attended: true,
+      last_attended_seconds_ago: 35,
+      risk_level: 'LOW',
+      current_order: 'ORD-9128',
+    },
+    {
+      table_number: 'Table 02',
+      section: 'Main Dining',
+      status: 'VACANT',
+      guests_detected: 0,
+      seated_seconds: 0,
+      waiter_assigned: null,
+      waiter_attended: false,
+      last_attended_seconds_ago: null,
+      risk_level: 'NONE',
+      current_order: null,
+    },
+    {
+      table_number: 'Table 03',
+      section: 'Main Dining',
+      status: 'ATTENTION_REQUIRED',
+      guests_detected: 3,
+      seated_seconds: 228,
+      waiter_assigned: null,
+      waiter_attended: false,
+      last_attended_seconds_ago: null,
+      risk_level: 'CRITICAL',
+      current_order: null,
+      alert_reason: 'Guests seated >3 mins with no server contact (Walkout Risk)',
+    },
+    {
+      table_number: 'Table 04',
+      section: 'Main Dining',
+      status: 'OCCUPIED',
+      guests_detected: 4,
+      seated_seconds: 780,
+      waiter_assigned: 'Pooja Nair',
+      waiter_attended: true,
+      last_attended_seconds_ago: 80,
+      risk_level: 'LOW',
+      current_order: 'ORD-9115',
+    },
+    {
+      table_number: 'Table 05',
+      section: 'Patio Deck',
+      status: 'BUSY_DIRTY',
+      guests_detected: 0,
+      seated_seconds: 0,
+      waiter_assigned: null,
+      waiter_attended: false,
+      last_attended_seconds_ago: 120,
+      risk_level: 'MEDIUM',
+      current_order: null,
+      alert_reason: 'Table vacant with uncleaned dishes >5 mins',
+    },
+    {
+      table_number: 'Table 06',
+      section: 'Patio Deck',
+      status: 'VACANT',
+      guests_detected: 0,
+      seated_seconds: 0,
+      waiter_assigned: null,
+      waiter_attended: false,
+      last_attended_seconds_ago: null,
+      risk_level: 'NONE',
+      current_order: null,
+    },
+  ],
+  incidentLog: [
+    {
+      id: 'inc_101',
+      timestamp: '15:43:10',
+      table: 'Table 03',
+      event: 'GUESTS_SEATED',
+      details: 'Computer vision detected 3 guests seated at Table 03.',
+      type: 'INFO',
+    },
+    {
+      id: 'inc_102',
+      timestamp: '15:45:15',
+      table: 'Table 03',
+      event: 'SLA_BREACH_ALERT',
+      details: 'Guests unattended for > 2m. Service alert chime bell triggered.',
+      type: 'WARNING',
+    },
+    {
+      id: 'inc_103',
+      timestamp: '15:45:20',
+      table: 'Table 03',
+      event: 'BELL_CHIME_DISPATCHED',
+      details: 'Restaurant bell chime & Captain alert broadcasted for Table 03.',
+      type: 'ALARM',
+    },
+  ],
+};
+
+// GET /api/erp/cctv-risk/status - Fetch current CCTV camera feeds and table risk state
+router.get('/cctv-risk/status', (req, res) => {
+  try {
+    const totalTables = cctvRiskState.tables.length;
+    const occupiedTables = cctvRiskState.tables.filter((t) => t.status === 'OCCUPIED' || t.status === 'ATTENTION_REQUIRED').length;
+    const atRiskTables = cctvRiskState.tables.filter((t) => t.risk_level === 'CRITICAL' || t.status === 'ATTENTION_REQUIRED').length;
+    const vacantTables = cctvRiskState.tables.filter((t) => t.status === 'VACANT').length;
+
+    res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      summary: {
+        totalCameras: cctvRiskState.cameras.length,
+        totalTables,
+        occupiedTables,
+        vacantTables,
+        atRiskTables,
+        occupancyRate: Math.round((occupiedTables / totalTables) * 100) + '%',
+        walkoutsPreventedToday: 14,
+        averageServerResponseSeconds: 78,
+        aiVisionEngine: 'YOLOv11x Real-Time Spatial Occupancy',
+        inferenceFps: 24.8,
+        latencyMs: 11.4,
+      },
+      alertThresholdSeconds: cctvRiskState.alertThresholdSeconds,
+      autoBellEnabled: cctvRiskState.autoBellEnabled,
+      cameras: cctvRiskState.cameras,
+      tables: cctvRiskState.tables,
+      incidentLog: cctvRiskState.incidentLog,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/erp/cctv-risk/bell-trigger - Ring the table service alert chime & bell
+router.post('/cctv-risk/bell-trigger', (req, res) => {
+  try {
+    const { table_number, manual = true, reason } = req.body;
+    const targetTable = table_number || 'Table 03';
+
+    const incident = {
+      id: 'inc_' + Date.now(),
+      timestamp: new Date().toLocaleTimeString(),
+      table: targetTable,
+      event: manual ? 'MANUAL_BELL_CHIME' : 'AUTO_SLA_BELL_CHIME',
+      details: reason || (manual ? 'Operator triggered loud attention bell chime for server.' : 'Auto-triggered by AI vision SLA breach (>2 mins unattended).'),
+      type: 'ALARM',
+    };
+
+    cctvRiskState.incidentLog.unshift(incident);
+    if (cctvRiskState.incidentLog.length > 50) {
+      cctvRiskState.incidentLog.pop();
+    }
+
+    res.json({
+      success: true,
+      message: `🔔 Attention Bell Chime Dispatched for ${targetTable}! Server alerted.`,
+      table_number: targetTable,
+      incident,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/erp/cctv-risk/assign-waiter - Dispatch waiter to attended table
+router.post('/cctv-risk/assign-waiter', (req, res) => {
+  try {
+    const { table_number, waiter_name = 'Sunil Verma' } = req.body;
+    const table = cctvRiskState.tables.find((t) => t.table_number === table_number);
+    if (table) {
+      table.status = 'OCCUPIED';
+      table.waiter_assigned = waiter_name;
+      table.waiter_attended = true;
+      table.risk_level = 'LOW';
+      table.last_attended_seconds_ago = 0;
+      table.alert_reason = null;
+    }
+
+    const incident = {
+      id: 'inc_' + Date.now(),
+      timestamp: new Date().toLocaleTimeString(),
+      table: table_number,
+      event: 'WAITER_DISPATCHED',
+      details: `Waiter ${waiter_name} assigned and dispatched to ${table_number}. Risk resolved.`,
+      type: 'SUCCESS',
+    };
+
+    cctvRiskState.incidentLog.unshift(incident);
+
+    res.json({
+      success: true,
+      message: `Waiter ${waiter_name} dispatched to ${table_number}`,
+      incident,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/erp/cctv-risk/configure - Configure SLA alert thresholds
+router.post('/cctv-risk/configure', (req, res) => {
+  try {
+    const { alertThresholdSeconds, autoBellEnabled } = req.body;
+    if (typeof alertThresholdSeconds === 'number') {
+      cctvRiskState.alertThresholdSeconds = alertThresholdSeconds;
+    }
+    if (typeof autoBellEnabled === 'boolean') {
+      cctvRiskState.autoBellEnabled = autoBellEnabled;
+    }
+
+    res.json({
+      success: true,
+      message: 'CCTV Risk SLA configuration updated successfully',
+      alertThresholdSeconds: cctvRiskState.alertThresholdSeconds,
+      autoBellEnabled: cctvRiskState.autoBellEnabled,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 export default router;

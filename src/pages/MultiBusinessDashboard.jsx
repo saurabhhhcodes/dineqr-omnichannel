@@ -49,6 +49,7 @@ const BUSINESS_VERTICALS = [
     primaryCapabilities: [
       'Interactive Visual Floor Plan Layout',
       'Table-Side Captain Waiter Ordering App',
+      'AI CCTV Table Occupancy & Waiter Attention Alert Bell',
       'Multi-Course KOT Firing (Starters -> Mains)',
       'Split Billing & Sommelier Recommendations',
     ],
@@ -520,6 +521,23 @@ export function MultiBusinessDashboard() {
                   </div>
                 ))}
               </div>
+
+              <Link
+                to="/cctv-demo"
+                className="mt-3.5 p-3 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-xs font-bold text-rose-200 flex items-center justify-between hover:bg-rose-900/40 transition group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                  <div>
+                    <div className="text-white font-extrabold flex items-center gap-1.5">
+                      <span>Live AI CCTV Table Risk Demo</span>
+                      <span className="text-[9px] bg-rose-500 text-white px-1.5 py-0.2 rounded font-black">NEW</span>
+                    </div>
+                    <div className="text-[10px] text-rose-300">Test computer vision surveillance &amp; waiter alert bell</div>
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-rose-400 group-hover:translate-x-1 transition" />
+              </Link>
             </div>
 
             <div className="pt-4 border-t border-slate-800 space-y-2">

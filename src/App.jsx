@@ -32,6 +32,7 @@ import { TokenDisplay } from './pages/TokenDisplay.jsx';
 import { PetpoojaComparison } from './pages/PetpoojaComparison.jsx';
 import { MultiBusinessDashboard } from './pages/MultiBusinessDashboard.jsx';
 import { GymRegister } from './pages/GymRegister.jsx';
+import { AdminOrderRisk } from './pages/AdminOrderRisk.jsx';
 import { AdminAuthGate } from './components/AdminAuthGate.jsx';
 
 function AppContent() {
@@ -103,6 +104,8 @@ function AppContent() {
           <Route path="/subscription" element={<SubscriptionPricing />} />
           <Route path="/admin/subscription" element={<AdminAuthGate><SubscriptionPricing /></AdminAuthGate>} />
           <Route path="/admin/settings" element={<AdminAuthGate><AdminSettings /></AdminAuthGate>} />
+          <Route path="/admin/order-risk" element={<AdminAuthGate><AdminOrderRisk /></AdminAuthGate>} />
+          <Route path="/admin/cctv-risk" element={<AdminAuthGate><AdminOrderRisk /></AdminAuthGate>} />
 
           {/* Super Admin Fleet */}
           <Route path="/super-admin" element={<AdminAuthGate><SuperAdmin /></AdminAuthGate>} />
@@ -113,6 +116,8 @@ function AppContent() {
           <Route path="/display/tokens" element={<TokenDisplay />} />
           <Route path="/captain" element={<CaptainApp />} />
           <Route path="/kds-demo" element={<AdminKitchen isPublicDemo={true} />} />
+          <Route path="/cctv-demo" element={<AdminOrderRisk isPublicDemo={true} />} />
+          <Route path="/risk-demo" element={<AdminOrderRisk isPublicDemo={true} />} />
           <Route path="/poss" element={<Navigate to="/pricing" replace />} />
           <Route path="/compare/petpooja" element={<Navigate to="/pricing" replace />} />
         </Routes>
