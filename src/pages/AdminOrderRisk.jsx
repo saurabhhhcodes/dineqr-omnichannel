@@ -43,21 +43,21 @@ export function AdminOrderRisk({ isPublicDemo = false }) {
 
   const camFeeds = {
     cam_01: {
-      name: 'Cam 01: Dining Hall',
+      name: 'Cam 01: Dining Hall (Ceiling 4K)',
       src: '/videos/cctv_dining_feed.mp4',
-      resolution: '1080p · 30 FPS',
+      resolution: '4K Ultra HD · 30 FPS',
       rtsp: 'RTSP://192.168.1.120:554/live/dining_hall',
     },
     cam_02: {
-      name: 'Cam 02: Patio Garden',
+      name: 'Cam 02: Counter & Kitchen (IP Dome)',
       src: '/videos/cctv_patio_feed.mp4',
-      resolution: '1080p · 29.9 FPS',
-      rtsp: 'RTSP://192.168.1.121:554/live/patio_garden',
+      resolution: '1080p HD · 30 FPS',
+      rtsp: 'RTSP://192.168.1.121:554/live/ip_dome_counter',
     },
     cam_03: {
-      name: 'Cam 03: VIP Lounge',
+      name: 'Cam 03: VIP Lounge & Tables',
       src: '/videos/cctv_vip_feed.mp4',
-      resolution: '1080p · 29.9 FPS',
+      resolution: '1080p HD · 29.9 FPS',
       rtsp: 'RTSP://192.168.1.122:554/live/vip_lounge',
     },
   };
@@ -565,14 +565,20 @@ export function AdminOrderRisk({ isPublicDemo = false }) {
             <div className="p-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between text-xs font-bold">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                <span className="font-mono text-white">
-                  {useWebcam ? 'LIVE WEBCAM FEED' : (camFeeds[activeCam]?.name || activeCam.toUpperCase())} · {camFeeds[activeCam]?.rtsp || 'RTSP://192.168.1.120:554'}
+                <span className="font-mono text-white tracking-wide">
+                  {useWebcam ? 'LIVE WEBCAM FEED' : (camFeeds[activeCam]?.name || activeCam.toUpperCase())}
                 </span>
-                <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-mono">
-                  {camFeeds[activeCam]?.resolution || '1080p · 30 FPS'}
+                <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-mono">
+                  {camFeeds[activeCam]?.rtsp || 'RTSP://192.168.1.120:554'}
+                </span>
+                <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-mono font-bold">
+                  {camFeeds[activeCam]?.resolution || '4K · 30 FPS'}
                 </span>
               </div>
-              <div className="text-slate-400 font-mono">{currentTime}</div>
+              <div className="text-slate-400 font-mono text-[11px] flex items-center gap-2">
+                <span className="text-emerald-400 font-bold hidden sm:inline">● LIVE STREAM</span>
+                <span>{currentTime}</span>
+              </div>
             </div>
 
             {/* Video Viewport with Real CCTV Video Stream & Vision AI Bounding Overlays */}
@@ -587,7 +593,7 @@ export function AdminOrderRisk({ isPublicDemo = false }) {
                 />
               ) : (
                 /* Authentic Real-Life CCTV Security Stream of Restaurant Dining Room */
-                <div className="w-full h-full relative overflow-hidden flex items-center justify-center bg-black">
+                <div className="w-full h-full relative overflow-hidden flex items-center justify-center bg-black select-none">
                   {/* REAL PLAYING CCTV FOOTAGE */}
                   <video
                     key={activeCam}
@@ -596,11 +602,11 @@ export function AdminOrderRisk({ isPublicDemo = false }) {
                     loop
                     muted
                     playsInline
-                    className="w-full h-full object-cover brightness-95 contrast-105"
+                    className="w-full h-full object-cover brightness-100 contrast-105"
                   />
 
                   {/* CCTV scanlines & security camera vignette filter */}
-                  <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,27,0)_50%,rgba(0,0,0,0.28)_50%)] bg-[length:100%_4px] pointer-events-none opacity-40 z-10" />
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,27,0)_50%,rgba(0,0,0,0.18)_50%)] bg-[length:100%_4px] pointer-events-none opacity-30 z-10" />
 
                   {/* Active Service Bell Chime Alarm Screen Glow Effect */}
                   {isBellRinging && (
@@ -611,113 +617,170 @@ export function AdminOrderRisk({ isPublicDemo = false }) {
                           🔔 SERVICE ATTENTION BELL RUNG!
                         </div>
                         <div className="text-xs text-rose-300 font-mono">
-                          Table 03 SLA Breach · Captain POS &amp; Server Notified
+                          Table 03 SLA Breach · Captain POS &amp; Server Sunil Notified
                         </div>
                       </div>
                     </div>
                   )}
 
                   {/* Top CCTV Overlay Stats & Camera OSD */}
-                  <div className="absolute top-3 left-3 right-3 z-20 flex justify-between items-start text-[11px] font-mono pointer-events-none">
-                    <div className="space-y-0.5 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800 backdrop-blur-xs">
-                      <div className="text-emerald-400 font-bold flex items-center gap-1.5">
+                  <div className="absolute top-2.5 left-2.5 right-2.5 z-20 flex justify-between items-start text-[11px] font-mono pointer-events-none">
+                    <div className="space-y-0.5 bg-slate-950/85 px-2.5 py-1.5 rounded-xl border border-slate-700/80 backdrop-blur-sm shadow-lg">
+                      <div className="text-emerald-400 font-black flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                         <span>● YOLO-11x SPATIAL VISION ACTIVE</span>
                       </div>
-                      <div className="text-slate-400">FPS: 30.0 · Source: {camFeeds[activeCam]?.name || 'Dining Hall CCTV'}</div>
+                      <div className="text-slate-300 text-[10px]">FPS: 30.0 · Detects: Tables, Guests, Chairs &amp; Staff</div>
                     </div>
-                    <div className="text-right space-y-0.5 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800 backdrop-blur-xs">
-                      <div className="text-amber-400 font-bold">MONITORED: 4 TABLES</div>
-                      <div className="text-rose-400 font-bold">{activeCam === 'cam_01' ? '⚠️ ATTENTION RISK: TABLE 03' : '✓ ALL TABLES ATTENDED'}</div>
+                    <div className="text-right space-y-0.5 bg-slate-950/85 px-2.5 py-1.5 rounded-xl border border-slate-700/80 backdrop-blur-sm shadow-lg">
+                      <div className="text-amber-300 font-bold">MONITORED: 4 TABLES</div>
+                      <div className={`font-black text-[10px] ${tables[2]?.waiter_attended ? 'text-emerald-400' : 'text-rose-400 animate-pulse'}`}>
+                        {tables[2]?.waiter_attended ? '✓ ALL TABLES ATTENDED' : '⚠️ ATTENTION RISK: TABLE 03'}
+                      </div>
                     </div>
                   </div>
 
                   {/* SPATIAL BOUNDING BOXES (Computer Vision Live Overlays) */}
                   {showHudOverlay && (
-                    <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+                    <div className="absolute inset-0 z-20 pointer-events-none">
                       {activeCam === 'cam_01' && (
                         <>
-                          {/* Bounding Box 1: Table 01 (Occupied & Attended) */}
-                          <div className="absolute left-[6%] top-[30%] w-[34%] h-[38%] rounded-xl border-2 border-emerald-500 bg-emerald-500/15 p-2 text-left space-y-1 backdrop-blur-xs pointer-events-auto shadow-lg shadow-emerald-500/20">
+                          {/* Bounding Box 1: Table 01 (Occupied & Attended Booth) */}
+                          <div className="absolute left-[20%] top-[16%] w-[22%] h-[28%] rounded-xl border-2 border-emerald-400 bg-emerald-500/15 p-2 text-left space-y-0.5 backdrop-blur-xs pointer-events-auto shadow-lg shadow-emerald-500/30">
                             <div className="flex items-center justify-between text-[10px] font-bold">
-                              <span className="bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded font-black uppercase">
+                              <span className="bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded font-black uppercase tracking-wider">
                                 Table 01 · Occupied
                               </span>
-                              <span className="text-emerald-300 font-mono font-bold">2 Guests</span>
+                              <span className="text-emerald-300 font-mono font-bold text-[9px]">2 Guests</span>
                             </div>
-                            <div className="text-[10px] text-emerald-200">Server: Sunil Verma</div>
-                            <div className="text-[9px] text-slate-300 font-mono">Order #ORD-9128 Served</div>
+                            <div className="text-[9px] text-emerald-200 font-semibold">Server: Sunil Verma</div>
+                            <div className="text-[8px] text-slate-300 font-mono">Dwell: {formatTime(tables[0]?.seated_seconds || 412)} · Served</div>
                           </div>
 
-                          {/* Bounding Box 2: Table 02 (Vacant) */}
-                          <div className="absolute right-[8%] top-[25%] w-[30%] h-[38%] rounded-xl border-2 border-dashed border-slate-400/80 bg-slate-950/40 p-2 text-left space-y-1 backdrop-blur-xs pointer-events-auto">
+                          {/* Bounding Box 2: Table 02 (Vacant 2-Seater) */}
+                          <div className="absolute left-[47%] top-[19%] w-[16%] h-[22%] rounded-xl border-2 border-dashed border-cyan-400/90 bg-slate-950/50 p-2 text-left space-y-0.5 backdrop-blur-xs pointer-events-auto shadow-md">
                             <div className="flex items-center justify-between text-[10px] font-bold">
-                              <span className="bg-slate-700 text-slate-200 px-1.5 py-0.2 rounded uppercase">
+                              <span className="bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 px-1.5 py-0.2 rounded uppercase text-[9px] font-black">
                                 Table 02 · Vacant
                               </span>
-                              <span className="text-slate-400 font-mono">0 Guests</span>
+                              <span className="text-slate-400 font-mono text-[9px]">0 Guests</span>
                             </div>
-                            <div className="text-[9px] text-slate-300">Sanitized &amp; Ready for Seating</div>
+                            <div className="text-[8px] text-slate-300">Sanitized &amp; Ready</div>
                           </div>
 
-                          {/* Bounding Box 3: Table 03 (CRITICAL RISK - Guests waiting without server!) */}
-                          <div className="absolute left-[26%] bottom-[8%] w-[48%] h-[42%] rounded-xl border-2 border-rose-500 bg-rose-500/25 p-2.5 text-left space-y-1.5 shadow-2xl shadow-rose-500/40 animate-pulse pointer-events-auto backdrop-blur-xs">
+                          {/* Bounding Box 3: Table 03 (FOREGROUND LARGE TABLE - Dynamic State) */}
+                          {tables[2]?.waiter_attended ? (
+                            /* State A: Attended (Safe) */
+                            <div className="absolute left-[34%] top-[45%] w-[48%] h-[48%] rounded-2xl border-2 border-emerald-400 bg-emerald-500/20 p-3 text-left space-y-1 backdrop-blur-xs pointer-events-auto shadow-2xl shadow-emerald-500/40">
+                              <div className="flex items-center justify-between text-[11px] font-black">
+                                <span className="bg-emerald-500 text-slate-950 px-2 py-0.5 rounded font-black uppercase flex items-center gap-1">
+                                  <UserCheck className="w-3.5 h-3.5 text-slate-950" />
+                                  Table 03 · Attended &amp; Safe
+                                </span>
+                                <span className="text-emerald-300 font-mono font-bold">3 Guests</span>
+                              </div>
+                              <div className="text-xs font-bold text-emerald-100">
+                                Server: Sunil Verma On-Site · Order Flow Restored
+                              </div>
+                              <div className="text-[10px] text-emerald-200 font-mono">
+                                Walkout Risk Resolved · Attended at {currentTime}
+                              </div>
+                            </div>
+                          ) : (
+                            /* State B: Unattended (CRITICAL WALKOUT RISK) */
+                            <div className="absolute left-[34%] top-[45%] w-[48%] h-[48%] rounded-2xl border-2 border-rose-500 bg-rose-500/25 p-3 text-left space-y-1.5 shadow-2xl shadow-rose-500/50 animate-pulse pointer-events-auto backdrop-blur-xs">
+                              <div className="flex items-center justify-between text-[11px] font-black">
+                                <span className="bg-rose-500 text-white px-2 py-0.5 rounded font-black uppercase flex items-center gap-1 shadow-md">
+                                  <Bell className="w-3.5 h-3.5 fill-white animate-bounce" />
+                                  Table 03 · ⚠️ Walkout Risk
+                                </span>
+                                <span className="text-rose-200 font-mono font-bold text-xs bg-slate-950/80 px-2 py-0.5 rounded border border-rose-500/40">
+                                  3 Guests Seated
+                                </span>
+                              </div>
+                              <div className="text-xs font-black text-white drop-shadow-md">
+                                Unattended: <span className="text-rose-300 font-mono text-sm underline">{formatTime(tables[2]?.seated_seconds || 236)}</span> · No Server Visited!
+                              </div>
+                              <div className="flex items-center gap-2 pt-1">
+                                <button
+                                  onClick={() => handleTriggerBell('Table 03', 'Triggered from CCTV Video Box')}
+                                  className="flex-1 py-1.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg cursor-pointer transition active:scale-95 flex items-center justify-center gap-1"
+                                >
+                                  <Bell className="w-3.5 h-3.5 fill-slate-950" />
+                                  <span>Ring Bell (बजर)</span>
+                                </button>
+                                <button
+                                  onClick={() => handleAssignWaiter('Table 03', 'Sunil Verma')}
+                                  className="flex-1 py-1.5 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-lg cursor-pointer transition active:scale-95 flex items-center justify-center gap-1"
+                                >
+                                  <UserCheck className="w-3.5 h-3.5 text-slate-950" />
+                                  <span>Dispatch Sunil</span>
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Bounding Box 4: Table 04 (Upper Right Window Table) */}
+                          <div className="absolute left-[70%] top-[17%] w-[25%] h-[28%] rounded-xl border-2 border-emerald-400 bg-emerald-500/15 p-2 text-left space-y-0.5 backdrop-blur-xs pointer-events-auto shadow-lg shadow-emerald-500/30">
                             <div className="flex items-center justify-between text-[10px] font-bold">
-                              <span className="bg-rose-500 text-white px-2 py-0.5 rounded font-black uppercase flex items-center gap-1 shadow-md">
-                                <Bell className="w-3 h-3 fill-white" />
-                                Table 03 · At Risk
+                              <span className="bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded font-black uppercase tracking-wider">
+                                Table 04 · Occupied
                               </span>
-                              <span className="text-rose-300 font-mono font-bold">3 Guests</span>
+                              <span className="text-emerald-300 font-mono font-bold text-[9px]">4 Guests</span>
                             </div>
-                            <div className="text-[11px] font-black text-white drop-shadow-md">
-                              Seated: 03m 56s · No Waiter Visited!
+                            <div className="text-[9px] text-emerald-200 font-semibold">Server: Pooja Nair</div>
+                            <div className="text-[8px] text-slate-300 font-mono">Order #ORD-9115 Active</div>
+                          </div>
+
+                          {/* Staff Waiter Spatial Tracking Marker */}
+                          <div className="absolute left-[23%] top-[39%] w-[12%] h-[30%] rounded-xl border border-dashed border-amber-400 bg-amber-400/10 p-1.5 text-left space-y-0.5 pointer-events-auto">
+                            <div className="bg-amber-400 text-slate-950 px-1 py-0.2 rounded font-black uppercase text-[8px]">
+                              STAFF: WAITER
                             </div>
-                            <div className="flex items-center gap-1.5 pt-1">
-                              <button
-                                onClick={() => handleTriggerBell('Table 03', 'Triggered from CCTV Video Box')}
-                                className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[10px] shadow cursor-pointer transition active:scale-95"
-                              >
-                                🔔 Ring Bell
-                              </button>
-                              <button
-                                onClick={() => handleAssignWaiter('Table 03', 'Sunil Verma')}
-                                className="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] shadow cursor-pointer transition active:scale-95"
-                              >
-                                🏃 Assign Waiter
-                              </button>
-                            </div>
+                            <div className="text-[8px] text-amber-200 font-semibold leading-tight">Sunil Verma</div>
+                            <div className="text-[7px] text-slate-400 font-mono">Station 01</div>
                           </div>
                         </>
                       )}
 
                       {activeCam === 'cam_02' && (
                         <>
-                          {/* Patio Table: Attended by Waiter serving wine */}
-                          <div className="absolute left-[12%] bottom-[12%] w-[76%] h-[74%] rounded-xl border-2 border-emerald-500 bg-emerald-500/15 p-3 text-left space-y-1.5 backdrop-blur-xs pointer-events-auto shadow-xl shadow-emerald-500/20">
-                            <div className="flex items-center justify-between text-xs font-bold">
-                              <span className="bg-emerald-500 text-slate-950 px-2 py-0.5 rounded font-black uppercase">
-                                Table 04 (Patio) · Attended
-                              </span>
-                              <span className="text-emerald-300 font-mono font-bold">2 Guests + 1 Waiter</span>
+                          {/* Counter IP Dome Camera Detections */}
+                          <div className="absolute left-[20%] top-[8%] w-[24%] h-[28%] rounded-xl border-2 border-emerald-400 bg-emerald-500/15 p-2 text-left space-y-1 backdrop-blur-xs pointer-events-auto shadow-lg shadow-emerald-500/20">
+                            <div className="bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded font-black uppercase text-[9px]">
+                              Table 05 · Seated &amp; Dining
                             </div>
-                            <div className="text-xs text-emerald-200 font-semibold">Server: Sunil Verma (Active Pouring Service)</div>
-                            <div className="text-[10px] text-slate-300 font-mono">Response Time: 48s · Customer Satisfaction: Excellent</div>
+                            <div className="text-[9px] text-emerald-200">2 Guests · Meal In Progress</div>
+                          </div>
+
+                          <div className="absolute left-[37%] top-[28%] w-[30%] h-[36%] rounded-xl border-2 border-emerald-400 bg-emerald-500/15 p-2 text-left space-y-1 backdrop-blur-xs pointer-events-auto shadow-lg shadow-emerald-500/20">
+                            <div className="bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded font-black uppercase text-[9px]">
+                              Bar Counter · 3 Seated Guests
+                            </div>
+                            <div className="text-[9px] text-emerald-200">Drinks &amp; Starters Active</div>
+                          </div>
+
+                          <div className="absolute left-[66%] top-[38%] w-[30%] h-[50%] rounded-xl border-2 border-amber-400/90 bg-amber-400/10 p-2 text-left space-y-1 backdrop-blur-xs pointer-events-auto">
+                            <div className="bg-amber-400 text-slate-950 px-1.5 py-0.2 rounded font-black uppercase text-[9px]">
+                              Barista / Prep Area · Active
+                            </div>
+                            <div className="text-[9px] text-amber-200">Chef Preparing Order #ORD-9128</div>
                           </div>
                         </>
                       )}
 
                       {activeCam === 'cam_03' && (
                         <>
-                          {/* VIP Lounge Table: Guests drinking beverages */}
-                          <div className="absolute left-[10%] bottom-[10%] w-[80%] h-[78%] rounded-xl border-2 border-sky-500 bg-sky-500/15 p-3 text-left space-y-1.5 backdrop-blur-xs pointer-events-auto shadow-xl shadow-sky-500/20">
+                          {/* VIP Lounge Table Detections */}
+                          <div className="absolute left-[12%] top-[14%] w-[76%] h-[74%] rounded-2xl border-2 border-sky-400 bg-sky-500/15 p-3 text-left space-y-1.5 backdrop-blur-xs pointer-events-auto shadow-xl shadow-sky-500/30">
                             <div className="flex items-center justify-between text-xs font-bold">
-                              <span className="bg-sky-500 text-slate-950 px-2 py-0.5 rounded font-black uppercase">
-                                Table 06 (VIP Lounge) · Occupied
+                              <span className="bg-sky-400 text-slate-950 px-2 py-0.5 rounded font-black uppercase">
+                                VIP Table 06 · Dining &amp; Drinks
                               </span>
-                              <span className="text-sky-300 font-mono font-bold">2 Guests</span>
+                              <span className="text-sky-300 font-mono font-bold">4 Guests</span>
                             </div>
-                            <div className="text-xs text-sky-200 font-semibold">Status: Dining &amp; Relaxing · Course: Beverages / Dessert</div>
-                            <div className="text-[10px] text-slate-300 font-mono">Order #ORD-9115 · Attended: 1m ago</div>
+                            <div className="text-xs text-sky-200 font-semibold">Status: QR Order Placed · Kitchen Preparing</div>
+                            <div className="text-[10px] text-slate-300 font-mono">Server: Pooja Nair · Table Satisfaction: High</div>
                           </div>
                         </>
                       )}
@@ -725,20 +788,23 @@ export function AdminOrderRisk({ isPublicDemo = false }) {
                   )}
 
                   {/* Bottom Camera Timestamp Watermark */}
-                  <div className="absolute bottom-2 left-3 right-3 z-20 flex justify-between items-end text-[10px] font-mono text-white/90 bg-slate-950/70 px-2 py-0.5 rounded pointer-events-none">
-                    <div>CAM-01 · DINING ROOM CCTV STREAM · LIVE FEED</div>
-                    <div>{currentTime} · YOLO-11x INFERENCE</div>
+                  <div className="absolute bottom-2 left-3 right-3 z-20 flex justify-between items-end text-[10px] font-mono text-white/90 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800 pointer-events-none">
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>{camFeeds[activeCam]?.name || 'DINING ROOM CCTV'} · AI VISION STREAM</span>
+                    </div>
+                    <div>{currentTime} · YOLO-11x INFERENCE ENGINE</div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Camera Switcher Tabs */}
+            {/* Camera Switcher Tabs & Live Controls */}
             <div className="p-3 bg-slate-950 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-1.5 text-xs font-bold">
+              <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold">
                 {[
-                  { id: 'cam_01', name: 'Cam 01: Dining Hall' },
-                  { id: 'cam_02', name: 'Cam 02: Patio Garden' },
+                  { id: 'cam_01', name: 'Cam 01: Dining Hall (4K)' },
+                  { id: 'cam_02', name: 'Cam 02: Counter & Kitchen' },
                   { id: 'cam_03', name: 'Cam 03: VIP Lounge' },
                 ].map((cam) => (
                   <button
@@ -750,7 +816,7 @@ export function AdminOrderRisk({ isPublicDemo = false }) {
                     }}
                     className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
                       activeCam === cam.id && !useWebcam
-                        ? 'bg-amber-500 text-slate-950 border-amber-400 font-black'
+                        ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-md shadow-amber-500/20'
                         : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800'
                     }`}
                   >
@@ -762,17 +828,18 @@ export function AdminOrderRisk({ isPublicDemo = false }) {
                 <button
                   onClick={() => {
                     setShowHudOverlay(!showHudOverlay);
-                    addToast(showHudOverlay ? 'Clean Surveillance Mode (HUD Hidden)' : 'AI Computer Vision HUD Overlays Enabled');
+                    addToast(showHudOverlay ? 'Raw CCTV Mode (Overlays Hidden)' : 'AI Computer Vision HUD Overlays Enabled');
                   }}
-                  className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
                     showHudOverlay
-                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 font-black'
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 font-black shadow-lg shadow-emerald-500/20'
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
                   }`}
-                  title="Toggle Live Computer Vision Bounding Boxes"
+                  title="Toggle Computer Vision Bounding Boxes"
                 >
+                  <span className={`w-2 h-2 rounded-full ${showHudOverlay ? 'bg-emerald-400 animate-ping' : 'bg-slate-500'}`} />
                   <Eye className="w-3.5 h-3.5" />
-                  <span>{showHudOverlay ? 'HUD: ON' : 'Raw CCTV'}</span>
+                  <span>{showHudOverlay ? 'AI Vision HUD: ON' : 'Raw CCTV (Overlays Off)'}</span>
                 </button>
               </div>
 
@@ -964,24 +1031,53 @@ export function AdminOrderRisk({ isPublicDemo = false }) {
                     </div>
 
                     {/* Table Actions (Ring Bell & Assign Server) */}
-                    {isCritical && (
+                    {isCritical ? (
                       <div className="pt-2 border-t border-slate-800/80 flex items-center gap-2">
                         <button
                           onClick={() => handleTriggerBell(tbl.table_number, 'Attention bell triggered for ' + tbl.table_number)}
-                          className="flex-1 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-md"
+                          className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-md shadow-amber-500/20"
                         >
                           <Bell className="w-3.5 h-3.5 fill-slate-950" />
                           <span>Ring Bell (बजर)</span>
                         </button>
                         <button
                           onClick={() => handleAssignWaiter(tbl.table_number, 'Sunil Verma')}
-                          className="flex-1 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-md"
+                          className="flex-1 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer shadow-md shadow-emerald-500/20"
                         >
-                          <UserCheck className="w-3.5 h-3.5" />
+                          <UserCheck className="w-3.5 h-3.5 text-slate-950" />
                           <span>Dispatch Sunil</span>
                         </button>
                       </div>
-                    )}
+                    ) : tbl.table_number === 'Table 03' && tbl.waiter_attended ? (
+                      <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                        <span className="text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          Server Sunil Verma Attending Table
+                        </span>
+                        <button
+                          onClick={() => {
+                            setTables((prev) =>
+                              prev.map((t) =>
+                                t.table_number === 'Table 03'
+                                  ? {
+                                      ...t,
+                                      status: 'ATTENTION_REQUIRED',
+                                      waiter_attended: false,
+                                      waiter_assigned: null,
+                                      risk_level: 'CRITICAL',
+                                      seated_seconds: 245,
+                                    }
+                                  : t
+                              )
+                            );
+                            addToast('Simulating: Table 03 guests unattended again');
+                          }}
+                          className="text-[10px] text-slate-400 hover:text-amber-300 underline cursor-pointer"
+                        >
+                          Reset to Unattended
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 );
               })}
