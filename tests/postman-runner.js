@@ -100,7 +100,7 @@ async function runPostmanTestSuite() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         restaurant_id: testRestId,
-        table_number: 'Table Postman-' + Math.floor(100 + Math.random() * 900),
+        table_number: 'Table Postman-' + Date.now().toString(36) + '-' + Math.floor(100 + Math.random() * 900),
         section: 'Terrace Garden',
         capacity: 4,
       }),

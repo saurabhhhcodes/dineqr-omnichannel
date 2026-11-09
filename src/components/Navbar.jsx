@@ -38,6 +38,7 @@ import {
   LogOut,
   Tv,
   Camera,
+  Video,
 } from 'lucide-react';
 import { useCart } from '../context/CartContext.jsx';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
@@ -484,6 +485,16 @@ export function Navbar({ onOpenCart }) {
             </Link>
 
             <Link
+              to="/promo"
+              className={`hover:text-pink-400 transition flex items-center gap-1.5 ${
+                location.pathname === '/promo' ? 'text-pink-400 font-bold' : ''
+              }`}
+            >
+              <Video className="w-3.5 h-3.5 text-pink-400" />
+              <span>Promo Studio</span>
+            </Link>
+
+            <Link
               to="/downloads"
               className={`hover:text-sky-300 transition flex items-center gap-1.5 ${
                 location.pathname === '/downloads' ? 'text-sky-400 font-bold' : ''
@@ -619,6 +630,17 @@ export function Navbar({ onOpenCart }) {
                 <div className="flex items-center gap-2.5">
                   <Zap className="w-4 h-4 text-amber-400" />
                   <span>Subscription Pricing (Flat ₹1,500/mo)</span>
+                </div>
+                <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
+              </Link>
+
+              <Link
+                to="/promo"
+                className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-slate-200 hover:text-pink-400 transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Video className="w-4 h-4 text-pink-400" />
+                  <span>Promo Studio (Shorts & Reels)</span>
                 </div>
                 <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
               </Link>

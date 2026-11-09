@@ -33,6 +33,7 @@ import { PetpoojaComparison } from './pages/PetpoojaComparison.jsx';
 import { MultiBusinessDashboard } from './pages/MultiBusinessDashboard.jsx';
 import { GymRegister } from './pages/GymRegister.jsx';
 import { AdminOrderRisk } from './pages/AdminOrderRisk.jsx';
+import { MarketingPromoHub } from './pages/MarketingPromoHub.jsx';
 import { AdminAuthGate } from './components/AdminAuthGate.jsx';
 
 function AppContent() {
@@ -52,7 +53,10 @@ function AppContent() {
     location.pathname === '/display/tokens' ||
     location.pathname === '/showcase' ||
     location.pathname === '/dashboards' ||
-    location.pathname === '/business-dashboard';
+    location.pathname === '/business-dashboard' ||
+    location.pathname === '/promo' ||
+    location.pathname === '/marketing' ||
+    location.pathname === '/social';
   const pageBg = isDarkPage ? 'bg-slate-950' : 'bg-slate-50';
 
   return (
@@ -75,6 +79,11 @@ function AppContent() {
           {/* Interactive Multi-Vertical Product Walkthrough with Subtitles */}
           <Route path="/walkthrough" element={<ProductWalkthrough />} />
           <Route path="/demo" element={<ProductWalkthrough />} />
+
+          {/* Social Media & Marketing Video Studio + Google AdSense Monetization */}
+          <Route path="/promo" element={<MarketingPromoHub />} />
+          <Route path="/marketing" element={<MarketingPromoHub />} />
+          <Route path="/social" element={<MarketingPromoHub />} />
 
           {/* Master Multi-Business Vertical Dashboards */}
           <Route path="/showcase" element={<MultiBusinessDashboard />} />

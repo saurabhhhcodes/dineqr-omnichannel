@@ -16,6 +16,7 @@ import {
   Coffee,
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
+import { AdSenseBanner } from '../components/AdSenseBanner.jsx';
 
 export function TokenDisplay() {
   const { activeRestaurant } = useRestaurant();
@@ -306,6 +307,11 @@ export function TokenDisplay() {
           </div>
         </section>
       </main>
+
+      {/* Optional Sponsor Ad Banner for Food Court Monetization */}
+      <div className="bg-slate-950 px-4 py-1 border-t border-slate-900">
+        <AdSenseBanner showDemoNotice={false} className="my-1" />
+      </div>
 
       {/* Bottom TV Ticker Marquee */}
       <footer className="bg-slate-900 border-t border-slate-800 px-6 py-2.5 flex items-center justify-between text-xs text-slate-400">

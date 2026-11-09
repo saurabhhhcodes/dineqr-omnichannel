@@ -21,6 +21,7 @@ import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { ItemCard } from '../components/ItemCard.jsx';
 import { ItemModal } from '../components/ItemModal.jsx';
 import { CartDrawer } from '../components/CartDrawer.jsx';
+import { AdSenseBanner } from '../components/AdSenseBanner.jsx';
 import { getFallbackMenu, getFallbackTables, resolveRestaurant } from '../data/fallbackMenu.js';
 
 export function CustomerMenu() {
@@ -409,6 +410,11 @@ export function CustomerMenu() {
             </div>
           </div>
         )}
+
+        {/* Google AdSense Monetization Banner for Zero-Budget Revenue */}
+        <div className="pt-6 pb-20">
+          <AdSenseBanner showDemoNotice={false} />
+        </div>
       </main>
 
       {/* Floating Bottom Cart Bar (Sticky on Mobile Phones) */}

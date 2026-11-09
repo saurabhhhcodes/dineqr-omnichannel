@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useRestaurant } from '../context/RestaurantContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import { AdSenseBanner } from '../components/AdSenseBanner.jsx';
 
 export function SubscriptionPricing() {
   const { activeRestaurant, refreshRestaurants } = useRestaurant();
@@ -382,6 +383,11 @@ export function SubscriptionPricing() {
             Configure Cloud Domain & Thermal Printer in Settings →
           </Link>
         </div>
+      </div>
+
+      {/* AdSense Monetization Placement */}
+      <div className="pt-4">
+        <AdSenseBanner showDemoNotice={false} />
       </div>
     </div>
   );
