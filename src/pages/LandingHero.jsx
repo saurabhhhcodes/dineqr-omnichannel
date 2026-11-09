@@ -292,28 +292,64 @@ export function LandingHero() {
         </div>
 
         {/* Animated Cybernetic Workflow Motion Loop (Pure Motion Graphic, 0 Humans) */}
-        <div className="mt-10 max-w-4xl mx-auto rounded-3xl border border-amber-500/30 bg-slate-900/80 p-3 sm:p-4 shadow-2xl shadow-amber-500/10 backdrop-blur-xl relative overflow-hidden group">
-          <div className="flex items-center justify-between pb-2.5 px-2 border-b border-slate-800">
+        <div className="mt-10 max-w-4xl mx-auto rounded-3xl border border-amber-500/30 bg-slate-900/80 p-3 sm:p-5 shadow-2xl shadow-amber-500/10 backdrop-blur-xl relative overflow-hidden group">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 px-1 border-b border-slate-800 gap-2">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
               <span className="text-xs font-bold text-white uppercase tracking-wider">
-                QRFlow Autonomous Architecture · Real-Time Motion Graphic
+                QRFlow Autonomous Architecture · High-Tech Motion Visuals
               </span>
             </div>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-              1080p Seamless Flow · Zero Humans
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              1080p 60fps · 100% Human-Free Motion Graphics
             </span>
           </div>
 
           <div className="relative aspect-video rounded-2xl overflow-hidden mt-3 bg-black border border-slate-800 shadow-inner">
             <video
-              src="/videos/qrflow_animated_hero_loop.mp4"
+              key="hero_anim_video"
+              src="/videos/neon_hud_loop.mp4"
               autoPlay
               loop
               muted
               playsInline
+              controls
               className="w-full h-full object-cover"
             />
+          </div>
+
+          {/* Quick Motion Clip Switcher */}
+          <div className="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span className="text-[11px] text-slate-400 font-semibold flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>Select Motion Style:</span>
+            </span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <a
+                href="/videos/neon_hud_loop.mp4"
+                target="_blank"
+                rel="noreferrer"
+                className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-[11px] hover:bg-amber-500 hover:text-slate-950 transition"
+              >
+                ⚡ Neon Cyber HUD
+              </a>
+              <a
+                href="/videos/glowing_circuit_loop.mp4"
+                target="_blank"
+                rel="noreferrer"
+                className="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 font-bold text-[11px] hover:bg-sky-500 hover:text-slate-950 transition"
+              >
+                🌐 Glowing Circuit Matrix
+              </a>
+              <a
+                href="/videos/tech_network_loop.mp4"
+                target="_blank"
+                rel="noreferrer"
+                className="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold text-[11px] hover:bg-purple-500 hover:text-slate-950 transition"
+              >
+                📡 Data Network Stream
+              </a>
+            </div>
           </div>
         </div>
 
