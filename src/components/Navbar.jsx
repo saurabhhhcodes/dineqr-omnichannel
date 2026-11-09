@@ -362,28 +362,13 @@ export function Navbar({ onOpenCart }) {
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group shrink-0">
+          <Link to="/" className="flex items-center gap-2 group shrink-0">
             <DineQRLogo size="md" />
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-white text-base sm:text-lg tracking-tight">QR Flow</span>
-              <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-900 text-amber-400 border border-slate-800 hidden sm:inline-block">
-                ₹1,500/mo Multi-POS
-              </span>
-            </div>
+            <span className="font-extrabold text-white text-base sm:text-lg tracking-tight">QR Flow</span>
           </Link>
 
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-5 text-xs font-semibold text-slate-300">
-            <Link
-              to="/showcase"
-              className={`hover:text-amber-400 transition flex items-center gap-1.5 ${
-                location.pathname === '/showcase' ? 'text-amber-400 font-bold' : ''
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5 text-amber-400" />
-              <span>10 Dashboards</span>
-            </Link>
-
             {/* Live Demos Dropdown */}
             <div className="relative" ref={demosDropdownRef}>
               <button
@@ -395,70 +380,31 @@ export function Navbar({ onOpenCart }) {
                 }`}
               >
                 <Compass className="w-3.5 h-3.5 text-amber-400" />
-                <span>Live Demos</span>
+                <span>Demos</span>
                 <ChevronDown className="w-3 h-3 opacity-70" />
               </button>
 
               {isDemosDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 w-56 bg-slate-900 rounded-xl shadow-2xl border border-slate-800 py-1.5 z-50 animate-in fade-in zoom-in-95">
-                  <Link
-                    to="/menu?restaurant=losteria&table=tbl_1"
-                    onClick={() => setIsDemosDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
-                  >
+                <div className="absolute top-full left-0 mt-2 w-52 bg-slate-900 rounded-xl shadow-2xl border border-slate-800 py-1.5 z-50 animate-in fade-in zoom-in-95">
+                  <Link to="/menu?restaurant=losteria&table=tbl_1" onClick={() => setIsDemosDropdownOpen(false)} className="flex items-center gap-2.5 px-3.5 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition">
                     <QrCode className="w-3.5 h-3.5 text-amber-400" />
-                    <div>
-                      <div className="font-bold text-white">Table QR Menu</div>
-                      <div className="text-[10px] text-slate-400">Scan & UPI Ordering</div>
-                    </div>
+                    <span className="font-bold text-white">Table QR Menu</span>
                   </Link>
-
-                  <Link
-                    to="/kds-demo"
-                    onClick={() => setIsDemosDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
-                  >
+                  <Link to="/kds-demo" onClick={() => setIsDemosDropdownOpen(false)} className="flex items-center gap-2.5 px-3.5 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition">
                     <ChefHat className="w-3.5 h-3.5 text-emerald-400" />
-                    <div>
-                      <div className="font-bold text-white">Kitchen KDS Screen</div>
-                      <div className="text-[10px] text-slate-400">Live Ticket Dispatch</div>
-                    </div>
+                    <span className="font-bold text-white">Kitchen KDS</span>
                   </Link>
-
-                  <Link
-                    to="/tokens"
-                    onClick={() => setIsDemosDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
-                  >
+                  <Link to="/tokens" onClick={() => setIsDemosDropdownOpen(false)} className="flex items-center gap-2.5 px-3.5 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition">
                     <Tv className="w-3.5 h-3.5 text-sky-400" />
-                    <div>
-                      <div className="font-bold text-white">Token TV Display</div>
-                      <div className="text-[10px] text-slate-400">Audio Voice Callouts</div>
-                    </div>
+                    <span className="font-bold text-white">Token TV Display</span>
                   </Link>
-
-                  <Link
-                    to="/captain"
-                    onClick={() => setIsDemosDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
-                  >
+                  <Link to="/captain" onClick={() => setIsDemosDropdownOpen(false)} className="flex items-center gap-2.5 px-3.5 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition">
                     <Laptop className="w-3.5 h-3.5 text-orange-400" />
-                    <div>
-                      <div className="font-bold text-white">Captain Waiter POS</div>
-                      <div className="text-[10px] text-slate-400">Mobile KOT Punching</div>
-                    </div>
+                    <span className="font-bold text-white">Captain Waiter POS</span>
                   </Link>
-
-                  <Link
-                    to="/walkthrough"
-                    onClick={() => setIsDemosDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition"
-                  >
-                    <PlayCircle className="w-3.5 h-3.5 text-amber-400" />
-                    <div>
-                      <div className="font-bold text-white">Video Walkthroughs</div>
-                      <div className="text-[10px] text-slate-400">Step-by-step role guides</div>
-                    </div>
+                  <Link to="/showcase" onClick={() => setIsDemosDropdownOpen(false)} className="flex items-center gap-2.5 px-3.5 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white transition">
+                    <Layers className="w-3.5 h-3.5 text-rose-400" />
+                    <span className="font-bold text-white">All Dashboards</span>
                   </Link>
                 </div>
               )}
@@ -470,7 +416,6 @@ export function Navbar({ onOpenCart }) {
                 location.pathname === '/walkthrough' ? 'text-amber-400 font-bold' : ''
               }`}
             >
-              <PlayCircle className="w-3.5 h-3.5 text-amber-400" />
               <span>Walkthrough</span>
             </Link>
 
@@ -480,30 +425,16 @@ export function Navbar({ onOpenCart }) {
                 location.pathname === '/pricing' ? 'text-amber-400 font-bold' : ''
               }`}
             >
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
-              <span>Pricing (₹1,500/mo)</span>
+              <span>Pricing</span>
             </Link>
-
-            <Link
-              to="/promo"
-              className={`hover:text-pink-400 transition flex items-center gap-1.5 ${
-                location.pathname === '/promo' ? 'text-pink-400 font-bold' : ''
-              }`}
-            >
-              <Video className="w-3.5 h-3.5 text-pink-400" />
-              <span>Promo Studio</span>
-            </Link>
-
-
 
             <Link
               to="/downloads"
-              className={`hover:text-sky-300 transition flex items-center gap-1.5 ${
+              className={`hover:text-slate-100 transition flex items-center gap-1.5 ${
                 location.pathname === '/downloads' ? 'text-sky-400 font-bold' : ''
               }`}
             >
-              <Laptop className="w-3.5 h-3.5 text-slate-400" />
-              <span>Offline Apps</span>
+              <span>Downloads</span>
             </Link>
           </nav>
 
