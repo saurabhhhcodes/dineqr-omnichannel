@@ -34,7 +34,7 @@ import { MultiBusinessDashboard } from './pages/MultiBusinessDashboard.jsx';
 import { GymRegister } from './pages/GymRegister.jsx';
 import { AdminOrderRisk } from './pages/AdminOrderRisk.jsx';
 import { MarketingPromoHub } from './pages/MarketingPromoHub.jsx';
-import { InstagramAutomationStudio } from './pages/InstagramAutomationStudio.jsx';
+
 import { AdminAuthGate } from './components/AdminAuthGate.jsx';
 
 function AppContent() {
@@ -57,11 +57,7 @@ function AppContent() {
     location.pathname === '/business-dashboard' ||
     location.pathname === '/promo' ||
     location.pathname === '/marketing' ||
-    location.pathname === '/social' ||
-    location.pathname === '/instagram-automation' ||
-    location.pathname === '/autogram' ||
-    location.pathname === '/yc-pitch' ||
-    location.pathname === '/growth-ai';
+    location.pathname === '/social';
   const pageBg = isDarkPage ? 'bg-slate-950' : 'bg-slate-50';
 
   return (
@@ -90,11 +86,7 @@ function AppContent() {
           <Route path="/marketing" element={<MarketingPromoHub />} />
           <Route path="/social" element={<MarketingPromoHub />} />
 
-          {/* AutoGram AI: Autonomous Instagram Growth & Video Engine (YC Pitch Edition) */}
-          <Route path="/instagram-automation" element={<InstagramAutomationStudio />} />
-          <Route path="/autogram" element={<InstagramAutomationStudio />} />
-          <Route path="/yc-pitch" element={<InstagramAutomationStudio />} />
-          <Route path="/growth-ai" element={<InstagramAutomationStudio />} />
+
 
           {/* Master Multi-Business Vertical Dashboards */}
           <Route path="/showcase" element={<MultiBusinessDashboard />} />

@@ -12,7 +12,7 @@
 ## 📑 Table of Contents
 1. [Executive Summary & Core Philosophy](#1-executive-summary--core-philosophy)
 2. [End-to-End System Architecture](#2-end-to-end-system-architecture)
-3. [The 10 Core Functional Modules](#3-the-10-core-functional-modules)
+3. [The 9 Core Functional Modules](#3-the-9-core-functional-modules)
    - [Module 1: Customer Table QR Ordering & 0% Commission Checkout](#module-1-customer-table-qr-ordering--0-commission-checkout)
    - [Module 2: Captain Waiter Mobile POS](#module-2-captain-waiter-mobile-pos)
    - [Module 3: Kitchen Display System (KDS) & Timers](#module-3-kitchen-display-system-kds--timers)
@@ -20,9 +20,8 @@
    - [Module 5: Two-Way Zomato & Swiggy Delivery Aggregator Hub](#module-5-two-way-zomato--swiggy-delivery-aggregator-hub)
    - [Module 6: Multi-Vertical Operations (Gym & Clinic Queues)](#module-6-multi-vertical-operations-gym--clinic-queues)
    - [Module 7: 100% Local SQLite Storage & Zero Cloud Database Fees](#module-7-100-local-sqlite-storage--zero-cloud-database-fees)
-   - [Module 8: AutoGram AI (Autonomous Instagram Growth & Video Engine)](#module-8-autogram-ai-autonomous-instagram-growth--video-engine)
-   - [Module 9: Video Production & Marketing Studio](#module-9-video-production--marketing-studio)
-   - [Module 10: Google AdSense Passive Monetization](#module-10-google-adsense-passive-monetization)
+   - [Module 8: Video Production & Marketing Studio](#module-8-video-production--marketing-studio)
+   - [Module 9: Google AdSense Passive Monetization](#module-9-google-adsense-passive-monetization)
 4. [Hardware & Multi-Platform Compatibility](#4-hardware--multi-platform-compatibility)
 5. [Pricing Model & Revenue Economics](#5-pricing-model--revenue-economics)
 6. [Security, Tax Compliance & Data Ownership](#6-security-tax-compliance--data-ownership)
@@ -36,7 +35,7 @@
 
 1. **Zero Per-Order Commissions:** Legacy platforms charge 1.5% to 5% on top of payment processing or lock merchants into proprietary credit card processors. QRFlow connects directly to the merchant's own Razorpay/UPI gateway with **0% commission**.
 2. **Permanent Data Ownership (Zero Cloud Bills):** Traditional providers store business records on expensive remote clouds. If a subscription lapses, access to customer history and order ledgers is revoked. QRFlow embeds a high-speed SQLite database engine directly on the local counter machine (`./data/restaurant.db`). The merchant owns their data perpetually.
-3. **Autonomous Growth (Agency Killer):** Instead of requiring a ₹30,000/month social media marketing agency, QRFlow includes **AutoGram AI** — an autonomous agent that generates studio-quality 9:16 reels with animated kinetic captions, manages a 30-day posting calendar, and converts Instagram commenters into paying customers via instant 1.2-second DMs.
+3. **Zero Per-Device Licensing Fees:** Traditional POS systems charge ₹10,000+ per terminal, kitchen screen, or waiter device. QRFlow runs universally in any web browser, mobile tablet, or desktop with unlimited device connections included in the flat subscription.
 
 ---
 
@@ -139,25 +138,16 @@ QRFlow operates on an **Edge-Local Hybrid Architecture**:
   - 1-Click Binary Snapshot Export (`/api/erp/local-sqlite/export`) allows merchants to backup their full database to a USB thumb drive.
   - SHA-256 cryptographic webhook verification ensures data integrity across all 18 tables.
 
-### Module 8: AutoGram AI (Autonomous Instagram Growth & Video Engine)
-- **Routes:** `/instagram-automation`, `/yc-pitch`
-- **Features:**
-  - **AI Video Producer:** Input any topic or URL &rarr; AI drafts high-retention hooks, retention scripts, and kinetic Hormozi-style highlighted captions.
-  - **Comment-to-DM Sales Bot:** Viewer comments `DEMO` or `PRICE` &rarr; Bot replies publicly and fires a personalized DM in **1.2 seconds** with a tracking invite.
-  - **30-Day Auto-Pilot Content Queue:** Schedules 2 daily reels at peak engagement windows (12:45 PM & 7:45 PM) with live viral scoring (88–98/100).
-  - **Y Combinator Pitch Deck:** Built-in YC Founder Application ready for submission.
-
-### Module 9: Video Production & Marketing Studio
+### Module 8: Video Production & Marketing Studio
 - **Route:** `/promo`
 - **Features:**
   - Pre-rendered, broadcast-ready 1080p Full HD video assets:
-    - `public/videos/qrflow_animated_hero_loop.mp4`: Pure cybernetic 3D motion graphic loop (0 humans).
-    - `public/videos/autogram_yc_vertical_reels.mp4`: 9:16 vertical reel for Instagram & Shorts.
-    - `public/videos/autogram_yc_landscape_showcase.mp4`: 16:9 widescreen showcase for YouTube & YC.
-    - `public/videos/dineqr_promo_vertical_shorts.mp4`: Retail POS feature reel.
+    - `public/videos/neon_hud_loop.mp4`: Pure cybernetic 3D motion graphic loop (0 humans).
+    - `public/videos/glowing_circuit_loop.mp4`: Glowing circuit matrix loop.
+    - `public/videos/tech_network_loop.mp4`: Neural data network loop.
   - 1-Click copy-ready captions, hashtag bundles, and WhatsApp outreach templates.
 
-### Module 10: Google AdSense Passive Monetization
+### Module 9: Google AdSense Passive Monetization
 - **Component:** `src/components/AdSenseBanner.jsx`
 - **Features:**
   - Responsive ad banners placed non-intrusively on customer digital menus, food court token screens, and pricing pages.

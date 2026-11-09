@@ -494,17 +494,7 @@ export function Navbar({ onOpenCart }) {
               <span>Promo Studio</span>
             </Link>
 
-            <Link
-              to="/instagram-automation"
-              className={`hover:text-amber-400 transition flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-gradient-to-r from-rose-500/10 via-amber-500/10 to-purple-500/10 border border-amber-500/30 ${
-                location.pathname === '/instagram-automation' ? 'text-amber-400 font-bold' : 'text-slate-300'
-              }`}
-              title="AutoGram AI: Autonomous Instagram Growth & Video Engine (YC Pitch)"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-              <span className="font-bold">AutoGram AI</span>
-              <span className="text-[9px] font-black uppercase px-1 py-0.2 rounded bg-amber-500 text-slate-950">YC</span>
-            </Link>
+
 
             <Link
               to="/downloads"
@@ -657,18 +647,7 @@ export function Navbar({ onOpenCart }) {
                 <ChevronDown className="w-4 h-4 -rotate-90 text-slate-500" />
               </Link>
 
-              <Link
-                to="/instagram-automation"
-                className="flex items-center justify-between p-2.5 rounded-xl bg-gradient-to-r from-rose-500/10 via-amber-500/10 to-purple-500/10 border border-amber-500/30 text-amber-300 font-bold transition"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-                  <span>AutoGram AI · YC Pitch & Video</span>
-                </div>
-                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-500 text-slate-950">
-                  YC S26
-                </span>
-              </Link>
+
 
               <Link
                 to="/downloads"

@@ -273,14 +273,7 @@ export function LandingHero() {
             <Dumbbell className="w-3.5 h-3.5" />
             <span>Digital Gym Attendance Register &rarr;</span>
           </Link>
-          <span className="text-slate-700">·</span>
-          <Link
-            to="/instagram-automation"
-            className="inline-flex items-center gap-1.5 text-amber-400 hover:text-amber-300 font-medium"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>AutoGram AI (YC Pitch) &rarr;</span>
-          </Link>
+
           <span className="text-slate-700">·</span>
           <Link
             to="/admin"
