@@ -197,6 +197,18 @@ QR Flow एक आधुनिक, 100% सुरक्षित और सु�
           </button>
 
           <button
+            onClick={() => setActiveTab('motion')}
+            className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+              activeTab === 'motion'
+                ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/10'
+                : 'text-slate-400 hover:text-white bg-slate-900 border border-slate-800'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span>Pure Animation Loop (0 Humans)</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('adsense')}
             className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
               activeTab === 'adsense'
@@ -342,6 +354,67 @@ QR Flow एक आधुनिक, 100% सुरक्षित और सु�
 
               <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300 whitespace-pre-wrap max-h-64 overflow-y-auto leading-relaxed">
                 {YOUTUBE_DESCRIPTION}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: PURE ANIMATION LOOP (ZERO HUMANS) */}
+        {activeTab === 'motion' && (
+          <div className="space-y-6">
+            <div className="rounded-3xl border border-cyan-500/30 bg-slate-900 p-4 sm:p-6 shadow-2xl">
+              <video
+                src="/videos/qrflow_animated_hero_loop.mp4"
+                controls
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full aspect-video rounded-2xl bg-black object-contain shadow-lg border border-slate-800"
+              >
+                Your browser does not support video playback.
+              </video>
+
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-extrabold text-base text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-cyan-400" />
+                    <span>QRFlow Cybernetic 3D Motion Graphic Loop (No Humans)</span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    1920x1080 (16:9) 60fps Full HD · Pure Vector/3D Laser QR Scan & Orbiting Workflow Telemetry
+                  </p>
+                </div>
+
+                <a
+                  href="/videos/qrflow_animated_hero_loop.mp4"
+                  download="QRFlow_Cybernetic_Animation_Loop_1080p.mp4"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:opacity-90 text-slate-950 font-black text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/20 cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download 1080p Animation Loop MP4</span>
+                </a>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+                <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">🎯 100% Human-Free</span>
+                <p className="text-xs text-slate-300">
+                  Ideal for website hero background, pitch decks, investor demos, and tech Instagram reels without actor fatigue.
+                </p>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">⚡ Seamless 60-Frame Loop</span>
+                <p className="text-xs text-slate-300">
+                  Engineered with mathematical sine curves for infinite seamless loop playback on landing pages and TVs.
+                </p>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">💾 0 Cloud Fees Graphic</span>
+                <p className="text-xs text-slate-300">
+                  Visually proves the offline SQLite architecture, table ordering, KDS, and token TV flow.
+                </p>
               </div>
             </div>
           </div>

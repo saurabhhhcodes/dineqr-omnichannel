@@ -97,7 +97,7 @@ export function ProductWalkthrough() {
       icon: UtensilsCrossed,
       routeUrl: '/menu?restaurant=rest_losteria&table=tbl_1&embed=true',
       standaloneUrl: '/menu?restaurant=rest_losteria&table=tbl_1',
-      browserUrlText: 'dineqr.live/losteria/tbl_1',
+      browserUrlText: 'qrflow.live/losteria/tbl_1',
       deviceType: 'mobile',
       hindiNarration:
         'अध्याय 1: ग्राहक फ्लो। ग्राहक टेबल का क्यूआर स्कैन करते हैं। मेनू से आइटम जोड़ते ही ऑर्डर बास्केट खुलती है। देखिए, ग्राहक अपना नाम और फोन नंबर डालते हैं। रेज़रपे ऑनलाइन यूपीआई चुनकर तुरंत पेमेंट कन्फर्म हो जाती है, टोकन नंबर 128 मिल जाता है और टिकट किचन में पहुंच जाता है। पूरा प्रोसेस सिर्फ 15 सेकंड में पूरा हो गया।',
@@ -185,7 +185,7 @@ export function ProductWalkthrough() {
       icon: Smartphone,
       routeUrl: '/captain?embed=true',
       standaloneUrl: '/captain',
-      browserUrlText: 'dineqr.live/captain',
+      browserUrlText: 'qrflow.live/captain',
       deviceType: 'mobile',
       hindiNarration:
         'अध्याय 2: कैप्टन फ्लो। वेटर अपने फोन पर कैप्टन ऐप खोलते हैं। देखिए, हमने टेबल 03 चुनी। कस्टमर के कहे अनुसार तंदूरी प्लेटर जोड़ा और स्पेशल निर्देश कम तीखा टाइप किया। अब Punch KOT दबाने पर यह बिना एक सेकंड गंवाए सीधे शेफ की स्क्रीन पर पहुंच जाता है।',
@@ -243,7 +243,7 @@ export function ProductWalkthrough() {
       icon: ChefHat,
       routeUrl: '/admin/kitchen?embed=true',
       standaloneUrl: '/admin/kitchen',
-      browserUrlText: 'dineqr.live/admin/kitchen',
+      browserUrlText: 'qrflow.live/admin/kitchen',
       deviceType: 'screen',
       hindiNarration:
         'अध्याय 3: किचन केडीएस फ्लो। जैसे ही नया ऑर्डर आया, अलर्ट घंटी बजी। शेफ स्क्रीन पर टेबल नंबर और आइटम देखते हैं। शेफ ने Accept & Start Prep बटन दबाया जिससे टिकट पीला हो गया। खाना तैयार होने पर उन्होंने Mark Ready दबाया और टिकट हरा हो गया।',
@@ -300,7 +300,7 @@ export function ProductWalkthrough() {
       icon: Tv,
       routeUrl: '/tokens?embed=true',
       standaloneUrl: '/tokens',
-      browserUrlText: 'dineqr.live/tokens',
+      browserUrlText: 'qrflow.live/tokens',
       deviceType: 'tv',
       hindiNarration:
         'अध्याय 4: टोकन टीवी डिस्प्ले फ्लो। बड़े टीवी स्क्रीन पर बाईं तरफ Now Preparing है और दाईं तरफ Ready for Pickup। शेफ के रेडी करते ही टोकन 9724 हरे बॉक्स में आ गया और तेज आवाज में अनाउंसमेंट हुआ: टोकन नंबर 9724, आपका ऑर्डर काउंटर पर तैयार है।',
@@ -355,7 +355,7 @@ export function ProductWalkthrough() {
       icon: Receipt,
       routeUrl: '/admin/orders?embed=true',
       standaloneUrl: '/admin/orders',
-      browserUrlText: 'dineqr.live/admin/orders',
+      browserUrlText: 'qrflow.live/admin/orders',
       deviceType: 'screen',
       hindiNarration:
         'अध्याय 5: बिलिंग कैशियर फ्लो। कैशियर काउंटर पर टेबल 03 का बिल खोलते हैं। देखिए, हमने Cash Settlement चुना और Settle & Print बटन दबाया। बिल तुरंत सेटल हो गया और बिना इंटरनेट के भी आपके कंप्यूटर के फोल्डर QR Flow-Data/bills में 80mm थर्मल रसीद सेव हो गई।',
@@ -407,7 +407,7 @@ export function ProductWalkthrough() {
       icon: Store,
       routeUrl: '/admin/inventory?embed=true',
       standaloneUrl: '/admin/inventory',
-      browserUrlText: 'dineqr.live/admin/inventory',
+      browserUrlText: 'qrflow.live/admin/inventory',
       deviceType: 'screen',
       hindiNarration:
         'अध्याय 6: मालिक का फ्लो। मालिक अपने मोबाइल या लैपटॉप से 2 सेकंड में किसी भी डिश का दाम बदल सकते हैं। देखिए, हमने डिश का दाम ₹240 से ₹260 कर दिया। और स्टॉक इन्वेंटरी में कच्चा माल, आलू, चीज़ और मसालों के यूनिट्स तुरंत अपडेट हो जाते हैं।',
@@ -464,7 +464,7 @@ export function ProductWalkthrough() {
       icon: Dumbbell,
       routeUrl: '/gym-register?embed=true',
       standaloneUrl: '/gym-register',
-      browserUrlText: 'dineqr.live/gym-register',
+      browserUrlText: 'qrflow.live/gym-register',
       deviceType: 'screen',
       hindiNarration:
         'अध्याय 7: जिम अटेंडेंस फ्लो। जिम रिसेप्शन पर पेपरलेस डिजिटल रजिस्टर चलता है। मेंबर आते ही एक टैप में हाजिरी दर्ज होती है, लॉकर नंबर असाइन होता है और 1500 रुपये की मासिक फीस रेज़रपे यूपीआई से सीधे बैंक खाते में जमा हो जाती है।',
@@ -524,7 +524,7 @@ export function ProductWalkthrough() {
       icon: Zap,
       routeUrl: '/onboard?embed=true',
       standaloneUrl: '/onboard',
-      browserUrlText: 'dineqr.live/onboard',
+      browserUrlText: 'qrflow.live/onboard',
       deviceType: 'screen',
       hindiNarration:
         'अध्याय 8: व्यापारी ऑनबोर्डिंग फ्लो। व्यापारी मात्र ₹1,500 के लोकल पीओएस या ₹3,500 के जोमैटो-स्विगी एग्रीगेटर प्लान को चुनते हैं। Pay with Razorpay दबाते ही असली चेकआउट खुल जाता है, 6 टेबल्स तुरंत बन जाती हैं और 60 सेकंड में सिस्टम लाइव हो जाता है।',
@@ -839,7 +839,7 @@ export function ProductWalkthrough() {
         amountPaise,
         receipt: `sub_${Date.now().toString().slice(-6)}`,
         customerName: 'Verified Merchant Partner',
-        customerEmail: 'merchant@dineqr.com',
+        customerEmail: 'merchant@qrflow.live',
         customerPhone: '+919876543210',
         restaurantName: `QR Flow ${planLabel}`,
         onSuccess: (p) => {

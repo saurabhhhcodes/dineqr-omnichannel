@@ -275,12 +275,46 @@ export function LandingHero() {
           </Link>
           <span className="text-slate-700">·</span>
           <Link
+            to="/instagram-automation"
+            className="inline-flex items-center gap-1.5 text-amber-400 hover:text-amber-300 font-medium"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>AutoGram AI (YC Pitch) &rarr;</span>
+          </Link>
+          <span className="text-slate-700">·</span>
+          <Link
             to="/admin"
             className="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-200 font-medium"
           >
-            <Lock className="w-3.5 h-3.5 text-amber-400" />
+            <Lock className="w-3.5 h-3.5 text-slate-400" />
             <span>Staff Portal (PIN: 1234) &rarr;</span>
           </Link>
+        </div>
+
+        {/* Animated Cybernetic Workflow Motion Loop (Pure Motion Graphic, 0 Humans) */}
+        <div className="mt-10 max-w-4xl mx-auto rounded-3xl border border-amber-500/30 bg-slate-900/80 p-3 sm:p-4 shadow-2xl shadow-amber-500/10 backdrop-blur-xl relative overflow-hidden group">
+          <div className="flex items-center justify-between pb-2.5 px-2 border-b border-slate-800">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+              <span className="text-xs font-bold text-white uppercase tracking-wider">
+                QRFlow Autonomous Architecture · Real-Time Motion Graphic
+              </span>
+            </div>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              1080p Seamless Flow · Zero Humans
+            </span>
+          </div>
+
+          <div className="relative aspect-video rounded-2xl overflow-hidden mt-3 bg-black border border-slate-800 shadow-inner">
+            <video
+              src="/videos/qrflow_animated_hero_loop.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
 
         {/* Real Metrics Badges */}
