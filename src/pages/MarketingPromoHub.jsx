@@ -74,7 +74,7 @@ export function MarketingPromoHub() {
 
   const SHORTS_CAPTION = `₹50,000 की महंगी POS मशीन और क्लाउड बिल भूल जाओ! 🛑
 
-DineQR — Restaurant, Cafe, Gym और Clinics के लिए 100% On-Premise Local POS सिस्टम:
+QR Flow — Restaurant, Cafe, Gym और Clinics के लिए 100% On-Premise Local POS सिस्टम:
 ✅ टेबल QR डिजिटल मेन्यू & इंस्टेंट UPI पेमेंट (0% कमीशन)
 ✅ कैप्टन वेटर मोबाइल ऐप (सीधे फोन से KOT पंच)
 ✅ किचन शेफ KDS स्क्रीन (लाइव टाइमर & ऑडियो अलार्म)
@@ -88,9 +88,9 @@ DineQR — Restaurant, Cafe, Gym और Clinics के लिए 100% On-Premise
 
 #restaurantpos #restauranttech #cafeowner #billingsoftware #zomato #swiggy #restaurantmanagement #posbilling #qrordering #indiastartup #smallbusinessindia #foodcourt`;
 
-  const YOUTUBE_DESCRIPTION = `Complete Walkthrough: DineQR Omnichannel Restaurant POS & Management Platform (₹1,500/Month).
+  const YOUTUBE_DESCRIPTION = `Complete Walkthrough: QR Flow Omnichannel Restaurant POS & Management Platform (₹1,500/Month).
 
-In this video, explore how DineQR completely eliminates expensive legacy POS hardware and heavy recurring cloud bills for Restaurants, Cafes, Cloud Kitchens, Gyms, and Healthcare Clinics.
+In this video, explore how QR Flow completely eliminates expensive legacy POS hardware and heavy recurring cloud bills for Restaurants, Cafes, Cloud Kitchens, Gyms, and Healthcare Clinics.
 
 🚀 Try the 100% Real Live Demo:
 https://dineqr-omnichannel.netlify.app/walkthrough
@@ -117,7 +117,7 @@ https://dineqr-omnichannel.netlify.app/onboard`;
 
 क्या आप अपने रेस्टोरेंट/कैफे के लिए महंगी POS मशीनों या हर महीने के भारी क्लाउड सॉफ्टवेयर बिल से परेशान हैं?
 
-DineQR एक आधुनिक, 100% सुरक्षित और सुपर-फास्ट POS सिस्टम है:
+QR Flow एक आधुनिक, 100% सुरक्षित और सुपर-फास्ट POS सिस्टम है:
 • ग्राहक टेबल पर QR कोड स्कैन करके सीधे UPI से ऑर्डर कर सकते हैं (0% कमीशन)।
 • वेटर अपने फोन से सीधे किचन को KOT भेज सकते हैं।
 • किचन में शेफ के लिए बड़ी स्क्रीन (KDS) और फूड कोर्ट के लिए टोकन टीवी अनाउंसमेंट।
@@ -146,7 +146,7 @@ DineQR एक आधुनिक, 100% सुरक्षित और सुप
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white mt-1">
-              DineQR Viral Promo Videos & Free Growth Center
+              QR Flow Viral Promo Videos & Free Growth Center
             </h1>
             <p className="text-sm text-slate-400 mt-1 max-w-2xl">
               Download broadcast-ready promotional videos for Instagram Reels, YouTube Shorts, and WhatsApp. Monetize free traffic with Google AdSense without paying for ads.
@@ -241,7 +241,7 @@ DineQR एक आधुनिक, 100% सुरक्षित और सुप
               <div className="w-full max-w-[340px] mt-4 flex gap-2">
                 <a
                   href="/videos/dineqr_promo_vertical_shorts.mp4"
-                  download="DineQR_Promo_Reels_Shorts.mp4"
+                  download="QR Flow_Promo_Reels_Shorts.mp4"
                   className="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 cursor-pointer"
                 >
                   <Download className="w-4 h-4" />
@@ -307,13 +307,13 @@ DineQR एक आधुनिक, 100% सुरक्षित और सुप
 
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h3 className="font-extrabold text-base text-white">DineQR Omnichannel POS Full Ecosystem Showcase</h3>
+                  <h3 className="font-extrabold text-base text-white">QR Flow Omnichannel POS Full Ecosystem Showcase</h3>
                   <p className="text-xs text-slate-400">1920x1080 (16:9) Full HD · Complete Role Walkthrough</p>
                 </div>
 
                 <a
                   href="/videos/dineqr_promo_landscape_youtube.mp4"
-                  download="DineQR_YouTube_Showcase_1080p.mp4"
+                  download="QR Flow_YouTube_Showcase_1080p.mp4"
                   className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20 cursor-pointer"
                 >
                   <Download className="w-4 h-4" />

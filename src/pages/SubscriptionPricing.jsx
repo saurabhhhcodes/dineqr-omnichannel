@@ -91,7 +91,7 @@ export function SubscriptionPricing() {
           key: orderData.key_id,
           amount: orderData.amount_paise,
           currency: 'INR',
-          name: 'DineQR Restaurant Platform',
+          name: 'QR Flow Restaurant Platform',
           description: `Monthly Subscription: ${orderData.plan_name}`,
           order_id: orderData.order_id,
           prefill: {
@@ -366,7 +366,7 @@ export function SubscriptionPricing() {
           </h4>
         </div>
         <p className="text-xs text-amber-800 leading-relaxed">
-          Unlike other software providers that hold your restaurant order records hostage if a subscription lapses, DineQR runs on your embedded local SQLite engine. Your data resides in <code className="bg-amber-100 px-1 py-0.5 rounded font-mono font-bold">./data/restaurant.db</code> on your computer or counter terminal. You can export a full binary backup of your entire historical order ledger at any time.
+          Unlike other software providers that hold your restaurant order records hostage if a subscription lapses, QR Flow runs on your embedded local SQLite engine. Your data resides in <code className="bg-amber-100 px-1 py-0.5 rounded font-mono font-bold">./data/restaurant.db</code> on your computer or counter terminal. You can export a full binary backup of your entire historical order ledger at any time.
         </p>
         <div className="pt-1 flex items-center gap-3 flex-wrap">
           <a

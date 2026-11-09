@@ -147,7 +147,7 @@ export function TokenDisplay() {
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
-                {activeRestaurant?.name || 'DineQR Food Court'}
+                {activeRestaurant?.name || 'QR Flow Food Court'}
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                   LIVE TOKEN SCREEN
                 </span>
@@ -322,7 +322,7 @@ export function TokenDisplay() {
           </span>
         </div>
         <div className="hidden sm:flex items-center gap-4 text-slate-500 text-[11px] flex-shrink-0 font-medium">
-          <span>DineQR Cloud Engine v3.5</span>
+          <span>QR Flow Cloud Engine v3.5</span>
           <span>•</span>
           <Link to="/poss" className="text-amber-400 hover:underline">
             POS & Outlet Solutions

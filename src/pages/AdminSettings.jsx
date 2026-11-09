@@ -299,7 +299,7 @@ export function AdminSettings() {
               <ShieldCheck className="w-5 h-5 text-sky-600 shrink-0 mt-0.5" />
               <div>
                 <span className="font-bold">How it works: </span>
-                When customers scan your QR code and pay via UPI, Cards, or NetBanking, the funds settle straight into your linked bank account via your Razorpay MID. If left blank, DineQR automatically provides an interactive test sandbox so ordering is never disrupted.
+                When customers scan your QR code and pay via UPI, Cards, or NetBanking, the funds settle straight into your linked bank account via your Razorpay MID. If left blank, QR Flow automatically provides an interactive test sandbox so ordering is never disrupted.
               </div>
             </div>
 
@@ -437,7 +437,7 @@ export function AdminSettings() {
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Connect your external business partner IDs to stream live online delivery orders straight into your DineQR Kitchen Display (KDS).
+                    Connect your external business partner IDs to stream live online delivery orders straight into your QR Flow Kitchen Display (KDS).
                   </p>
                 </div>
               </div>

@@ -209,7 +209,7 @@ export function PetpoojaComparison() {
     {
       title: 'Local Disk Data Ownership',
       icon: Database,
-      description: 'All receipts, database, inventory, and staff logs saved locally in DineQR-Data/ on your PC. You own your data.',
+      description: 'All receipts, database, inventory, and staff logs saved locally in QR Flow-Data/ on your PC. You own your data.',
       petpoojaPrice: 'Not Available (Cloud-lock)',
       dineqrIncluded: true,
       route: '/admin/downloads',
@@ -279,7 +279,7 @@ export function PetpoojaComparison() {
     {
       feature: 'Offline Mode & Local Storage',
       petpooja: 'Cloud dependent, proprietary local cache',
-      dineqr: 'Full offline SQLite with local DineQR-Data/ folder storage',
+      dineqr: 'Full offline SQLite with local QR Flow-Data/ folder storage',
       win: true,
     },
     {
@@ -510,7 +510,7 @@ export function PetpoojaComparison() {
               Everything Included. Zero Sneaky Add-on Fees.
             </h2>
             <p className="mt-2 text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
-              While other legacy POS systems lock key tools behind expensive yearly add-ons, DineQR equips you with the complete hospitality suite right from day one.
+              While other legacy POS systems lock key tools behind expensive yearly add-ons, QR Flow equips you with the complete hospitality suite right from day one.
             </p>
           </div>
 
@@ -570,7 +570,7 @@ export function PetpoojaComparison() {
               The Real Comparison
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-white mt-2">
-              DineQR vs. Legacy Petpooja POS
+              QR Flow vs. Legacy Petpooja POS
             </h2>
             <p className="mt-2 text-sm sm:text-base text-slate-400">
               See why modern restaurateurs and cloud kitchens are switching to open, offline-first software.
@@ -588,7 +588,7 @@ export function PetpoojaComparison() {
                     Petpooja POS
                   </th>
                   <th className="py-4 px-4 sm:px-6 text-xs sm:text-sm font-bold text-amber-400 bg-amber-500/10">
-                    DineQR Omnichannel (Winner)
+                    QR Flow Omnichannel (Winner)
                   </th>
                 </tr>
               </thead>

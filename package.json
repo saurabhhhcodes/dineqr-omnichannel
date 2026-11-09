@@ -1,7 +1,7 @@
 {
-  "name": "dineqr-platform",
+  "name": "qr-flow-platform",
   "version": "1.0.0",
-  "description": "",
+  "description": "QR Flow - Universal Omnichannel QR Workflows, Multi-Activity POS & Self-Service Kiosks",
   "main": "index.js",
   "type": "module",
   "scripts": {

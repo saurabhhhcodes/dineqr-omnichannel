@@ -308,7 +308,7 @@ export function ClientOnboarding() {
           key: orderData.key_id || 'rzp_test_TxIAxSWbhZU5bk',
           amount: orderData.amount_paise,
           currency: 'INR',
-          name: 'DineQR Restaurant Platform',
+          name: 'QR Flow Restaurant Platform',
           description: `Onboarding: ${plan.name} (₹${plan.amount.toLocaleString('en-IN')})`,
           order_id: orderData.order_id,
           prefill: {
@@ -963,7 +963,7 @@ export function ClientOnboarding() {
 
             <div>
               <h2 className="text-2xl sm:text-3xl font-black text-white">
-                Welcome to DineQR, {createdResult.restaurant?.name}!
+                Welcome to QR Flow, {createdResult.restaurant?.name}!
               </h2>
               <p className="text-slate-400 text-sm mt-1 max-w-lg mx-auto">
                 Your restaurant is registered on our platform. Your tables, QR menus, floor plan, and local SQLite database have been provisioned.

@@ -32,7 +32,7 @@ export function RazorpayCheckoutButton({
       },
       notes: {
         order_id: orderId,
-        source: 'DineQR Standard Checkout',
+        source: 'QR Flow Standard Checkout',
       },
       onStart: () => setIsProcessing(true),
       onSuccess: (verifyData, response) => {

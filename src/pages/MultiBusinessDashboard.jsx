@@ -289,7 +289,7 @@ export function MultiBusinessDashboard() {
               Switch Business Models Instantly
             </h1>
             <p className="text-sm text-slate-400 mt-1 max-w-2xl">
-              Explore how DineQR dynamically adapts its KOT rules, station layouts, billing speeds, and reports for every hospitality and retail vertical.
+              Explore how QR Flow dynamically adapts its KOT rules, station layouts, billing speeds, and reports for every hospitality and retail vertical.
             </p>
           </div>
 
@@ -505,7 +505,7 @@ export function MultiBusinessDashboard() {
                 <ShieldCheck className="w-4 h-4" />
                 <span>Tailored Vertical Capabilities</span>
               </div>
-              <h3 className="text-lg font-black text-white">Why {activeVertical.category} Wins with DineQR</h3>
+              <h3 className="text-lg font-black text-white">Why {activeVertical.category} Wins with QR Flow</h3>
               <p className="text-xs text-slate-400 mt-1">
                 Configured out-of-the-box. No extra developer work, zero expensive yearly add-on bills.
               </p>

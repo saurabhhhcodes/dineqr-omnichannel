@@ -12,3 +12,4 @@ DineQR-Data/
 .netlify
 .video_build/
 .autogram_video_build/
+.motion_build/

@@ -1,4 +1,4 @@
-// src/pages/LandingHero.jsx - Professional Human-Crafted SaaS Landing Page for DineQR
+// src/pages/LandingHero.jsx - Professional Human-Crafted SaaS Landing Page for QR Flow
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -106,7 +106,7 @@ const VIDEO_SUITE = [
     videoUrl: '/videos/walkthrough_owner.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1556742049-0a67e557224f?w=1200&q=80',
     tags: ['Flat ₹1,500 / mo', 'Zero Hidden Fees', 'Razorpay UPI & Cards', 'Perpetual Local Data'],
-    description: 'Activate your DineQR commercial license with zero commission per order. Includes permanent local SQLite database ownership with zero ongoing cloud hosting bills.',
+    description: 'Activate your QR Flow commercial license with zero commission per order. Includes permanent local SQLite database ownership with zero ongoing cloud hosting bills.',
     targetRoute: '/pricing',
     targetLabel: 'View Subscription Plans',
   },
@@ -515,17 +515,17 @@ export function LandingHero() {
           </div>
         </div>
 
-        {/* COMPARISON TABLE: DineQR vs Traditional ERP / Aggregators */}
+        {/* COMPARISON TABLE: QR Flow vs Traditional ERP / Aggregators */}
         <div className="mt-16 sm:mt-20 p-5 sm:p-8 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-6">
           <div className="text-center max-w-2xl mx-auto space-y-1.5">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
               Clear Comparison
             </span>
             <h2 className="text-xl sm:text-3xl font-bold text-white">
-              DineQR vs. Traditional ERP & Aggregators
+              QR Flow vs. Traditional ERP & Aggregators
             </h2>
             <p className="text-xs sm:text-sm text-slate-400">
-              Full restaurant management without the 25% commissions or expensive cloud software fees.
+              Full multi-activity and venue management without the 25% commissions or expensive cloud software fees.
             </p>
           </div>
 
@@ -535,7 +535,7 @@ export function LandingHero() {
                 <tr>
                   <th className="py-3 px-4">Feature / Requirement</th>
                   <th className="py-3 px-4 text-amber-400 font-extrabold text-xs sm:text-sm">
-                    DineQR Omnichannel
+                    QR Flow Omnichannel
                   </th>
                   <th className="py-3 px-4 text-slate-400">Traditional ERP / Portals</th>
                 </tr>

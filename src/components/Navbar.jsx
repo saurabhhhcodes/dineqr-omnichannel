@@ -365,9 +365,9 @@ export function Navbar({ onOpenCart }) {
           <Link to="/" className="flex items-center gap-2.5 group shrink-0">
             <DineQRLogo size="md" />
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-white text-base sm:text-lg tracking-tight">DineQR</span>
+              <span className="font-extrabold text-white text-base sm:text-lg tracking-tight">QR Flow</span>
               <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-900 text-amber-400 border border-slate-800 hidden sm:inline-block">
-                ₹1,500/mo POS
+                ₹1,500/mo Multi-POS
               </span>
             </div>
           </Link>

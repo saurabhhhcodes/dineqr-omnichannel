@@ -171,7 +171,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
     timestamp: new Date().toISOString(),
-    service: 'DineQR Restaurant Platform API',
+    service: 'QR Flow Restaurant Platform API',
   });
 });
 
@@ -217,7 +217,7 @@ app.post('/api/system/pentest', (req, res) => {
     res.json({
       success: true,
       timestamp: new Date().toISOString(),
-      test: 'DineQR Concurrency Penetration & High-Throughput Load Suite',
+      test: 'QR Flow Concurrency Penetration & High-Throughput Load Suite',
       summary: {
         concurrencyRequested: concurrency,
         totalRequests: concurrency,
@@ -257,14 +257,14 @@ app.get('{*path}', (req, res) => {
   if (fs.existsSync(indexPath)) {
     res.status(200).sendFile('index.html', { root: distPath });
   } else {
-    res.status(200).send(`DineQR Server running on port ${PORT}. In dev mode, visit Vite dev server at http://localhost:5173.`);
+    res.status(200).send(`QR Flow Server running on port ${PORT}. In dev mode, visit Vite dev server at http://localhost:5173.`);
   }
 });
 
 // Start listening if not running in a serverless environment (e.g. Vercel)
 if (process.env.VERCEL !== '1') {
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[Server] DineQR Platform Server running on http://localhost:${PORT}`);
+    console.log(`[Server] QR Flow Platform Server running on http://localhost:${PORT}`);
     console.log(`[SSE] Real-time Kitchen SSE ready at http://localhost:${PORT}/api/events`);
   });
 }

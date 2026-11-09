@@ -358,9 +358,9 @@ export function ProductWalkthrough() {
       browserUrlText: 'dineqr.live/admin/orders',
       deviceType: 'screen',
       hindiNarration:
-        'अध्याय 5: बिलिंग कैशियर फ्लो। कैशियर काउंटर पर टेबल 03 का बिल खोलते हैं। देखिए, हमने Cash Settlement चुना और Settle & Print बटन दबाया। बिल तुरंत सेटल हो गया और बिना इंटरनेट के भी आपके कंप्यूटर के फोल्डर DineQR-Data/bills में 80mm थर्मल रसीद सेव हो गई।',
+        'अध्याय 5: बिलिंग कैशियर फ्लो। कैशियर काउंटर पर टेबल 03 का बिल खोलते हैं। देखिए, हमने Cash Settlement चुना और Settle & Print बटन दबाया। बिल तुरंत सेटल हो गया और बिना इंटरनेट के भी आपके कंप्यूटर के फोल्डर QR Flow-Data/bills में 80mm थर्मल रसीद सेव हो गई।',
       englishNarration:
-        'Chapter 5: Billing Cashier Flow. The cashier opens Table 03, selects Cash or UPI, and taps "Settle & Print". The bill settles in under 3 seconds and the official 80mm ESC/POS receipt automatically saves to your local DineQR-Data/bills/ folder.',
+        'Chapter 5: Billing Cashier Flow. The cashier opens Table 03, selects Cash or UPI, and taps "Settle & Print". The bill settles in under 3 seconds and the official 80mm ESC/POS receipt automatically saves to your local QR Flow-Data/bills/ folder.',
       stepsCount: 3,
       executeSimulation: async (runStep) => {
         await runStep(
@@ -389,7 +389,7 @@ export function ProductWalkthrough() {
             setCashierBillSettled(true);
             playChime(1050);
             setCursorPos({ x: 50, y: 82, visible: false, clicking: false });
-            setActionLog((l) => ['[Cashier POS] Bill Settled! Thermal HTML & JSON saved to DineQR-Data/bills/BILL_ORD-9128.html', ...l]);
+            setActionLog((l) => ['[Cashier POS] Bill Settled! Thermal HTML & JSON saved to QR Flow-Data/bills/BILL_ORD-9128.html', ...l]);
           }
         );
       },
@@ -800,7 +800,7 @@ export function ProductWalkthrough() {
         body: JSON.stringify({ restaurant_id: activeRestaurant?.id || 'rest_losteria', order_id: 'ord_losteria_1' }),
       });
       playChime(1050);
-      addToast('✅ 80mm Thermal Receipt Saved to DineQR-Data/bills/ folder', 'success');
+      addToast('✅ 80mm Thermal Receipt Saved to QR Flow-Data/bills/ folder', 'success');
       setActionLog((l) => ['[Thermal ESC/POS] 80mm Receipt dispatched to local printer buffer.', ...l]);
     } catch {
       addToast('ESC/POS Thermal print preview generated locally', 'success');
@@ -841,7 +841,7 @@ export function ProductWalkthrough() {
         customerName: 'Verified Merchant Partner',
         customerEmail: 'merchant@dineqr.com',
         customerPhone: '+919876543210',
-        restaurantName: `DineQR ${planLabel}`,
+        restaurantName: `QR Flow ${planLabel}`,
         onSuccess: (p) => {
           addToast(`✅ Payment Confirmed! ID: ${p.razorpay_payment_id}. Merchant Plan Active.`, 'success');
           setActionLog((l) => [`[Razorpay Verification] Success: ${p.razorpay_payment_id} for ${planLabel} (30 Days Active).`, ...l]);
@@ -1305,7 +1305,7 @@ export function ProductWalkthrough() {
                       />
                     </div>
                     <div className="bg-slate-950 py-1.5 text-center text-[10px] text-slate-500 font-mono">
-                      DineQR Token Announcer · Connected via HDMI / Chrome Web Display
+                      QR Flow Token Announcer · Connected via HDMI / Chrome Web Display
                     </div>
                   </div>
                 ) : (
@@ -1506,7 +1506,7 @@ export function ProductWalkthrough() {
           <div className="mt-2 p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/30">
             <div className="flex items-center gap-2 text-xs font-black text-amber-400">
               <Sparkles className="w-4 h-4" />
-              <span>DineQR Commercial Onboarding Active</span>
+              <span>QR Flow Commercial Onboarding Active</span>
             </div>
             <p className="text-xs text-slate-300 mt-1">
               Architecture: <strong className="text-white">Local SQLite Engine (Zero Cloud Database Cost)</strong><br />

@@ -115,7 +115,7 @@ export function AdminDownloads() {
             Desktop & Mobile Terminal Hub
           </h1>
           <p className="mt-2 text-sm md:text-base text-slate-300 leading-relaxed">
-            Download the native DineQR terminal applications for your restaurant PCs, POS touchscreens,
+            Download the native QR Flow terminal applications for your restaurant PCs, POS touchscreens,
             waiter tablets, or back-office Macs. Every package runs completely offline using
             your on-premise local SQLite engine with zero cloud database fees.
           </p>
@@ -243,7 +243,7 @@ export function AdminDownloads() {
                 </span>
               </h4>
               <p className="text-xs text-slate-600 mt-0.5">
-                If macOS displays <em>"Apple could not verify DineQR is free of malware..."</em>, choose any of the 3 quick verified methods below:
+                If macOS displays <em>"Apple could not verify QR Flow is free of malware..."</em>, choose any of the 3 quick verified methods below:
               </p>
             </div>
           </div>
@@ -256,10 +256,10 @@ export function AdminDownloads() {
               <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[9px] font-black">Inside DMG</span>
             </div>
             <p className="text-slate-600 leading-relaxed text-[11px]">
-              Open the downloaded <strong>DineQR-macOS-Universal.dmg</strong> and double-click <strong>"Install & Open DineQR.command"</strong>.
+              Open the downloaded <strong>QR Flow-macOS-Universal.dmg</strong> and double-click <strong>"Install & Open QR Flow.command"</strong>.
             </p>
             <p className="text-slate-500 text-[10px] leading-relaxed">
-              It copies the app to <code className="text-amber-800 bg-amber-50 px-1 py-0.5 rounded font-mono">/Applications</code>, removes the quarantine flag, and launches DineQR automatically.
+              It copies the app to <code className="text-amber-800 bg-amber-50 px-1 py-0.5 rounded font-mono">/Applications</code>, removes the quarantine flag, and launches QR Flow automatically.
             </p>
           </div>
 
@@ -272,7 +272,7 @@ export function AdminDownloads() {
               Open <strong>System Settings &gt; Privacy & Security</strong>.
             </p>
             <p className="text-slate-600 leading-relaxed text-[11px]">
-              Scroll down to <strong>Security</strong>, find <em>"DineQR was blocked"</em>, and click the <strong>"Open Anyway"</strong> button. Enter your Touch ID or password.
+              Scroll down to <strong>Security</strong>, find <em>"QR Flow was blocked"</em>, and click the <strong>"Open Anyway"</strong> button. Enter your Touch ID or password.
             </p>
           </div>
 
@@ -282,13 +282,13 @@ export function AdminDownloads() {
               <span className="px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 text-[9px] font-black">Instant</span>
             </div>
             <p className="text-slate-600 leading-relaxed text-[11px]">
-              Drag DineQR to Applications, open <strong>Terminal</strong>, and run:
+              Drag QR Flow to Applications, open <strong>Terminal</strong>, and run:
             </p>
             <div className="flex items-center justify-between bg-slate-900 text-amber-300 p-2 rounded-xl font-mono text-[10px]">
-              <span className="truncate">xattr -cr /Applications/DineQR.app</span>
+              <span className="truncate">xattr -cr /Applications/QR Flow.app</span>
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText('xattr -cr /Applications/DineQR.app');
+                  navigator.clipboard.writeText('xattr -cr /Applications/QR Flow.app');
                   addToast('Terminal command copied!');
                 }}
                 className="text-amber-400 hover:text-white ml-1 shrink-0 cursor-pointer"
