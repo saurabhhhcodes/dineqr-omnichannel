@@ -183,7 +183,7 @@ const androidManifest = `<?xml version="1.0" encoding="utf-8"?>
 const apkStrings = `<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">DineQR POS Terminal</string>
-    <string name="sync_server">https://dineqr-omnichannel.netlify.app</string>
+    <string name="sync_server">https://qrflow-app.netlify.app</string>
 </resources>`;
 
 const apkIndexHtml = `<!DOCTYPE html>
@@ -206,9 +206,9 @@ const apkIndexHtml = `<!DOCTYPE html>
     <div class="badge">OFFLINE-FIRST POS READY</div>
     <h1>DineQR Terminal</h1>
     <p>Connected to On-Premise SQLite Engine & AxonFlow Cloud Sync.</p>
-    <a href="https://dineqr-omnichannel.netlify.app/admin/orders" class="btn" style="background: #f59e0b;">Open Live Orders & KDS</a>
-    <a href="https://dineqr-omnichannel.netlify.app/admin/floor-plan" class="btn">Visual Floor Plan</a>
-    <a href="https://dineqr-omnichannel.netlify.app/admin/inventory" class="btn" style="background: #10b981;">Inventory & Stocks</a>
+    <a href="https://qrflow-app.netlify.app/admin/orders" class="btn" style="background: #f59e0b;">Open Live Orders & KDS</a>
+    <a href="https://qrflow-app.netlify.app/admin/floor-plan" class="btn">Visual Floor Plan</a>
+    <a href="https://qrflow-app.netlify.app/admin/inventory" class="btn" style="background: #10b981;">Inventory & Stocks</a>
   </div>
 </body>
 </html>`;
@@ -287,7 +287,7 @@ if curl -s -m 1 http://localhost:3001/api/health >/dev/null 2>&1; then
   open "http://localhost:3001"
 else
   echo "Opening DineQR POS Cloud..."
-  open "https://dineqr-omnichannel.netlify.app"
+  open "https://qrflow-app.netlify.app"
 fi
 `;
 
@@ -403,7 +403,7 @@ const debLauncher = `#!/bin/bash
 DATA_DIR="/var/lib/dineqr"
 mkdir -p "$DATA_DIR"
 echo "Starting DineQR Terminal with local storage in $DATA_DIR..."
-xdg-open "https://dineqr-omnichannel.netlify.app" 2>/dev/null || sensible-browser "https://dineqr-omnichannel.netlify.app"
+xdg-open "https://qrflow-app.netlify.app" 2>/dev/null || sensible-browser "https://qrflow-app.netlify.app"
 `;
 
 const debDesktop = `[Desktop Entry]

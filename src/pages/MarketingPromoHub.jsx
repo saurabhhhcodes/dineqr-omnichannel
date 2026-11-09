@@ -84,7 +84,7 @@ QR Flow — Restaurant, Cafe, Gym और Clinics के लिए 100% On-Premis
 
 💰 सिर्फ ₹1,500/माह फ्लैट! कोई क्लाउड डेटाबेस बिल नहीं, कोई एक्स्ट्रा कमीशन नहीं।
 
-👉 अभी फ्री में टेस्ट करें: dineqr-omnichannel.netlify.app (Link in Bio!)
+👉 अभी फ्री में टेस्ट करें: qrflow-app.netlify.app (Link in Bio!)
 
 #restaurantpos #restauranttech #cafeowner #billingsoftware #zomato #swiggy #restaurantmanagement #posbilling #qrordering #indiastartup #smallbusinessindia #foodcourt`;
 
@@ -93,7 +93,7 @@ QR Flow — Restaurant, Cafe, Gym और Clinics के लिए 100% On-Premis
 In this video, explore how QR Flow completely eliminates expensive legacy POS hardware and heavy recurring cloud bills for Restaurants, Cafes, Cloud Kitchens, Gyms, and Healthcare Clinics.
 
 🚀 Try the 100% Real Live Demo:
-https://dineqr-omnichannel.netlify.app/walkthrough
+https://qrflow-app.netlify.app/walkthrough
 
 ⚡ Key Features Covered:
 0:00 - The Problem: Overpaying ₹50,000 for legacy POS hardware
@@ -111,7 +111,7 @@ https://dineqr-omnichannel.netlify.app/walkthrough
 • Cloud Sync Hub: ₹5,000/month (Dual SQLite + 2GB Managed Cloud Storage)
 
 👉 Launch Your Outlet Today:
-https://dineqr-omnichannel.netlify.app/onboard`;
+https://qrflow-app.netlify.app/onboard`;
 
   const WHATSAPP_OUTREACH = `नमस्ते सर/मैडम! 🙏
 
@@ -127,7 +127,7 @@ QR Flow एक आधुनिक, 100% सुरक्षित और सु�
 💰 खर्च: मात्र ₹1,500 प्रति माह फ्लैट (कोई हिडन चार्ज नहीं)।
 
 आप अपने फोन पर इसका असली लाइव डेमो अभी देख सकते हैं:
-👉 https://dineqr-omnichannel.netlify.app/walkthrough
+👉 https://qrflow-app.netlify.app/walkthrough
 
 अगर आप अपने आउटलेट पर इसे 10 मिनट में चालू करवाना चाहते हैं, तो मुझे रिप्लाई करें।`;
 
@@ -295,7 +295,7 @@ QR Flow एक आधुनिक, 100% सुरक्षित और सु�
                 <ul className="text-xs text-slate-300 space-y-2 list-disc list-inside">
                   <li><strong>Post Timing:</strong> Post between <strong>12:30 PM - 2:00 PM</strong> or <strong>7:30 PM - 9:30 PM</strong> when restaurant owners check their phones.</li>
                   <li><strong>Trending Audio:</strong> When uploading to Instagram, select a subtle trending lo-fi / tech audio track at 5% volume under the voiceover.</li>
-                  <li><strong>Bio Link:</strong> Put <code className="text-amber-400 font-mono">dineqr-omnichannel.netlify.app</code> in your Instagram and YouTube channel bio.</li>
+                  <li><strong>Bio Link:</strong> Put <code className="text-amber-400 font-mono">qrflow-app.netlify.app</code> in your Instagram and YouTube channel bio.</li>
                   <li><strong>Direct Comments:</strong> Search for cafe & food bloggers in your city and comment: "Love the ambience! Have you guys checked out self-order QR menus?"</li>
                 </ul>
               </div>

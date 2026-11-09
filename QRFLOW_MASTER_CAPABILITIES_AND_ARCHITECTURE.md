@@ -3,7 +3,7 @@
 > **Platform Version:** 3.8.0 Enterprise  
 > **Brand Identity:** QRFlow (formerly DineQR)  
 > **Product Thesis:** Autonomous Multi-Activity QR Workflows, On-Premise POS & AI Growth Engine  
-> **Production Live URL:** [https://dineqr-omnichannel.netlify.app](https://dineqr-omnichannel.netlify.app)  
+> **Production Live URL:** [https://qrflow-app.netlify.app](https://qrflow-app.netlify.app)  
 > **Local Base Port:** `http://localhost:3005`  
 > **Target Audience:** Restaurants, Cafes, Cloud Kitchens, QSR Food Courts, Gyms, Clinics, and Retail Venues  
 
