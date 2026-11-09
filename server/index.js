@@ -28,6 +28,7 @@ import webhookRouter from './routes/webhook.js';
 import razorpayStandardRouter from './routes/razorpayStandard.js';
 import cloudRouter from './routes/cloud.js';
 import ttsRouter from './routes/tts.js';
+import instagramAutomationRouter from './routes/instagramAutomation.js';
 import { initMongo } from './cloudMongo.js';
 import { getFolderOverview, initLocalFileSystem } from './localFileSystem.js';
 
@@ -72,6 +73,7 @@ app.use('/api/porter', porterRouter);
 app.use('/api/erp/webhook', webhookRouter);
 app.use('/api/cloud', cloudRouter);
 app.use('/api/tts', ttsRouter);
+app.use('/api/autogram', instagramAutomationRouter);
 
 // Razorpay Standard Web Checkout routes: /api/create-order & /api/verify-payment
 app.use('/api', razorpayStandardRouter);

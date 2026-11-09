@@ -11,3 +11,4 @@ DineQR-Data/
 # Local Netlify folder
 .netlify
 .video_build/
+.autogram_video_build/
